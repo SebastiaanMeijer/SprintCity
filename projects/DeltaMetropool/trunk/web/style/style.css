@@ -3,15 +3,11 @@ html, body {
 }
 
 a {
-	display: block;
-	width: 160px;
 	color: black;
 	text-decoration: none;	
 }
 
 a:hover {
-	display: block;
-	width: 160px;
 	color: black;
 	background-color: #cccccc;
 }
@@ -27,10 +23,20 @@ textarea {
 table{
 	border: 1px solid #bbbbbb;
 	border-collapse: collapse;
+	margin: 10px;
 }
 
 th, td {
 	border-style: none;
+}
+
+th {
+	background-color: #c7c7c7;
+}
+
+div.menu-body a {
+	display: block;
+	width: 160px;
 }
 
 div#hd {
@@ -114,4 +120,34 @@ div.area h2 {
 	margin: 0 0 0 -5px;
 	font-size: 11pt;
 	color: #777777;
+}
+
+table.data td {
+	border-left: 1px solid #bbbbbb;
+}
+
+tr.even {
+	background-color: #e0e0e0;
+}
+
+ul.pager {
+	border: 1px solid #bbbbbb;
+	padding: 5px;
+	margin-left: 9px;
+	margin-right: 10px;
+}
+
+ul.pager li {
+	display: inline;
+	list-style-type: none;
+	padding-right: 20px;
+}
+
+ul.pager li.selected {
+	font-weight: bold;
+	text-decoration: underline overline;
+}
+
+ul.pager li.disabled {
+	color: #bbbbbb;
 }
