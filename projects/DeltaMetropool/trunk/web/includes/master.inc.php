@@ -7,6 +7,7 @@
 
     // Global include files
     require DOC_ROOT . '/includes/functions.inc.php'; // __autoload() is contained in this file
+    require DOC_ROOT . '/includes/myfunctions.inc.php';
     require DOC_ROOT . '/includes/class.dbobject.php';
     require DOC_ROOT . '/includes/class.objects.php';
 

@@ -1,4 +1,6 @@
 <?php
+require_once './includes/master.inc.php';
+
 // TODO: Add admin check
 ?>
 
@@ -22,32 +24,33 @@
 		<div id="yui-main">
 			<div class="yui-b">
 				<?php
-					if ($_GET['page'] && 
-						file_exists('pages/' . $_GET['page'] . '.php')) 
-						include('pages/' . $_GET['page'] . '.php');
+					if (isset($_GET['view']) && 
+						file_exists('pages/' . $_GET['view'] . '.php')) 
+						include('pages/' . $_GET['view'] . '.php');
 					else 
 						include('pages/start.php');
 				?>
+				
 			</div>
 		</div>
 		<div class="yui-b">
-			<div class="menu-body">
 			<div class="menu-header">Spel</div>
+			<div class="menu-body">
 				<ul>
-					<li><a href="admin.php?page=new_game">Nieuw Spel</a></li>
-					<li><a href="admin.php?page=games">Spellen</a></li>
-					<li><a href="admin.php?page=teams">Teams</a></li>
+					<li><a href="admin.php?view=new_game">Nieuw Spel</a></li>
+					<li><a href="admin.php?view=games">Spellen</a></li>
+					<li><a href="admin.php?view=teams">Teams</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>
 			<div class="menu-header">Data</div>
 			<div class="menu-body">
 				<ul>
-					<li><a href="admin.php?page=stations">Stationen</a></li>
-					<li><a href="admin.php?page=rounds">Ronden</a></li>
-					<li><a href="admin.php?page=station_types">Stationstypen</a></li>
-					<li><a href="admin.php?page=build_options">Bouw opties</a></li>
-					<li><a href="admin.php?page=constants">Constante gegevens</a></li>
+					<li><a href="admin.php?view=stations">Stations</a></li>
+					<li><a href="admin.php?view=rounds">Ronden</a></li>
+					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
+					<li><a href="admin.php?view=build_options">Bouw opties</a></li>
+					<li><a href="admin.php?view=constants">Constante gegevens</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>
