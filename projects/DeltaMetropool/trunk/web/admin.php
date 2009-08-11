@@ -50,7 +50,7 @@ require_once './includes/master.inc.php';
 					<li><a href="admin.php?view=rounds">Ronden</a></li>
 					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
 					<li><a href="admin.php?view=build_options">Bouw opties</a></li>
-					<li><a href="admin.php?view=constants">Constante gegevens</a></li>
+					<li><a href="admin.php?view=constants">Constanten</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>
