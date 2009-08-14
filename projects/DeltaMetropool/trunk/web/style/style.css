@@ -20,6 +20,10 @@ textarea {
 	border: 1px solid #a7a7a7;
 }
 
+select {
+	border: 1px solid #a7a7a7;
+}
+
 table{
 	border: 1px solid #bbbbbb;
 	border-collapse: collapse;
@@ -51,7 +55,7 @@ div#ft {
 	width: 974px;
 	height: 66px;
 	background-color: #c6c6c6;
-}l
+}
 
 div.credits {
 	float: right;
