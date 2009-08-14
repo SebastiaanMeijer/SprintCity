@@ -25,7 +25,6 @@ select {
 }
 
 table{
-	border: 1px solid #bbbbbb;
 	border-collapse: collapse;
 	margin: 10px;
 }
@@ -112,7 +111,7 @@ div.area {
 	display: block;
 	width: 770px;
 	border: 1px solid #a7a7a7;
-	margin: 0 0 10px 0;
+	margin: 10px 0 10px 0;
 	padding: 0 0 5px 5px;
 }
 
@@ -124,6 +123,10 @@ div.area h2 {
 	margin: 0 0 0 -5px;
 	font-size: 11pt;
 	color: #777777;
+}
+
+table.data {
+	border: 1px solid #bbbbbb;
 }
 
 table.data td {

@@ -17,7 +17,6 @@
 	$row = $db->getRow();
 ?>
 
-<h2>Constanten</h2>
 <div class="area">
 	<h2>Constante waarden</h2>
 	<form action="pages/submit_form.php" method="POST">

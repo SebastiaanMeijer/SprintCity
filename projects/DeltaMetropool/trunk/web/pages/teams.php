@@ -8,7 +8,6 @@ function getPage()
 // TODO: Add admin check
 ?>
 
-<h2>Teams</h2>
 <div class="area">
 	<h2>Nieuw team</h2>
 	<form action="pages/submit_form.php" method="POST">

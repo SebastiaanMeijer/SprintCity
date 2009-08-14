@@ -20,16 +20,18 @@ switch( $_REQUEST['Action'] )
 function NewGame()
 {
 	$db = Database::getDatabase();
+	$firstRoundId = RoundInfo::GetRoundId(0);
 	
 	$query = "
 		INSERT INTO `Game` 
-			(`name` , `notes` , `starttime`)
+			(`name` , `notes` , `starttime`, `current_round_id`)
 		VALUES 
-			(:name, :notes, :starttime);";
+			(:name, :notes, :starttime, :firstround);";
 	$args = array(
 		'name' => $_REQUEST['name'], 
 		'notes' => $_REQUEST['notes'], 
-		'starttime' => date( 'Y-m-d H:i:s'));
+		'starttime' => date( 'Y-m-d H:i:s'), 
+		'firstround' => $firstRoundId);
 	$db->query($query, $args);
 	
 	$game_id = mysql_insert_id($db->db);
@@ -48,6 +50,18 @@ function NewGame()
 				'station_id' => $station_key, 
 				'team_id' => $_REQUEST['team_' . $station_key], 
 				'game_id' => $game_id);
+			$db->query($query, $args);
+			
+			$station_instance_id = mysql_insert_id($db->db);
+			
+			$query = "
+				INSERT INTO `RoundInstance` 
+					(`round_id` , `starttime`)
+				VALUES 
+					(:round_id, :starttime);";
+			$args = array(
+				'round_id' => $firstRoundId, 
+				'starttime' =>date( 'Y-m-d H:i:s'));
 			$db->query($query, $args);
 		}
 	}
