@@ -8,9 +8,8 @@ require_once './includes/master.inc.php';
 	$stations = Station::getStations(0, Station::rowCount());
 ?>
 
-<h2>Nieuw Spel</h2>
 <div class="area">
-	<h2>Spel gegevens</h2>
+	<h2>Nieuw Spel</h2>
 	<form action="pages/submit_form.php" method="POST">
 		<table>
 			<tr>
