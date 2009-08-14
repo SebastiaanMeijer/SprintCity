@@ -31,7 +31,7 @@ function getPage()
 	{
 		$round_info = new RoundInfo($value->current_round_id);
 		$total_programs = StationInstance::rowCountByGame($key);
-		$committed_programs = RoundInstance::getCommittedRounds($value->current_round_id);
+		$committed_programs = RoundInstance::getCommittedRounds($key, $value->current_round_id);
 ?>
 		<tr class="<?php echo $class; ?>">
 			<td><?php echo $key; ?></td>
@@ -40,7 +40,7 @@ function getPage()
 			<td><?php echo $value->starttime; ?></td>
 			<td><?php echo $round_info->name; ?></td>
 			<td><?php echo $committed_programs . "/" . $total_programs; ?></td>
-			<td><input type="button" name="unknown" value="Volgende ronde"></td>
+			<td><input type="button" name="unknown" value="<&middot;&middot;">&#32;<input type="button" name="unknown" value="&middot;&middot;>"></td>
 		</tr>
 <?php
 	}

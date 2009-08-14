@@ -68,9 +68,24 @@
 		
 		public static function getGames($fromIndex, $numberOfRecords)
 		{
-			return DBObject::glob("Game", "SELECT * FROM  `game` ORDER BY `starttime` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+			return DBObject::glob("Game", "SELECT * FROM `game` ORDER BY `starttime` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
 		}
 	}
+	
+	class Round extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Round', 
+				array('station_id', 'round_info_id', 'description', 'new_transform_area', 'network_value', 'POVN', 'PWN'), $id);
+		}
+		
+		public static function getRoundsByStation($station_id)
+		{
+			return DBObject::glob("Round", "SELECT * FROM `round` WHERE station_id = " . $station_id);
+		}
+	}
+	
 	
 	class RoundInfo extends DBObject
 	{
@@ -115,19 +130,20 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInstance', array('round_id', 'program_id', 'starttime'), $id);
+			parent::__construct('RoundInstance', array('round_id', 'station_instance_id', 'program_id', 'starttime'), $id);
 		}
 		
-		public static function getCommittedRounds($round_id)
+		public static function getCommittedRounds($game_id, $round_id)
 		{
 			$db = Database::getDatabase();
 			return $db->getValue("
 				SELECT count(*)
-				FROM Round
+				FROM StationInstance
 				INNER JOIN RoundInstance
-				ON Round.id=RoundInstance.round_id
-				WHERE Round.round_info_id = " . $round_id . "
-				AND RoundInstance.program_id IS NOT NULL");
+				ON StationInstance.id=RoundInstance.station_instance_id
+				WHERE StationInstance.game_id=" . $game_id . "
+				AND RoundInstance.round_id=" . $round_id . "
+				AND program_id IS NOT NULL");
 		}
 	}
 
