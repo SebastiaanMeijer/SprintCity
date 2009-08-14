@@ -54,15 +54,20 @@ function NewGame()
 			
 			$station_instance_id = mysql_insert_id($db->db);
 			
-			$query = "
-				INSERT INTO `RoundInstance` 
-					(`round_id` , `starttime`)
-				VALUES 
-					(:round_id, :starttime);";
-			$args = array(
-				'round_id' => $firstRoundId, 
-				'starttime' =>date( 'Y-m-d H:i:s'));
-			$db->query($query, $args);
+			$rounds = Round::getRoundsByStation($station_key);
+			foreach($rounds as $round_key => $round_value)
+			{
+				$query = "
+					INSERT INTO `RoundInstance` 
+						(`round_id` , `station_instance_id`, `starttime`)
+					VALUES 
+						(:round_id, :station_instance_id, :starttime);";
+				$args = array(
+					'round_id' => $round_key, 
+					'station_instance_id' => $station_instance_id,
+					'starttime' => date( 'Y-m-d H:i:s'));
+				$db->query($query, $args);
+			}
 		}
 	}
 	header("Location: ../admin.php?view=games");
