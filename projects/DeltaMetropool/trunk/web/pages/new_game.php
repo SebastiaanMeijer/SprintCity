@@ -1,8 +1,8 @@
 <?php
-require_once './includes/master.inc.php';
-
-// TODO: Add admin check
-
+	require_once './includes/master.inc.php';
+	
+	if(!$Auth->loggedIn()) redirect('login.php');
+	
 	$class = new Loop('odd', 'even');
 	$teams = Team::getTeams(0, Team::rowCount());
 	$stations = Station::getStations(0, Station::rowCount());

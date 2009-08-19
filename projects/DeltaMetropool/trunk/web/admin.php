@@ -1,7 +1,7 @@
 <?php
-require_once './includes/master.inc.php';
+	require_once './includes/master.inc.php';
 
-// TODO: Add admin check
+	if(!$Auth->loggedIn()) redirect('login.php');
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -51,6 +51,13 @@ require_once './includes/master.inc.php';
 					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
 					<li><a href="admin.php?view=build_options">Bouw opties</a></li>
 					<li><a href="admin.php?view=constants">Constanten</a></li>
+				</ul>
+			</div>
+			<div class = "menu-footer"></div>
+			<div class="menu-header">Logout</div>
+			<div class="menu-body">
+				<ul>
+					<li><a href="logout.php">Logout</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>
