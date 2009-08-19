@@ -16,16 +16,18 @@ function getPage()
 	$objects = Game::getGames($pager->firstRecord, $pager->perPage);
 	printPager($pager, isset($_REQUEST['view']) ? $_REQUEST['view'] : "start");
 ?>
-	<table class="data">
-		<tr>
-			<th>ID</th>
-			<th>Naam</th>
-			<th>Opmerkingen</th>
-			<th>Start</th>
-			<th>Ronde</th>
-			<th>Programma's</th>
-			<th>Voortgang</th>
-		</tr>
+	<form action="pages/submit_form.php" method="POST">
+		<table class="data">
+			<tr>
+				<th>ID</th>
+				<th>Naam</th>
+				<th>Opmerkingen</th>
+				<th>Start</th>
+				<th>Ronde</th>
+				<th>Programma's</th>
+				<th>Actief</th>
+				<th>Voortgang</th>
+			</tr>
 <?php	
 	foreach ($objects as $key => $value) 
 	{
@@ -33,19 +35,34 @@ function getPage()
 		$total_programs = StationInstance::rowCountByGame($key);
 		$committed_programs = RoundInstance::getCommittedRounds($key, $value->current_round_id);
 ?>
-		<tr class="<?php echo $class; ?>">
-			<td><?php echo $key; ?></td>
-			<td><?php echo $value->name; ?></td>
-			<td><?php echo $value->notes; ?></td>
-			<td><?php echo $value->starttime; ?></td>
-			<td><?php echo $round_info->name; ?></td>
-			<td><?php echo $committed_programs . "/" . $total_programs; ?></td>
-			<td><input type="button" name="unknown" value="<&middot;&middot;">&#32;<input type="button" name="unknown" value="&middot;&middot;>"></td>
-		</tr>
+			<tr class="<?php echo $class; ?>">
+				<td><?php echo $key; ?></td>
+				<td><?php echo $value->name; ?></td>
+				<td><?php echo $value->notes; ?></td>
+				<td><?php echo $value->starttime; ?></td>
+				<td><?php echo $round_info->name; ?></td>
+				<td><?php echo $committed_programs . "/" . $total_programs; ?></td>
+				<td>
+					<button type="submit" name="Action" value="game_toggle_active,<?php echo $key . '"';?>><?php echo $value->active == 1 ? '&#215;' : '&#160;&#160;'; ?></button>
+				</td>
+				<td>
+<?php
+		if ($value->active == 1)
+		{
+?>
+					<button type="submit" name="Action" value="game_step_back,<?php echo $key; ?>">&lt;&middot;&middot;</button>
+					&#32;
+					<button type="submit" name="Action" value="game_step_next,<?php echo $key; ?>">&middot;&middot;&gt;</button>
+<?php
+		}
+?>
+				</td>
+			</tr>
 <?php
 	}
 ?>
-	</table>
+		</table>
+	</form>
 <?php
 	printPager($pager, isset($_REQUEST['view']) ? $_REQUEST['view'] : "start");
 ?>
