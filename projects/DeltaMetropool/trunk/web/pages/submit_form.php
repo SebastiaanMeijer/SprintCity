@@ -1,7 +1,8 @@
 <?php
 require_once '../includes/master.inc.php';
 
-// TODO: Add admin check
+if(!$Auth->loggedIn()) redirect('login.php');
+
 
 $action = isset($_REQUEST['Action']) ? $_REQUEST['Action'] : "";
 $vars = split(",", $action);

@@ -26,6 +26,18 @@
 		{
 			return DBObject::glob("Team", "SELECT * FROM  `team` ORDER BY `created` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
 		}
+		
+		public static function getTeamsInGame($gameId)
+		{
+			return DBObject::glob("Team", "
+				SELECT Team.id, Team.name, Team.description, Team.cpu, Team.created
+				FROM Team
+				INNER JOIN StationInstance
+				ON StationInstance.team_id=Team.id
+				INNER JOIN Game
+				ON StationInstance.game_id=Game.id
+				WHERE StationInstance.game_id=" . $gameId . ";");
+		}
 	}
 	
 	class Station extends DBObject
@@ -57,7 +69,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Game', array('name', 'notes', 'starttime', 'current_round_id', 'active'), $id);
+			parent::__construct('Game', array('id', 'name', 'notes', 'starttime', 'current_round_id', 'active'), $id);
 		}
 		
 		public static function rowCount()

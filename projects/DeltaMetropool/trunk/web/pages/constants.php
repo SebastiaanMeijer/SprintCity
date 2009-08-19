@@ -1,8 +1,8 @@
 <?php
 	require_once './includes/master.inc.php';
 
-	// TODO: Add admin check
-
+	if(!$Auth->loggedIn()) redirect('login.php');
+	
 	$db = Database::getDatabase();	
 	$query = "
 		SELECT * 

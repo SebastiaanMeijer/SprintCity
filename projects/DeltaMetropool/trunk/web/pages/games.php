@@ -1,11 +1,12 @@
 <?php
-require_once './includes/master.inc.php';
-
-function getPage()
-{
-	return isset($_GET['page']) ? $_GET['page'] : 1;
-}
-// TODO: Add admin check
+	require_once './includes/master.inc.php';
+	
+	if(!$Auth->loggedIn()) redirect('login.php');
+	
+	function getPage()
+	{
+		return isset($_GET['page']) ? $_GET['page'] : 1;
+	}
 ?>
 
 <div class="area">
