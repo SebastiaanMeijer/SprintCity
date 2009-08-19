@@ -57,7 +57,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Game', array('name', 'notes', 'starttime', 'current_round_id'), $id);
+			parent::__construct('Game', array('name', 'notes', 'starttime', 'current_round_id', 'active'), $id);
 		}
 		
 		public static function rowCount()
@@ -68,7 +68,12 @@
 		
 		public static function getGames($fromIndex, $numberOfRecords)
 		{
-			return DBObject::glob("Game", "SELECT * FROM `game` ORDER BY `starttime` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+			return DBObject::glob("Game", "SELECT * FROM `game` ORDER BY `active` DESC, `starttime` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+		}
+		
+		public static function getActiveGames()
+		{
+			return DBObject::glob("Game", "SELECT * FROM `game` WHERE `active` = 1 ORDER BY `name` ASC;");
 		}
 	}
 	

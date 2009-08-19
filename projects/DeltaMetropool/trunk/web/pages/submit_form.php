@@ -3,16 +3,34 @@ require_once '../includes/master.inc.php';
 
 // TODO: Add admin check
 
-switch( $_REQUEST['Action'] )
+$action = isset($_REQUEST['Action']) ? $_REQUEST['Action'] : "";
+$vars = split(",", $action);
+
+switch( $vars[0] )
 {
 	case "new_game":
 		NewGame();
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
 		break;
 	case "new_team":
 		NewTeam();
+		header("Location: ../admin.php?view=teams&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		break;
+	case "game_step_back":
+		BackStepGame($vars);
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		break;
+	case "game_step_next":
+		NextStepGame($vars);
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		break;
+	case "game_toggle_active":
+		ToggleGame($vars);
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
 		break;
 	case "edit_constants":
 		EditConstants();
+		header("Location: ../admin.php?view=constants");
 		break;
 	default:
 }
@@ -24,14 +42,15 @@ function NewGame()
 	
 	$query = "
 		INSERT INTO `Game` 
-			(`name` , `notes` , `starttime`, `current_round_id`)
+			(`name` , `notes` , `starttime`, `current_round_id`, `active`)
 		VALUES 
-			(:name, :notes, :starttime, :firstround);";
+			(:name, :notes, :starttime, :firstround, :active);";
 	$args = array(
 		'name' => $_REQUEST['name'], 
 		'notes' => $_REQUEST['notes'], 
 		'starttime' => date( 'Y-m-d H:i:s'), 
-		'firstround' => $firstRoundId);
+		'firstround' => $firstRoundId,
+		'active' => 1);
 	$db->query($query, $args);
 	
 	$game_id = mysql_insert_id($db->db);
@@ -70,12 +89,83 @@ function NewGame()
 			}
 		}
 	}
-	header("Location: ../admin.php?view=games");
+}
+
+function BackStepGame($vars)
+{
+	$db = Database::getDatabase();
+	$rounds = RoundInfo::GetRounds();
+	$game = new Game($vars[1]);
+	
+	$temp_key = -1;
+	foreach ($rounds as $key => $value)
+	{
+		if ($game->current_round_id == $key)
+			break;
+		$temp_key = $key;
+	}
+	if ($temp_key > -1)
+	{
+		$query = "
+			UPDATE `game` 
+			SET `current_round_id` = :round_id
+			WHERE `id` = :game_id;";
+		$args = array(
+			'round_id' => $temp_key, 
+			'game_id' => $game->id);
+		$db->query($query, $args);
+	}
+}
+
+function NextStepGame($vars)
+{
+	$db = Database::getDatabase();
+	$rounds = RoundInfo::GetRounds();
+	$game = new Game($vars[1]);
+
+	$temp_key = -1;
+	foreach ($rounds as $key => $value)
+	{
+		// dirty code starts here
+		if ($temp_key > -1)
+		{
+			$temp_key = $key;
+			break;
+		}
+		if ($game->current_round_id == $key)
+			$temp_key = $key;
+	}
+	if ($temp_key > -1)
+	{
+		$query = "
+			UPDATE `game` 
+			SET `current_round_id` = :round_id
+			WHERE `id` = :game_id;";
+		$args = array(
+			'round_id' => $temp_key, 
+			'game_id' => $game->id);
+		$db->query($query, $args);
+	}
+}
+
+function ToggleGame($vars)
+{
+	$db = Database::getDatabase();
+	$game = new Game($vars[1]);
+	
+	$query = "
+		UPDATE `game` 
+		SET `active` = :active
+		WHERE `id` = :game_id;";
+	$args = array(
+		'active' => !$game->active, 
+		'game_id' => $game->id);
+	$db->query($query, $args);
 }
 
 function NewTeam()
 {
-	$db = Database::getDatabase();	
+	$db = Database::getDatabase();
 	
 	$query = "
 		INSERT INTO `team` 
@@ -88,8 +178,6 @@ function NewTeam()
 		'cpu' => isset($_REQUEST['cpu']),
 		'created' => date( 'Y-m-d H:i:s'));
 	$db->query($query, $args);
-	
-	header("Location: ../admin.php?view=teams&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
 }
 
 function EditConstants()
@@ -105,7 +193,5 @@ function EditConstants()
 		'average_citizens_per_home' => $_REQUEST['average_citizens_per_home'], 
 		'average_workers_per_bvo' => $_REQUEST['average_workers_per_bvo']);
 	$db->query($query, $args);
-	
-	header("Location: ../admin.php?view=constants");
 }
 ?>
