@@ -18,6 +18,11 @@ if(isset($_REQUEST['Action']))
 <body>
 	<div class="login">
 		<h2>Login</h2>
+<?php
+	$games = Game::getActiveGames();
+	if ($games != null)
+	{
+?>
 		<form action="index.php" method="POST">
 		<table>
 			<tr>
@@ -25,16 +30,15 @@ if(isset($_REQUEST['Action']))
 				<td>
 					<select name="game" onChange="this.form.submit()">
 <?php
-	$games = Game::getActiveGames();
-	$keys = array_keys($games);
-	$selected_game = isset($_REQUEST['game']) ? $_REQUEST['game'] : $games[$keys[0]]->id;
-	foreach ($games as $key => $value)
-	{
-		if ($key == $selected_game)
-			echo "\t\t\t\t\t\t" . '<option value="' . $key . '" SELECTED>' . $value->name . '</option>' . "\n";
-		else
-			echo "\t\t\t\t\t\t" . '<option value="' . $key . '">' . $value->name . '</option>' . "\n";
-	}
+		$keys = array_keys($games);
+		$selected_game = isset($_REQUEST['game']) ? $_REQUEST['game'] : $games[$keys[0]]->id;
+		foreach ($games as $key => $value)
+		{
+			if ($key == $selected_game)
+				echo "\t\t\t\t\t\t" . '<option value="' . $key . '" SELECTED>' . $value->name . '</option>' . "\n";
+			else
+				echo "\t\t\t\t\t\t" . '<option value="' . $key . '">' . $value->name . '</option>' . "\n";
+		}
 ?>
 					</select>
 				</td>
@@ -43,14 +47,14 @@ if(isset($_REQUEST['Action']))
 				<td>Team</td>
 				<td>
 <?php
-	$teams = Team::getTeamsInGame($selected_game);
-	echo "\t\t\t\t\t" . '<select name="team">' . "\n";
-	foreach ($teams as $key => $value)
-	{
-		if ($value->cpu == 0)
-			echo "\t\t\t\t\t\t" . '<option value="' . $key . '">' . $value->name . '</option>' . "\n";
-	}
-	echo "\t\t\t\t\t" . '</select>' . "\n";
+		$teams = Team::getTeamsInGame($selected_game);
+		echo "\t\t\t\t\t" . '<select name="team">' . "\n";
+		foreach ($teams as $key => $value)
+		{
+			if ($value->cpu == 0)
+				echo "\t\t\t\t\t\t" . '<option value="' . $key . '">' . $value->name . '</option>' . "\n";
+		}
+		echo "\t\t\t\t\t" . '</select>' . "\n";
 ?>
 				</td>
 			</tr>
@@ -59,6 +63,13 @@ if(isset($_REQUEST['Action']))
 			</tr>
 		</table>
 		</form>
+<?php
+	}
+	else
+	{
+		echo 'Er zijn geen games actief.';
+	}
+?>
 		<a href="admin.php" style="display:block; margin:0 0 5px 5px; width: 95%; text-align: right;">admin</a>
 	</div>
 </body>

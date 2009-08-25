@@ -41,9 +41,10 @@ function NewGame()
 	$db = Database::getDatabase();
 	$firstRoundId = RoundInfo::GetRoundId(0);
 	
+	// add new game record to the Game table
 	$query = "
 		INSERT INTO `Game` 
-			(`name` , `notes` , `starttime`, `current_round_id`, `active`)
+			(`name`, `notes`, `starttime`, `current_round_id`, `active`)
 		VALUES 
 			(:name, :notes, :starttime, :firstround, :active);";
 	$args = array(
@@ -54,40 +55,49 @@ function NewGame()
 		'active' => 1);
 	$db->query($query, $args);
 	
+	// create a game tree containing the team_instances which in turn contain the staion_instances
 	$game_id = mysql_insert_id($db->db);
 	$stations = Station::getStations(0, Station::rowCount());
+	$game_tree = Array();
 	foreach ($stations as $station_key => $station_value) 
 	{
 		if (isset($_REQUEST['team_' . $station_key]) &&
 			$_REQUEST['team_'. $station_key] != "null")
 		{
+			$game_tree[$_REQUEST['team_'. $station_key]][] = $station_key;
+		}
+	}
+	
+	// save gaurd for empty input
+	if (sizeof($game_tree) <= 0)
+		return;
+		
+	// insert the game tree in the database
+	foreach($game_tree as $team_id => $station_collection)
+	{
+		$query = "
+			INSERT INTO `TeamInstance` 
+				(`game_id`, `team_id`) 
+			VALUES
+				(:game_id, :team_id);";
+		$args = array(
+			'game_id' => $game_id,
+			'team_id' => $team_id);
+		$db->query($query, $args);
+		
+		$team_instance_id = mysql_insert_id($db->db);
+		
+		foreach ($station_collection as $station_id)
+		{
 			$query = "
 				INSERT INTO `StationInstance` 
-					(`station_id` , `team_id` , `game_id`)
+					(`station_id`, `team_instance_id`) 
 				VALUES 
-					(:station_id, :team_id, :game_id);";
+					(:station_id, :team_instance_id);";
 			$args = array(
-				'station_id' => $station_key, 
-				'team_id' => $_REQUEST['team_' . $station_key], 
-				'game_id' => $game_id);
+				'station_id' => $station_id,
+				'team_instance_id' => $team_instance_id);
 			$db->query($query, $args);
-			
-			$station_instance_id = mysql_insert_id($db->db);
-			
-			$rounds = Round::getRoundsByStation($station_key);
-			foreach($rounds as $round_key => $round_value)
-			{
-				$query = "
-					INSERT INTO `RoundInstance` 
-						(`round_id` , `station_instance_id`, `starttime`)
-					VALUES 
-						(:round_id, :station_instance_id, :starttime);";
-				$args = array(
-					'round_id' => $round_key, 
-					'station_instance_id' => $station_instance_id,
-					'starttime' => date( 'Y-m-d H:i:s'));
-				$db->query($query, $args);
-			}
 		}
 	}
 }
