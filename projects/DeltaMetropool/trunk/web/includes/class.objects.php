@@ -5,7 +5,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('users', array('username', 'password', 'level', 'email'), $id);
+			parent::__construct('users', array('id', 'username', 'password', 'level', 'email'), $id);
 		}
 	}
 	
@@ -13,7 +13,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Team', array('name', 'description', 'cpu', 'created'), $id);
+			parent::__construct('Team', array('id', 'name', 'description', 'cpu', 'created'), $id);
 		}
 		
 		public static function rowCount()
@@ -32,11 +32,9 @@
 			return DBObject::glob("Team", "
 				SELECT Team.id, Team.name, Team.description, Team.cpu, Team.created
 				FROM Team
-				INNER JOIN StationInstance
-				ON StationInstance.team_id=Team.id
-				INNER JOIN Game
-				ON StationInstance.game_id=Game.id
-				WHERE StationInstance.game_id=" . $gameId . ";");
+				INNER JOIN TeamInstance
+				ON TeamInstance.team_id=Team.id
+				WHERE TeamInstance.game_id=" . $gameId . ";");
 		}
 	}
 	
@@ -45,11 +43,11 @@
 		public function __construct($id = null)
 		{
 			parent::__construct('Station', array(
-				'code', 'name', 'description', 'image', 'town', 'region', 
+				'id', 'code', 'name', 'description', 'image', 'town', 'region', 
 				'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
-				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform', 'network_value'), 
+				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform'), 
 				$id);
 		}
 		
@@ -94,7 +92,7 @@
 		public function __construct($id = null)
 		{
 			parent::__construct('Round', 
-				array('station_id', 'round_info_id', 'description', 'new_transform_area', 'network_value', 'POVN', 'PWN'), $id);
+				array('id', 'station_id', 'round_info_id', 'description', 'new_transform_area', 'POVN', 'PWN'), $id);
 		}
 		
 		public static function getRoundsByStation($station_id)
@@ -108,7 +106,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInfo', array('number', 'name'), $id);
+			parent::__construct('RoundInfo', array('id', 'number', 'name'), $id);
 		}
 		
 		public static function rowCount()
@@ -133,13 +131,18 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('StationInstance', array('station_id', 'team_id', 'game_id'), $id);
+			parent::__construct('StationInstance', array('id', 'station_id', 'team_instance_id'), $id);
 		}
 		
 		public static function rowCountByGame($game_id)
 		{
 			$db = Database::getDatabase();
-			return $db->getValue("SELECT COUNT(*) FROM stationinstance WHERE game_id = " . $game_id);
+			return $db->getValue("
+				SELECT COUNT(*) 
+				FROM StationInstance
+				INNER JOIN TeamInstance
+				ON TeamInstance.id=StationInstance.team_instance_id
+				WHERE TeamInstance.game_id = " . $game_id);
 		}
 	}
 	
@@ -147,7 +150,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInstance', array('round_id', 'station_instance_id', 'program_id', 'starttime'), $id);
+			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'program_id', 'starttime'), $id);
 		}
 		
 		public static function getCommittedRounds($game_id, $round_id)
@@ -155,10 +158,12 @@
 			$db = Database::getDatabase();
 			return $db->getValue("
 				SELECT count(*)
-				FROM StationInstance
-				INNER JOIN RoundInstance
+				FROM RoundInstance
+				INNER JOIN StationInstance
 				ON StationInstance.id=RoundInstance.station_instance_id
-				WHERE StationInstance.game_id=" . $game_id . "
+				INNER JOIN TeamInstance
+				ON TeamInstance.id=StationInstance.team_instance_id
+				WHERE TeamInstance.game_id=" . $game_id . "
 				AND RoundInstance.round_id=" . $round_id . "
 				AND program_id IS NOT NULL");
 		}
