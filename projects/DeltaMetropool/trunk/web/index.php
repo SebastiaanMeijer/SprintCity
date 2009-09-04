@@ -1,8 +1,42 @@
 <?php
 require_once './includes/master.inc.php';
-if(isset($_REQUEST['Action']))
-	header("Location: ./game.htm");
 
+$db = Database::getDatabase();
+
+// if something needs to happen with the client session
+if (isset($_REQUEST['action']))
+{
+	// if the game is closed from the flash app
+	if ($_REQUEST['action'] == "close")
+	{
+		$query = "
+			DELETE FROM `ClientSession` 
+			WHERE `id`=:id;";
+		$args = array('id' => session_id());
+		$db->query($query, $args);
+	}
+	// if a game needs to be joined
+	else if ($_REQUEST['action'] == "join")
+	{
+		$team_instance_id = TeamInstance::getTeamInstanceIdByGameAndTeam($_REQUEST['game'], $_REQUEST['team']);
+		$query = "
+			INSERT IGNORE INTO `ClientSession` 
+				(`id`, `team_instance_id`, `created`) 
+			VALUES
+				(:id, :team_instance_id, :created);";
+		$args = array(
+			'id' => session_id(),
+			'team_instance_id' => $team_instance_id,
+			'created' => time());
+		$db->query($query, $args);
+	}
+}
+
+// if in a game, go to the game
+if (ClientSession::hasSession(session_id()))
+{
+	header('Location: ./game.php');
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -59,7 +93,7 @@ if(isset($_REQUEST['Action']))
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><button type="submit" name="Action" value="join_game">Start Spel</button></td>
+				<td colspan="2"><button type="submit" name="action" value="join">Start Spel</button></td>
 			</tr>
 		</table>
 		</form>
