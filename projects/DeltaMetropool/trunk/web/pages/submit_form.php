@@ -99,6 +99,22 @@ function NewGame()
 				'team_instance_id' => $team_instance_id);
 			$db->query($query, $args);
 		}
+		
+		$values = Value::getValues();
+		
+		foreach ($values as $value_key => $value_value) 
+		{
+			$query = "
+				INSERT INTO `ValueInstance` 
+					(`value_id`, `team_instance_id`, `checked`) 
+				VALUES 
+					(:value_id, :team_instance_id, :checked);";
+			$args = array(
+				'value_id' => $value_key,
+				'team_instance_id' => $team_instance_id,
+				'checked' => 0);
+			$db->query($query, $args);
+		}
 	}
 }
 
@@ -187,7 +203,7 @@ function NewTeam()
 		'name' => $_REQUEST['name'], 
 		'description' => $_REQUEST['description'], 
 		'cpu' => isset($_REQUEST['cpu']),
-		'created' => date( 'Y-m-d H:i:s'));
+		'created' => date('Y-m-d H:i:s'));
 	$db->query($query, $args);
 }
 

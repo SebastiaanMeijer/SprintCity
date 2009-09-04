@@ -9,6 +9,25 @@
 		}
 	}
 	
+	class ClientSession extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('ClientSession', array('id', 'team_instance_id', 'created'), $id);
+		}
+		
+		public static function hasSession($id)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+					SELECT COUNT(*) 
+					FROM ClientSession
+					WHERE id = :id;",
+					array('id' => $id));
+			return $db->getValue($result) > 0;
+		}
+	}
+	
 	class Team extends DBObject
 	{
 		public function __construct($id = null)
@@ -35,6 +54,27 @@
 				INNER JOIN TeamInstance
 				ON TeamInstance.team_id=Team.id
 				WHERE TeamInstance.game_id=" . $gameId . ";");
+		}
+	}
+	
+	class TeamInstance extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TeamInstance', array('id', 'game_id', 'team_id', 'value_description'), $id);
+		}
+		
+		public static function getTeamInstanceIdByGameAndTeam($gameId, $teamId)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+					SELECT `id` 
+					FROM `TeamInstance` 
+					WHERE game_id = :gameId 
+					AND team_id = :teamId 
+					LIMIT 0, 1",
+					array('gameId' => $gameId, 'teamId' => $teamId));
+			return $db->getValue($result);
 		}
 	}
 	
@@ -101,6 +141,18 @@
 		}
 	}
 	
+	class Value extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Value', array('id', 'title', 'description'), $id);
+		}
+		
+		public static function getValues()
+		{
+			return DBObject::glob("Value", "SELECT * FROM `value`");
+		}
+	}
 	
 	class RoundInfo extends DBObject
 	{
