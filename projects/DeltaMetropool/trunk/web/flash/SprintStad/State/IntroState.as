@@ -13,7 +13,7 @@
 		
 		private function onContinueEvent(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(11);
+			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
 		}
 		
 		/* INTERFACE SprintStad.State.IState */

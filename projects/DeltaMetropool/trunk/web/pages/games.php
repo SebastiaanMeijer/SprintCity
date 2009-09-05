@@ -44,7 +44,7 @@
 				<td><?php echo $round_info->name; ?></td>
 				<td><?php echo $committed_programs . "/" . $total_programs; ?></td>
 				<td>
-					<button type="submit" name="Action" value="game_toggle_active,<?php echo $key . '"';?>><?php echo $value->active == 1 ? '&#215;' : '&#160;&#160;'; ?></button>
+					<button type="submit" name="Action" value="game_toggle_active,<?php echo $key;?>"><?php echo $value->active == 1 ? '&#215;' : '&#160;&#160;'; ?></button>
 				</td>
 				<td>
 <?php
