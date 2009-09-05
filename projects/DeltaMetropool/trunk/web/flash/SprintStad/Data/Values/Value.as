@@ -36,7 +36,7 @@
 			
 			xmlString += "<value>";
 			xmlString += "<id>" + id + "</id>";
-			xmlString += "<checked>" + checked + "</checked>";
+			xmlString += "<checked>" + int(checked) + "</checked>";
 			xmlString += "</value>";
 			
 			return xmlString;

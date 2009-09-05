@@ -11,6 +11,10 @@
 		public static const STATE_VALUES:int = 1;
 		public static const STATE_STATION_INFO:int = 2;
 		
+		public static const FRAME_INTRO:int = 1;
+		public static const FRAME_VALUES:int = 11;
+		public static const FRAME_STATION_INFO:int = 21;
+		
 		private var currentState:IState = null;
 		private var states:Array = new Array();
 		

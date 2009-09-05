@@ -19,6 +19,14 @@
 			return values[index];
 		}
 		
+		public function GetValueById(id:int):Value
+		{
+			for each (var value:Value in values)
+				if (value.id == id)
+					return value;
+			return null;
+		}
+		
 		public function GetValueCount():int
 		{
 			return values.length;
