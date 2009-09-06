@@ -1,11 +1,13 @@
 ﻿package{
 	import flash.display.MovieClip;
+	import SprintStad.Data.Station.Stations;
 	import SprintStad.Data.Values.Values;
 	import SprintStad.State.*;
 	public class SprintStad extends MovieClip {
 		
 		public static const DOMAIN:String = "http://localhost/Sprintstad/";
 		public var session:String = "";
+		public static const LOADER:MovieClip = new LoadingScreen();
 		
 		public static const STATE_INTRO:int = 0;
 		public static const STATE_VALUES:int = 1;
@@ -20,6 +22,7 @@
 		
 		// data
 		private var values:Values = new Values();
+		private var stations:Stations = new Stations();
 		
 		public function SprintStad()
 		{
@@ -51,6 +54,11 @@
 		public function GetValues():Values
 		{
 			return values;
+		}
+		
+		public function GetStations():Stations
+		{
+			return stations;
 		}
 	}
 }
