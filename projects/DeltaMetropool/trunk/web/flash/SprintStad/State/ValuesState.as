@@ -17,8 +17,6 @@
 	{
 		private var parent:SprintStad = null;
 		
-		private var loader:MovieClip = new LoadingScreen();
-		
 		private static const CHECKBOX_HORIZONTAL_MARGIN:int = 10;
 		
 		public function ValuesState(parent:SprintStad) 
@@ -26,7 +24,7 @@
 			this.parent = parent;
 		}	
 		
-		private function xmlDownloaded(event:Event):void 
+		private function valuesLoaded(event:Event):void 
 		{
 			var xmlData:XML;
 			
@@ -39,10 +37,10 @@
 			drawUI();
 			
 			//remove loading screen
-			parent.removeChild(loader);
+			parent.removeChild(SprintStad.LOADER);
 		}
 		
-		private function parseXmlData(xmlData:XML)
+		private function parseXmlData(xmlData:XML):void
 		{
 			var valueList:XMLList = null;
 			var value:Value = new Value();
@@ -75,7 +73,7 @@
 			}
 		}
 		
-		private function drawUI()
+		private function drawUI():void
 		{
 			// set description field text
 			parent.values_movie.description_field.text = parent.GetValues().description;
@@ -138,15 +136,17 @@
 		
 		public function Activate():void
 		{
-			parent.addChild(loader);
+			parent.addChild(SprintStad.LOADER);
+			// prepare continue button
 			parent.values_movie.continue_button.addEventListener(MouseEvent.CLICK, onContinueEvent);
-			var urlLoader:URLLoader = new URLLoader();
+			// load data
+			var loader:URLLoader = new URLLoader();
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
 			var vars:URLVariables = new URLVariables();
 			vars.session = parent.session;
 			request.data = vars;
-			urlLoader.addEventListener(Event.COMPLETE, xmlDownloaded);
-			urlLoader.load(request);
+			loader.addEventListener(Event.COMPLETE, valuesLoaded);
+			loader.load(request);
 		}
 		
 		public function Deactivate():void
