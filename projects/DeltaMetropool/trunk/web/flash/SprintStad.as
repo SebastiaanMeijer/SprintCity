@@ -1,6 +1,7 @@
 ﻿package{
 	import flash.display.MovieClip;
 	import SprintStad.Data.Station.Stations;
+	import SprintStad.Data.StationTypes.StationTypes;
 	import SprintStad.Data.Values.Values;
 	import SprintStad.State.*;
 	public class SprintStad extends MovieClip {
@@ -23,6 +24,7 @@
 		// data
 		private var values:Values = new Values();
 		private var stations:Stations = new Stations();
+		private var stationTypes:StationTypes = new StationTypes();
 		
 		public function SprintStad()
 		{
@@ -59,6 +61,11 @@
 		public function GetStations():Stations
 		{
 			return stations;
+		}
+		
+		public function GetStationTypes():StationTypes
+		{
+			return stationTypes
 		}
 	}
 }

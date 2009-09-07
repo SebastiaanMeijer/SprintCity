@@ -7,6 +7,7 @@
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.StationTypes.StationType;
 	import SprintStad.State.IState;
 
 	public class StationInfoState implements IState
@@ -22,6 +23,8 @@
 		
 		private function stationsLoaded(event:Event):void 
 		{
+			trace(event.target.data);
+			trace("stuff");
 			var xmlData:XML = new XML(event.target.data);
 			parseStationData(xmlData);
 			drawUI();
@@ -63,7 +66,27 @@
 		
 		private function parseStationTypesData(xmlData:XML):void
 		{
+			var xmlList:XMLList = null;
+			var stationType:StationType = new StationType();
+			var xml:XML = null;
+			var firstTag:String = "";
 			
+			xmlList = xmlData.station.children();
+			for each (xml in xmlList) 
+			{
+				var tag:String = xml.name();
+				
+				if (xml.name() == firstTag)
+				{
+					parent.GetStationTypes().AddStationType(stationType);
+					stationType = new StationType();
+				}
+				
+				if (firstTag == "")
+					firstTag = xml.name();
+					
+				stationType[xml.name()] = xml;
+			}
 		}
 		
 		private function drawUI():void

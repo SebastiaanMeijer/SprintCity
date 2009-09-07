@@ -11,7 +11,9 @@
 	function printStations()
 	{
 		$station_fields = array(
-		'id', 'code', 'name', 'description', 'image', 'town', 'region', 
+		'id', 'code', 'name', 
+		'description_facts', 'description_background', 'description_future', 
+		'image', 'town', 'region', 
 		'POVN', 'PWN', 'IWD', 'MNG',
 		'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 
 		'area_undeveloped_urban', 'area_undeveloped_rural',
@@ -79,7 +81,7 @@
 	{
 		$db = Database::getDatabase();
 		$query = "
-			SELECT Round.*, RoundInfo.number, RoundInfo.name 
+			SELECT Round.id, Round.new_transform_area, Round.POVN, Round.PWN, RoundInfo.number, RoundInfo.name, RoundInfo.description
 			FROM Round 
 			INNER JOIN RoundInfo 
 			ON RoundInfo.id = Round.round_info_id 

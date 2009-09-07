@@ -83,7 +83,9 @@
 		public function __construct($id = null)
 		{
 			parent::__construct('Station', array(
-				'id', 'code', 'name', 'description', 'image', 'town', 'region', 
+				'id', 'code', 'name', 
+				'description_facts', 'description_background', 'description_future', 
+				'image', 'town', 'region', 
 				'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
@@ -158,7 +160,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInfo', array('id', 'number', 'name'), $id);
+			parent::__construct('RoundInfo', array('id', 'number', 'name', 'description'), $id);
 		}
 		
 		public static function rowCount()

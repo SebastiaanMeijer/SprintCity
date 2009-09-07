@@ -28,7 +28,7 @@
 		
 		public function GetStationTypeCount():int
 		{
-			return stationType.length;
+			return stationTypes.length;
 		}		
 	}
 }
