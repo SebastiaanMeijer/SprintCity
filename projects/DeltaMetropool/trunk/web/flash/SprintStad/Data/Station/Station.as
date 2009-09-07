@@ -7,7 +7,9 @@
 		public var id:int = 0;
 		public var code:String = "";
 		public var name:String = "";
-		public var description:String = "";
+		public var description_facts:String = "";
+		public var description_background:String = "";
+		public var description_future:String = "";
 		public var image:String = "";
 		public var town:String = "";
 		public var region:String = "";
