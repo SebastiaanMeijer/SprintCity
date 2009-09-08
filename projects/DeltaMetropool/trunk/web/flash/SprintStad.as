@@ -7,6 +7,8 @@
 	import SprintStad.State.*;
 	public class SprintStad extends MovieClip 
 	{
+		public static const WIDTH:int = 1024;
+		public static const HEIGHT:int = 768;
 		public static const DOMAIN:String = "/Sprintstad/";
 		public var session:String = "";
 		public static const LOADER:MovieClip = new LoadingScreen();
