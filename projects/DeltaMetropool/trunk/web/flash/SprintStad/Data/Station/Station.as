@@ -1,7 +1,14 @@
 ﻿package SprintStad.Data.Station 
 {
+	import flash.display.Loader;
+	import flash.display.MovieClip;
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.net.URLRequest;
 	import flash.utils.Proxy;
 	import SprintStad.Data.Round.Round;
+	import SprintStad.Debug.ErrorDisplay;
 	public class Station
 	{	
 		public var id:int = 0;
@@ -11,6 +18,7 @@
 		public var description_background:String = "";
 		public var description_future:String = "";
 		public var image:String = "";
+		public var imageData:Sprite = new Sprite();
 		public var town:String = "";
 		public var region:String = "";
 		public var POVN:Number = 0;
@@ -34,8 +42,34 @@
 		
 		private var rounds:Array = new Array();
 		
+		private var loader:Loader = null;
+		
 		public function Station() 
 		{			
+		}
+		
+		public function PostConstruct()
+		{
+			try
+			{
+				this.loader = new Loader();
+				this.loader.load(new URLRequest(image));
+				this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
+				this.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR , OnLoadError);
+			}
+			catch (e:Error)
+			{
+				ErrorDisplay.Get().DisplayError("error loading: " + image);
+			}
+ 		}
+		
+		public function OnLoadComplete(event:Event):void {
+			imageData.addChild(this.loader);
+		}
+
+		function OnLoadError(e:IOErrorEvent):void 
+		{
+			ErrorDisplay.Get().DisplayError("error loading: " + image);
 		}
 		
 		public function AddRound(round:Round):void

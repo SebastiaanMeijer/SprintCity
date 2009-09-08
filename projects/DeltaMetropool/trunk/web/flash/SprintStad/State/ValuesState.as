@@ -5,12 +5,14 @@
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import SprintStad.Data.Values.Value;
+	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
 	
 	public class ValuesState implements IState
@@ -132,6 +134,11 @@
 			parent.GetValues().description = parent.values_movie.description_field.text;
 		}
 		
+		function OnValuesLoadError(e:IOErrorEvent):void 
+		{
+			ErrorDisplay.Get().DisplayError("error loading: values; " + SprintStad.DOMAIN + "data/values.php");
+		}
+		
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void
@@ -139,14 +146,22 @@
 			parent.addChild(SprintStad.LOADER);
 			// prepare continue button
 			parent.values_movie.continue_button.addEventListener(MouseEvent.CLICK, onContinueEvent);
-			// load data
-			var loader:URLLoader = new URLLoader();
-			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
-			var vars:URLVariables = new URLVariables();
-			vars.session = parent.session;
-			request.data = vars;
-			loader.addEventListener(Event.COMPLETE, valuesLoaded);
+			try
+			{
+				// load data
+				var loader:URLLoader = new URLLoader();
+				var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
+				var vars:URLVariables = new URLVariables();
+				vars.session = parent.session;
+				request.data = vars;
+				loader.addEventListener(Event.COMPLETE, valuesLoaded);
+				loader.addEventListener(IOErrorEvent.IO_ERROR , OnValuesLoadError);
 			loader.load(request);
+			}
+			catch (e:Error)
+			{
+				ErrorDisplay.Get().DisplayError("error loading: values; " + SprintStad.DOMAIN + "data/values.php");
+			}
 		}
 		
 		public function Deactivate():void
