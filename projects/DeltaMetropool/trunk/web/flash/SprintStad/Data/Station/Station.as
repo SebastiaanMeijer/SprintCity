@@ -65,6 +65,8 @@
 		
 		public function OnLoadComplete(event:Event):void {
 			imageData.addChild(this.loader);
+			imageData.width = SprintStad.WIDTH;
+			imageData.height = SprintStad.HEIGHT;
 		}
 
 		function OnLoadError(e:IOErrorEvent):void 

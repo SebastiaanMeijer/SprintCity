@@ -11,6 +11,7 @@
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.StationTypes.StationType;
+	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
 
@@ -161,9 +162,20 @@
 		private function drawUI():void
 		{
 			//draw stuff
-			parent.station_info_movie.addChild(parent.GetStations().GetStation(0).imageData);
-			parent.station_info_movie.description_background_field.editable = false;
-			parent.station_info_movie.description_background_field.text = parent.GetStations().GetStation(0).description_background;
+			var view:MovieClip = parent.station_info_movie;
+			var station:Station = parent.GetStations().GetStation(0); 
+			view.name_field.text = station.name;
+			view.region_field.text = station.region;
+			view.town_field.text = station.town;
+			view.description_facts.editable = false;
+			view.description_facts.text = station.description_facts;
+			view.description_background.editable = false;
+			view.description_background.text = station.description_background;
+			view.description_future.editable = false;
+			view.description_future.text = station.description_future;
+			view.sheet.addChild(station.imageData);
+			
+			
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);
 		}
