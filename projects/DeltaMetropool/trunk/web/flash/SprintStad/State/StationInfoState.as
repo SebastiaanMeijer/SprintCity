@@ -1,42 +1,83 @@
 ﻿package SprintStad.State 
 {
+	import fl.controls.TextArea;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
+	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.StationTypes.StationType;
+	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
 
 	public class StationInfoState implements IState
 	{
 		private var parent:SprintStad = null;
 		
-		private var loaded:Boolean = false;
-		
 		public function StationInfoState(parent:SprintStad) 
 		{
 			this.parent = parent;
 		}
 		
+		private function loadStations()
+		{
+			try
+			{
+				// prepare loader vars
+				var vars:URLVariables = new URLVariables();
+				vars.session = parent.session;
+				// load station data
+				var stationLoader:URLLoader = new URLLoader();
+				var stationRequest:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/stations.php");
+				stationRequest.data = vars;
+				stationLoader.addEventListener(Event.COMPLETE, stationsLoaded);
+				stationLoader.addEventListener(IOErrorEvent.IO_ERROR , OnStationLoadError);
+				stationLoader.load(stationRequest);
+			}
+			catch (e:Error)
+			{
+				ErrorDisplay.Get().DisplayError("error loading: stations; " + SprintStad.DOMAIN + "data/stations.php");
+			}
+		}
+		
+		private function loadStationTypes()
+		{
+			try
+			{
+				// prepare loader vars
+				var vars:URLVariables = new URLVariables();
+				vars.session = parent.session;
+				// load station data
+				var typesLoader:URLLoader = new URLLoader();
+				var typesRequest:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/station_types.php");
+				typesRequest.data = vars;
+				typesLoader.addEventListener(Event.COMPLETE, stationTypesLoaded);
+				typesLoader.addEventListener(IOErrorEvent.IO_ERROR , OnStationTypesLoadError);
+				typesLoader.load(typesRequest);
+			}
+			catch (e:Error)
+			{
+				ErrorDisplay.Get().DisplayError("error loading: station types; " + SprintStad.DOMAIN + "data/station_types.php");
+			}
+		}
+		
 		private function stationsLoaded(event:Event):void 
 		{
-			trace(event.target.data);
-			trace("stuff");
 			var xmlData:XML = new XML(event.target.data);
 			parseStationData(xmlData);
-			drawUI();
-			loaded = true;
+			loadStationTypes();	
 		}
 		
 		private function stationTypesLoaded(event:Event):void 
 		{
 			var xmlData:XML = new XML(event.target.data);
 			parseStationTypesData(xmlData);
+			parent.GetStations().PostConstruct();
 			drawUI();
-			loaded = true;
 		}
 		
 		private function parseStationData(xmlData:XML):void
@@ -45,12 +86,12 @@
 			var station:Station = new Station();
 			var xml:XML = null;
 			var firstTag:String = "";
-			
+			parent.GetStations().AddStation(station);
+
 			xmlList = xmlData.station.children();
 			for each (xml in xmlList) 
 			{
 				var tag:String = xml.name();
-				
 				if (xml.name() == firstTag)
 				{
 					parent.GetStations().AddStation(station);
@@ -60,7 +101,34 @@
 				if (firstTag == "")
 					firstTag = xml.name();
 					
-				station[xml.name()] = xml;
+				if (xml.name() == "rounds")
+					parseRounds(xml.rounds.children(), station);
+				else
+					station[xml.name()] = xml;
+			}
+		}
+		
+		private function parseRounds(xmlList:XMLList, station:Station):void
+		{
+			var round:Round = new Round();
+			var xml:XML = null;
+			var firstTag:String = "";
+			station.AddRound(round);
+			
+			for each (xml in xmlList) 
+			{
+				var tag:String = xml.name();
+				
+				if (xml.name() == firstTag)
+				{
+					station.AddRound(round);
+					round = new Round();
+				}
+				
+				if (firstTag == "")
+					firstTag = xml.name();
+					
+				round[xml.name()] = xml;
 			}
 		}
 		
@@ -70,6 +138,7 @@
 			var stationType:StationType = new StationType();
 			var xml:XML = null;
 			var firstTag:String = "";
+			parent.GetStationTypes().AddStationType(stationType);
 			
 			xmlList = xmlData.station.children();
 			for each (xml in xmlList) 
@@ -91,12 +160,22 @@
 		
 		private function drawUI():void
 		{
-			if (loaded)
-			{
-				//draw stuff				
-				//remove loading screen
-				parent.removeChild(SprintStad.LOADER);
-			}		
+			//draw stuff
+			parent.station_info_movie.addChild(parent.GetStations().GetStation(0).imageData);
+			parent.station_info_movie.description_background_field.editable = false;
+			parent.station_info_movie.description_background_field.text = parent.GetStations().GetStation(0).description_background;
+			//remove loading screen
+			parent.removeChild(SprintStad.LOADER);
+		}
+		
+		function OnStationLoadError(e:IOErrorEvent):void 
+		{
+			ErrorDisplay.Get().DisplayError("error loading: stations; " + SprintStad.DOMAIN + "data/stations.php");
+		}
+		
+		function OnStationTypesLoadError(e:IOErrorEvent):void 
+		{
+			ErrorDisplay.Get().DisplayError("error loading: station types; " + SprintStad.DOMAIN + "data/station_types.php");
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
@@ -104,21 +183,7 @@
 		public function Activate():void
 		{
 			parent.addChild(SprintStad.LOADER);
-			// prepare loader vars
-			var vars:URLVariables = new URLVariables();
-			vars.session = parent.session;
-			// load station data
-			var stationLoader:URLLoader = new URLLoader();
-			var stationRequest:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/stations.php");
-			stationRequest.data = vars;
-			stationLoader.addEventListener(Event.COMPLETE, stationsLoaded);
-			stationLoader.load(stationRequest);
-			// load station data
-			var typesLoader:URLLoader = new URLLoader();
-			var typesRequest:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/station_types.php");
-			typesRequest.data = vars;
-			typesLoader.addEventListener(Event.COMPLETE, stationTypesLoaded);
-			typesLoader.load(typesRequest);
+			loadStations();
 		}
 		
 		public function Deactivate():void

@@ -7,7 +7,15 @@
 		public function Stations() 
 		{
 			
-		}	
+		}
+		
+		public function PostConstruct():void
+		{
+			for each (var station:Station in stations)
+			{
+				station.PostConstruct();
+			}
+		}
 		
 		public function AddStation(station:Station):void
 		{

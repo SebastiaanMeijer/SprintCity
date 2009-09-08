@@ -3,10 +3,11 @@
 	import SprintStad.Data.Station.Stations;
 	import SprintStad.Data.StationTypes.StationTypes;
 	import SprintStad.Data.Values.Values;
+	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.*;
-	public class SprintStad extends MovieClip {
-		
-		public static const DOMAIN:String = "http://localhost/Sprintstad/";
+	public class SprintStad extends MovieClip 
+	{
+		public static const DOMAIN:String = "/Sprintstad/";
 		public var session:String = "";
 		public static const LOADER:MovieClip = new LoadingScreen();
 		
@@ -32,6 +33,7 @@
 			states[STATE_INTRO] = new IntroState(this);
 			states[STATE_VALUES] = new ValuesState(this);
 			states[STATE_STATION_INFO] = new StationInfoState(this);
+			ErrorDisplay.Get().SetRoot(this);
 		}
 		
 		private function ResolveSessionHash()
