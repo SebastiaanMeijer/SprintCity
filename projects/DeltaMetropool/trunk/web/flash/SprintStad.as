@@ -24,11 +24,6 @@
 		private var currentState:IState = null;
 		private var states:Array = new Array();
 		
-		// data
-		private var values:Values = new Values();
-		private var stations:Stations = new Stations();
-		private var stationTypes:StationTypes = new StationTypes();
-		
 		public function SprintStad()
 		{
 			ResolveSessionHash();
@@ -55,21 +50,6 @@
 				currentState.Deactivate();
 			currentState = states[state];
 			currentState.Activate();
-		}
-		
-		public function GetValues():Values
-		{
-			return values;
-		}
-		
-		public function GetStations():Stations
-		{
-			return stations;
-		}
-		
-		public function GetStationTypes():StationTypes
-		{
-			return stationTypes
 		}
 	}
 }

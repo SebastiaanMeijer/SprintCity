@@ -8,11 +8,15 @@
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
+	import SprintStad.Calculators.Result.StationTypeEntry;
+	import SprintStad.Calculators.StationTypeCalculator;
+	import SprintStad.Data.Data;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.StationTypes.StationType;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
+	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.State.IState;
 
 	public class StationInfoState implements IState
@@ -70,6 +74,7 @@
 		{
 			var xmlData:XML = new XML(event.target.data);
 			parseStationData(xmlData);
+			Data.Get().GetStations().PostConstruct();
 			loadStationTypes();	
 		}
 		
@@ -77,7 +82,7 @@
 		{
 			var xmlData:XML = new XML(event.target.data);
 			parseStationTypesData(xmlData);
-			parent.GetStations().PostConstruct();
+			Data.Get().GetStationTypes().PostConstruct();
 			drawUI();
 		}
 		
@@ -87,7 +92,6 @@
 			var station:Station = new Station();
 			var xml:XML = null;
 			var firstTag:String = "";
-			parent.GetStations().AddStation(station);
 
 			xmlList = xmlData.station.children();
 			for each (xml in xmlList) 
@@ -95,7 +99,7 @@
 				var tag:String = xml.name();
 				if (xml.name() == firstTag)
 				{
-					parent.GetStations().AddStation(station);
+					Data.Get().GetStations().AddStation(station);
 					station = new Station();
 				}
 				
@@ -107,6 +111,7 @@
 				else
 					station[xml.name()] = xml;
 			}
+			Data.Get().GetStations().AddStation(station);
 		}
 		
 		private function parseRounds(xmlList:XMLList, station:Station):void
@@ -139,16 +144,15 @@
 			var stationType:StationType = new StationType();
 			var xml:XML = null;
 			var firstTag:String = "";
-			parent.GetStationTypes().AddStationType(stationType);
 			
-			xmlList = xmlData.station.children();
+			xmlList = xmlData.station_type.children();
 			for each (xml in xmlList) 
 			{
 				var tag:String = xml.name();
 				
 				if (xml.name() == firstTag)
 				{
-					parent.GetStationTypes().AddStationType(stationType);
+					Data.Get().GetStationTypes().AddStationType(stationType);
 					stationType = new StationType();
 				}
 				
@@ -157,24 +161,78 @@
 					
 				stationType[xml.name()] = xml;
 			}
+			Data.Get().GetStationTypes().AddStationType(stationType);
 		}
 		
 		private function drawUI():void
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
-			var station:Station = parent.GetStations().GetStation(0); 
+			var station:Station = Data.Get().GetStations().GetStation(0); 
+			
+			// station sign
 			view.name_field.text = station.name;
 			view.region_field.text = station.region;
 			view.town_field.text = station.town;
+			
+			// right info
 			view.description_facts.editable = false;
 			view.description_facts.text = station.description_facts;
+			
 			view.description_background.editable = false;
 			view.description_background.text = station.description_background;
+			
 			view.description_future.editable = false;
 			view.description_future.text = station.description_future;
-			view.sheet.addChild(station.imageData);
 			
+			// background
+			view.sheet.addChild(station.imageData);
+
+			//left info
+			var top:Array = StationTypeCalculator.Get().GetStationTypeTop(station);
+			
+			view.station_type_1_percent.text = top[0].similarity + "%";
+			top[0].stationType.imageData.width = view.station_type_1_image.width;
+			top[0].stationType.imageData.height = view.station_type_1_image.height;
+			view.station_type_1_image.addChild(top[0].stationType.imageData);
+			
+			view.station_type_2_percent.text = top[1].similarity + "%";
+			top[1].stationType.imageData.width = view.station_type_2_image.width;
+			top[1].stationType.imageData.height = view.station_type_2_image.height;
+			view.station_type_2_image.addChild(top[1].stationType.imageData);
+			
+			view.station_type_3_percent.text = top[2].similarity + "%";
+			top[2].stationType.imageData.width = view.station_type_3_image.width;
+			top[2].stationType.imageData.height = view.station_type_3_image.height;
+			view.station_type_3_image.addChild(top[2].stationType.imageData);
+			
+			AreaBarDrawer.Get().DrawBar(view.area_bar,
+				station.area_cultivated_home,
+				station.area_cultivated_work,
+				station.area_cultivated_mixed, 
+				station.area_undeveloped_urban,
+				station.area_undeveloped_rural);
+			view.area.text = "(" + (
+				station.area_cultivated_home +
+				station.area_cultivated_work +
+				station.area_cultivated_mixed + 
+				station.area_undeveloped_urban + 
+				station.area_undeveloped_rural) + " ha.)";
+			AreaBarDrawer.Get().DrawBar(view.transform_area_bar, 
+				station.transform_area_cultivated_home, 
+				station.transform_area_cultivated_work, 
+				station.transform_area_cultivated_mixed, 
+				station.transform_area_undeveloped_urban,
+				station.transform_area_undeveloped_mixed);
+			view.transform_area.text = "(" + ( 
+				station.transform_area_cultivated_home + 
+				station.transform_area_cultivated_work + 
+				station.transform_area_cultivated_mixed +  
+				station.transform_area_undeveloped_urban +
+				station.transform_area_undeveloped_mixed) + " ha.)";
+			view.ha_home.text = station.area_cultivated_home;
+			view.bvo_work.text = station.area_cultivated_work;
+			view.bvo_leisure.text = station.area_cultivated_mixed;
 			
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);

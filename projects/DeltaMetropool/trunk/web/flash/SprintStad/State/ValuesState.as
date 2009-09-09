@@ -11,6 +11,7 @@
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
+	import SprintStad.Data.Data;
 	import SprintStad.Data.Values.Value;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
@@ -52,7 +53,7 @@
 			for each (valueInfo in valueList) 
 			{
 				if (valueInfo.name() == "description")
-					parent.GetValues().description = valueInfo;
+					Data.Get().GetValues().description = valueInfo;
 			}
 			
 			valueList = xmlData.value.children();
@@ -69,7 +70,7 @@
 				else if (tag == "checked")
 				{
 					value.checked = Boolean(int(valueInfo));
-					parent.GetValues().AddValue(value);
+					Data.Get().GetValues().AddValue(value);
 					value = new Value();
 				}
 			}
@@ -77,19 +78,21 @@
 		
 		private function drawUI():void
 		{
+			var data:Data = Data.Get();
+			
 			// set description field text
-			parent.values_movie.description_field.text = parent.GetValues().description;
+			parent.values_movie.description_field.text = data.GetValues().description;
 			parent.values_movie.description_field.addEventListener(Event.CHANGE, descriptionChanged);
 			
 			// build checkboxes field
 			var field:MovieClip = parent.values_movie.checkbox_field;
-			var entrySpace:Number = field.height / (parent.GetValues().GetValueCount() + 1);
+			var entrySpace:Number = field.height / (data.GetValues().GetValueCount() + 1);
 			var y:Number = entrySpace / 2;
 			var width:Number = field.width - CHECKBOX_HORIZONTAL_MARGIN * 2;
 			
-			for (var i:int = 0; i < parent.GetValues().GetValueCount(); i++)
+			for (var i:int = 0; i < data.GetValues().GetValueCount(); i++)
 			{
-				var value:Value = parent.GetValues().GetValue(i);
+				var value:Value = Data.Get().GetValues().GetValue(i);
 				var checkBox:CheckBox = new CheckBox();
 				
 				checkBox.name = String(value.id);
@@ -112,7 +115,7 @@
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
 			var vars:URLVariables = new URLVariables();
 			vars.session = parent.session;
-			vars.data = parent.GetValues().GetXmlString();
+			vars.data = Data.Get().GetValues().GetXmlString();
 			request.data = vars;
 			loader.load(request);
 		}
@@ -124,14 +127,14 @@
 		
 		private function checkBoxChanged(event:Event):void
 		{
-			var value:Value = parent.GetValues().GetValueById(int(event.target.name));
+			var value:Value = Data.Get().GetValues().GetValueById(int(event.target.name));
 			if (value != null)
 				value.checked = event.target.selected;
 		}
 		
 		private function descriptionChanged(event:Event):void
 		{
-			parent.GetValues().description = parent.values_movie.description_field.text;
+			Data.Get().GetValues().description = parent.values_movie.description_field.text;
 		}
 		
 		function OnValuesLoadError(e:IOErrorEvent):void 
@@ -156,7 +159,7 @@
 				request.data = vars;
 				loader.addEventListener(Event.COMPLETE, valuesLoaded);
 				loader.addEventListener(IOErrorEvent.IO_ERROR , OnValuesLoadError);
-			loader.load(request);
+				loader.load(request);
 			}
 			catch (e:Error)
 			{

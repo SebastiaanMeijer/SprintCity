@@ -8,6 +8,15 @@
 		{
 			
 		}
+		
+		public function PostConstruct():void
+		{
+			for each (var stationType:StationType in stationTypes)
+			{
+				stationType.PostConstruct();
+			}
+		}
+		
 		public function AddStationType(stationType:StationType):void
 		{
 			stationTypes.push(stationType);

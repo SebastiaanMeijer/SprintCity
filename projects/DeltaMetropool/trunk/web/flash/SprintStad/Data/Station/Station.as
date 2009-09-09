@@ -48,7 +48,7 @@
 		{			
 		}
 		
-		public function PostConstruct()
+		public function PostConstruct():void
 		{
 			try
 			{
@@ -63,7 +63,8 @@
 			}
  		}
 		
-		public function OnLoadComplete(event:Event):void {
+		public function OnLoadComplete(event:Event):void 
+		{
 			imageData.addChild(this.loader);
 			imageData.width = SprintStad.WIDTH;
 			imageData.height = SprintStad.HEIGHT;
