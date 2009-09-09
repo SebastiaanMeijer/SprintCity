@@ -4,6 +4,11 @@
 	{	
 		private var stations:Array = new Array();	
 		
+		public var MaxPOVN:Number = 0;
+		public var MaxPWN:Number = 0;
+		public var MaxIWD:Number = 0;
+		public var MaxMNG:Number = 0;
+		
 		public function Stations() 
 		{
 			
@@ -19,6 +24,10 @@
 		
 		public function AddStation(station:Station):void
 		{
+			MaxPOVN = Math.max(MaxPOVN, station.POVN);
+			MaxPWN = Math.max(MaxPWN, station.PWN);
+			MaxIWD = Math.max(MaxIWD, station.IWD);
+			MaxMNG = Math.max(MaxMNG, station.MNG);
 			stations.push(station);
 		}
 		
