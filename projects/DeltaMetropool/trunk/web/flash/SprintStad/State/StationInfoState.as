@@ -22,10 +22,33 @@
 	public class StationInfoState implements IState
 	{
 		private var parent:SprintStad = null;
+		private var currentStation:int = 0;
 		
 		public function StationInfoState(parent:SprintStad) 
 		{
 			this.parent = parent;
+		}
+		
+		public function NextStation():void
+		{
+			currentStation = (currentStation + 1) % Data.Get().GetStations().GetStationCount();
+			drawUI(currentStation);
+		}
+		
+		public function PreviousStation():void
+		{
+			currentStation = Math.abs(currentStation - 1) % Data.Get().GetStations().GetStationCount();
+			drawUI(currentStation);
+		}
+		
+		public function NextStationEvent(e:Event):void
+		{
+			NextStation();
+		}
+		
+		public function PreviousStationEvent(e:Event):void
+		{
+			PreviousStation();
 		}
 		
 		private function loadStations()
@@ -80,10 +103,15 @@
 		
 		private function stationTypesLoaded(event:Event):void 
 		{
+			var view:MovieClip = parent.station_info_movie;
 			var xmlData:XML = new XML(event.target.data);
 			parseStationTypesData(xmlData);
 			Data.Get().GetStationTypes().PostConstruct();
-			drawUI();
+			drawUI(currentStation);			
+			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
+			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
+			//remove loading screen
+			parent.removeChild(SprintStad.LOADER);
 		}
 		
 		private function parseStationData(xmlData:XML):void
@@ -164,11 +192,11 @@
 			Data.Get().GetStationTypes().AddStationType(stationType);
 		}
 		
-		private function drawUI():void
+		private function drawUI(index:int):void
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
-			var station:Station = Data.Get().GetStations().GetStation(0); 
+			var station:Station = Data.Get().GetStations().GetStation(index); 
 			
 			// station sign
 			view.name_field.text = station.name;
@@ -192,18 +220,18 @@
 			var top:Array = StationTypeCalculator.Get().GetStationTypeTop(station);
 			
 			view.station_type_1_percent.text = top[0].similarity + "%";
-			top[0].stationType.imageData.width = view.station_type_1_image.width;
-			top[0].stationType.imageData.height = view.station_type_1_image.height;
+			top[0].stationType.imageData.width = 100;
+			top[0].stationType.imageData.height = 100;
 			view.station_type_1_image.addChild(top[0].stationType.imageData);
 			
 			view.station_type_2_percent.text = top[1].similarity + "%";
-			top[1].stationType.imageData.width = view.station_type_2_image.width;
-			top[1].stationType.imageData.height = view.station_type_2_image.height;
+			top[1].stationType.imageData.width = 100;
+			top[1].stationType.imageData.height = 100;
 			view.station_type_2_image.addChild(top[1].stationType.imageData);
 			
 			view.station_type_3_percent.text = top[2].similarity + "%";
-			top[2].stationType.imageData.width = view.station_type_3_image.width;
-			top[2].stationType.imageData.height = view.station_type_3_image.height;
+			top[2].stationType.imageData.width = 100;
+			top[2].stationType.imageData.height = 100;
 			view.station_type_3_image.addChild(top[2].stationType.imageData);
 			
 			AreaBarDrawer.Get().DrawBar(view.area_bar,
@@ -233,9 +261,6 @@
 			view.ha_home.text = station.area_cultivated_home;
 			view.bvo_work.text = station.area_cultivated_work;
 			view.bvo_leisure.text = station.area_cultivated_mixed;
-			
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
 		}
 		
 		function OnStationLoadError(e:IOErrorEvent):void 

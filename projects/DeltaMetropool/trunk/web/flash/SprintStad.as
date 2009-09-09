@@ -33,7 +33,7 @@
 			ErrorDisplay.Get().SetRoot(this);
 		}
 		
-		private function ResolveSessionHash()
+		private function ResolveSessionHash():void
 		{
 			var args:Object = this.root.loaderInfo.parameters;
 			
