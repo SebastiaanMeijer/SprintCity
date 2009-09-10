@@ -48,6 +48,30 @@
 		{			
 		}
 		
+				
+		public function AddRound(round:Round):void
+		{
+			rounds.push(round);
+		}
+		
+		public function GetRound(index:int):Round
+		{
+			return rounds[index];
+		}
+		
+		public function GetRoundById(id:int):Round
+		{
+			for each (var round:Round in rounds)
+				if (round.id == id)
+					return round;
+			return null;
+		}
+		
+		public function GetRoundCount():int
+		{
+			return rounds.length;
+		}
+		
 		public function PostConstruct():void
 		{
 			try
@@ -73,29 +97,6 @@
 		function OnLoadError(e:IOErrorEvent):void 
 		{
 			ErrorDisplay.Get().DisplayError("error loading: " + image);
-		}
-		
-		public function AddRound(round:Round):void
-		{
-			rounds.push(round);
-		}
-		
-		public function GetRound(index:int):Round
-		{
-			return rounds[index];
-		}
-		
-		public function GetRoundById(id:int):Round
-		{
-			for each (var round:Round in rounds)
-				if (round.id == id)
-					return round;
-			return null;
-		}
-		
-		public function GetRoundCount():int
-		{
-			return rounds.length;
 		}
 		
 		public function ParseXML(xmlList:XMLList):void
