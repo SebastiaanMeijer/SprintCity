@@ -48,5 +48,31 @@
 		{
 			return stations.length;
 		}
+		
+		public function ParseXML(xmlList:XMLList):void
+		{
+			var station:Station = new Station();
+			var xml:XML = null;
+			var firstTag:String = "";
+
+			for each (xml in xmlList) 
+			{
+				var tag:String = xml.name();
+				if (xml.name() == firstTag)
+				{
+					AddStation(station);
+					station = new Station();
+				}
+				
+				if (firstTag == "")
+					firstTag = xml.name();
+					
+				if (xml.name() == "rounds")
+					station.ParseXML(xml.rounds.children());
+				else
+					station[xml.name()] = xml;
+			}
+			AddStation(station);
+		}
 	}
 }

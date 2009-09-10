@@ -8,18 +8,11 @@
 	import SprintStad.Debug.Debug;
 	public class StationTypeCalculator
 	{
-		private static var instance:StationTypeCalculator = new StationTypeCalculator();
-		
 		public function StationTypeCalculator() 
 		{			
 		}
 		
-		public static function Get():StationTypeCalculator
-		{
-			return instance;
-		}
-		
-		public function GetStationTypeTop(station:Station):Array
+		public static function GetStationTypeTop(station:Station):Array
 		{
 			var data:Data = Data.Get();
 			var stationTypes:StationTypes = data.GetStationTypes();
@@ -38,12 +31,12 @@
 			return top;
 		}
 		
-		private function CalculateSimilarity(stationValue, typeValue, maxValue):Number
+		private static function CalculateSimilarity(stationValue, typeValue, maxValue):Number
 		{
 			return 100 - 100 * (Math.abs(stationValue - typeValue) / maxValue);
 		}
 		
-		private function compare(value1:StationTypeEntry, value2:StationTypeEntry)
+		private static function compare(value1:StationTypeEntry, value2:StationTypeEntry)
 		{
 			return value2.similarity - value1.similarity;
 		}

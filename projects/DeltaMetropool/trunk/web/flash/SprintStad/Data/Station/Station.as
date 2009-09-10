@@ -97,5 +97,29 @@
 		{
 			return rounds.length;
 		}
+		
+		public function ParseXML(xmlList:XMLList):void
+		{
+			var round:Round = new Round();
+			var xml:XML = null;
+			var firstTag:String = "";
+			AddRound(round);
+			
+			for each (xml in xmlList) 
+			{
+				var tag:String = xml.name();
+				
+				if (xml.name() == firstTag)
+				{
+					AddRound(round);
+					round = new Round();
+				}
+				
+				if (firstTag == "")
+					firstTag = xml.name();
+					
+				round[xml.name()] = xml;
+			}
+		}
 	}
 }
