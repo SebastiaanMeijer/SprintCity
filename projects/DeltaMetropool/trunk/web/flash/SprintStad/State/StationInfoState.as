@@ -166,12 +166,25 @@
 			ErrorDisplay.Get().DisplayError("error loading: stations; " + SprintStad.DOMAIN + "data/stations.php");
 		}
 		
+		private function OnNextButton(event:MouseEvent):void
+		{
+			parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
+		}
+		
+		private function OnValuesButton(event:MouseEvent):void
+		{
+			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
+		}
+		
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void
 		{
+			var view:MovieClip = parent.station_info_movie;
 			parent.addChild(SprintStad.LOADER);
 			LoadStations();
+			view.next_button.addEventListener(MouseEvent.CLICK, OnNextButton);
+			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
 		}
 		
 		public function Deactivate():void

@@ -49,8 +49,15 @@
 			return stations.length;
 		}
 		
+		public function Clear():void
+		{
+			stations = new Array();
+		}
+		
 		public function ParseXML(xmlList:XMLList):void
 		{
+			Clear();
+			
 			var station:Station = new Station();
 			var xml:XML = null;
 			var firstTag:String = "";
