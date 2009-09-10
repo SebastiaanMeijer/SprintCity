@@ -4,19 +4,12 @@
 	import SprintStad.Debug.Debug;
 	public class AreaBarDrawer
 	{
-		private static var instance:AreaBarDrawer = new AreaBarDrawer();
-		
 		public function AreaBarDrawer() 
 		{
 			
 		}
 		
-		public static function Get():AreaBarDrawer
-		{
-			return instance;
-		}
-		
-		public function DrawBar(bar:MovieClip, home:int, work:int, leisure:int, urban:int, rural:int)
+		public static function DrawBar(bar:MovieClip, home:int, work:int, leisure:int, urban:int, rural:int)
 		{
 			var colors:Array = new Array(
 				new ColorHome(), new ColorWork(), new ColorLeisure(), 

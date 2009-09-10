@@ -38,6 +38,30 @@
 		public function GetStationTypeCount():int
 		{
 			return stationTypes.length;
-		}		
+		}
+		
+		public function ParseXML(xmlList:XMLList):void
+		{
+			var stationType:StationType = new StationType();
+			var xml:XML = null;
+			var firstTag:String = "";
+			
+			for each (xml in xmlList) 
+			{
+				var tag:String = xml.name();
+				
+				if (xml.name() == firstTag)
+				{
+					AddStationType(stationType);
+					stationType = new StationType();
+				}
+				
+				if (firstTag == "")
+					firstTag = xml.name();
+					
+				stationType[xml.name()] = xml;
+			}
+			AddStationType(stationType);
+		}
 	}
 }
