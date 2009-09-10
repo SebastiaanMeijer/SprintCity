@@ -32,8 +32,15 @@
 			return values.length;
 		}
 		
+		public function Clear():void
+		{
+			values = new Array();
+		}
+		
 		public function GetXmlString():String
 		{
+			Clear();
+			
 			var xmlString:String = "";
 			
 			xmlString += "<values>";
