@@ -8,6 +8,8 @@
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
+	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import SprintStad.Calculators.Result.StationTypeEntry;
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Calculators.StationTypeCalculator;
@@ -28,6 +30,11 @@
 		public function StationInfoState(parent:SprintStad) 
 		{
 			this.parent = parent;
+		}
+		
+		public function SetCurrentStation(index:int):void
+		{
+			currentStation = index % Data.Get().GetStations().GetStationCount();
 		}
 		
 		public function NextStation():void
@@ -102,14 +109,21 @@
 			view.region_field.text = station.region;
 			view.town_field.text = station.town;
 			
+			var textAreaFormat:TextFormat = new TextFormat();
+			textAreaFormat.align = TextFormatAlign.JUSTIFY;
+			textAreaFormat.size = 9;
+			
 			// right info
 			view.description_facts.editable = false;
+			view.description_facts.setStyle("textFormat", textAreaFormat);
 			view.description_facts.text = station.description_facts;
 			
 			view.description_background.editable = false;
+			view.description_background.setStyle("textFormat", textAreaFormat);
 			view.description_background.text = station.description_background;
 			
 			view.description_future.editable = false;
+			view.description_future.setStyle("textFormat", textAreaFormat);
 			view.description_future.text = station.description_future;
 			
 			// background
@@ -184,6 +198,7 @@
 		
 		public function Activate():void
 		{
+			Debug.out("Activate StationInfoState");
 			var view:MovieClip = parent.station_info_movie;
 			parent.addChild(SprintStad.LOADER);
 			LoadStations();

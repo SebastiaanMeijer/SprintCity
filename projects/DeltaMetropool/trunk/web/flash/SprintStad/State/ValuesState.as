@@ -13,6 +13,7 @@
 	import flash.net.URLVariables;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.Values.Value;
+	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
 	
@@ -122,7 +123,8 @@
 		
 		private function onContinueEvent(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
+			//parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
 		private function checkBoxChanged(event:Event):void
@@ -146,6 +148,7 @@
 		
 		public function Activate():void
 		{
+			Debug.out("Activate ValueState");
 			parent.addChild(SprintStad.LOADER);
 			// prepare continue button
 			parent.values_movie.continue_button.addEventListener(MouseEvent.CLICK, onContinueEvent);
