@@ -8,6 +8,7 @@
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
 	import SprintStad.Data.Data;
+	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	public class IntroState implements IState
 	{
@@ -127,6 +128,7 @@
 		
 		public function Activate():void 
 		{			
+			Debug.out("Activate IntroState");
 			LoadStationTypes();
 			parent.intro_movie.addEventListener(MouseEvent.CLICK, onContinueEvent);
 		}

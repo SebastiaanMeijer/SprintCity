@@ -18,12 +18,14 @@
 		public static const STATE_STATION_INFO:int = 2;
 		public static const STATE_PROGRAM:int = 3;
 		public static const STATE_ROUND:int = 4;
+		public static const STATE_OVERVIEW:int = 5;
 		
 		public static const FRAME_INTRO:int = 1;
 		public static const FRAME_VALUES:int = 11;
 		public static const FRAME_STATION_INFO:int = 21;
 		public static const FRAME_PROGRAM:int = 31;
 		public static const FRAME_ROUND:int = 41;
+		public static const FRAME_OVERVIEW:int = 51;
 		
 		private var currentState:IState = null;
 		private var states:Array = new Array();
@@ -36,6 +38,7 @@
 			states[STATE_STATION_INFO] = new StationInfoState(this);
 			states[STATE_PROGRAM] = new ProgramState(this);
 			states[STATE_ROUND] = new RoundState(this);
+			states[STATE_OVERVIEW] = new OverviewState(this);
 			ErrorDisplay.Get().SetRoot(this);
 		}
 		
@@ -56,6 +59,11 @@
 				currentState.Deactivate();
 			currentState = states[state];
 			currentState.Activate();
+		}
+		
+		public function GetState(state:int):IState
+		{
+			return states[state];
 		}
 	}
 }

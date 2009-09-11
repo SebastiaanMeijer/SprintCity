@@ -2,6 +2,7 @@
 {
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import SprintStad.Debug.Debug;
 	public class ProgramState implements IState
 	{		
 		private var parent:SprintStad = null;
@@ -24,7 +25,8 @@
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void 
-		{			
+		{
+			Debug.out("Activate ProgramState");
 			var view:MovieClip = parent.program_movie;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
 			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
