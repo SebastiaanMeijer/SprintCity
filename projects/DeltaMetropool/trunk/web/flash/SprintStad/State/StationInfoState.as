@@ -9,6 +9,7 @@
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
 	import SprintStad.Calculators.Result.StationTypeEntry;
+	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.Round.Round;
@@ -156,9 +157,12 @@
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
 				station.transform_area_undeveloped_mixed) + " ha.)";
-			view.ha_home.text = station.area_cultivated_home;
-			view.bvo_work.text = station.area_cultivated_work;
-			view.bvo_leisure.text = station.area_cultivated_mixed;
+				
+			view.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
+			view.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
+			view.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
+			view.amount_houses.text = station.count_home_total;
+			view.bvo_work.text = station.count_work_total;
 		}
 		
 		function OnStationLoadError(e:IOErrorEvent):void 
