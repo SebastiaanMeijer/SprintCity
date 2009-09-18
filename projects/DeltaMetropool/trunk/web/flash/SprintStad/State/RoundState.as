@@ -26,20 +26,11 @@
 		
 		public function Activate():void 
 		{			
-			Debug.out("Activate RoundState");
-			try
-			{
 			var view:MovieClip = parent.round_movie;
-			Debug.out("1");
+			view.ok_button.buttonMode = true;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
-			Debug.out("2");
+			view.values_button.buttonMode = true;
 			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
-			Debug.out("3");
-			}
-			catch (e:Error)
-			{
-				Debug.out("Awww crap " + e.name + " " + e.message);
-			}
 		}
 		
 		public function Deactivate():void

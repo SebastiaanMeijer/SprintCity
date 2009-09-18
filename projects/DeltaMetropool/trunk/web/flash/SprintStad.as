@@ -1,5 +1,7 @@
 ﻿package{
 	import flash.display.MovieClip;
+	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
 	import SprintStad.Data.StationTypes.StationTypes;
 	import SprintStad.Data.Values.Values;
@@ -28,18 +30,20 @@
 		public static const FRAME_OVERVIEW:int = 51;
 		
 		private var currentState:IState = null;
+		private var currentStation:Station = null;
 		private var states:Array = new Array();
 		
 		public function SprintStad()
 		{
 			ResolveSessionHash();
+			ErrorDisplay.Get().SetRoot(this);
+			DataLoader.Get().SetRoot(this);
 			states[STATE_INTRO] = new IntroState(this);
 			states[STATE_VALUES] = new ValuesState(this);
 			states[STATE_STATION_INFO] = new StationInfoState(this);
 			states[STATE_PROGRAM] = new ProgramState(this);
 			states[STATE_ROUND] = new RoundState(this);
 			states[STATE_OVERVIEW] = new OverviewState(this);
-			ErrorDisplay.Get().SetRoot(this);
 		}
 		
 		private function ResolveSessionHash():void

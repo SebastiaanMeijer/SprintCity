@@ -7,11 +7,13 @@
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
+	import flash.filters.GlowFilter;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import SprintStad.Data.Data;
+	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Values.Value;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
@@ -21,6 +23,8 @@
 	{
 		private var parent:SprintStad = null;
 		
+		var filter:GlowFilter = new GlowFilter(0xffffff, 1, 6, 6, 1, 1);
+		
 		private static const CHECKBOX_HORIZONTAL_MARGIN:int = 10;
 		
 		public function ValuesState(parent:SprintStad) 
@@ -28,54 +32,6 @@
 			this.parent = parent;
 		}	
 		
-		private function valuesLoaded(event:Event):void 
-		{
-			var xmlData:XML;
-			
-			if (event.target.data != "")
-				xmlData = new XML(event.target.data);
-			else
-				xmlData = new XML("<values><value><id>1</id><title>Test waarde 1</title><description></description><checked>0</checked></value><value><id>2</id><title>Test waarde 2</title><description></description><checked>0</checked></value><value><id>3</id><title>Test waarde 3</title><description></description><checked>0</checked></value><value><id>4</id><title>Test waarde 4</title><description></description><checked>0</checked></value><value><id>5</id><title>Test waarde 5</title><description></description><checked>0</checked></value><description></description></values>");
-			
-			parseXmlData(xmlData);
-			drawUI();
-			
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
-		}
-		
-		private function parseXmlData(xmlData:XML):void
-		{
-			var valueList:XMLList = null;
-			var value:Value = new Value();
-			var valueInfo:XML = null;
-			
-			valueList = xmlData.children();		
-			for each (valueInfo in valueList) 
-			{
-				if (valueInfo.name() == "description")
-					Data.Get().GetValues().description = valueInfo;
-			}
-			
-			valueList = xmlData.value.children();
-			for each (valueInfo in valueList) 
-			{
-				var tag:String = valueInfo.name();
-				
-				if (tag == "id")
-					value.id = int(valueInfo);
-				else if (tag == "title")
-					value.title = valueInfo;
-				else if (tag == "description")
-					value.description = valueInfo;
-				else if (tag == "checked")
-				{
-					value.checked = Boolean(int(valueInfo));
-					Data.Get().GetValues().AddValue(value);
-					value = new Value();
-				}
-			}
-		}
 		
 		private function drawUI():void
 		{
@@ -127,6 +83,18 @@
 			//parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
+		private function onMouseOverEvent(event:MouseEvent):void
+		{
+			filter.strength = 1.5;
+			parent.values_movie.continue_button.filters = [filter];
+		}
+		
+		private function onMouseOutEvent(event:MouseEvent):void
+		{
+			filter.strength = 1;
+			parent.values_movie.continue_button.filters = [filter];
+		}
+		
 		private function checkBoxChanged(event:Event):void
 		{
 			var value:Value = Data.Get().GetValues().GetValueById(int(event.target.name));
@@ -139,35 +107,24 @@
 			Data.Get().GetValues().description = parent.values_movie.description_field.text;
 		}
 		
-		function OnValuesLoadError(e:IOErrorEvent):void 
+		public function OnLoadingDone(data:int)
 		{
-			ErrorDisplay.Get().DisplayError("error loading: values; " + SprintStad.DOMAIN + "data/values.php");
+			Debug.out(this + " I know " + data);
+			drawUI();
+			parent.removeChild(SprintStad.LOADER);
 		}
-		
+
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void
 		{
-			Debug.out("Activate ValueState");
 			parent.addChild(SprintStad.LOADER);
 			// prepare continue button
+			parent.values_movie.continue_button.buttonMode = true;
 			parent.values_movie.continue_button.addEventListener(MouseEvent.CLICK, onContinueEvent);
-			try
-			{
-				// load data
-				var loader:URLLoader = new URLLoader();
-				var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
-				var vars:URLVariables = new URLVariables();
-				vars.session = parent.session;
-				request.data = vars;
-				loader.addEventListener(Event.COMPLETE, valuesLoaded);
-				loader.addEventListener(IOErrorEvent.IO_ERROR , OnValuesLoadError);
-				loader.load(request);
-			}
-			catch (e:Error)
-			{
-				ErrorDisplay.Get().DisplayError("error loading: values; " + SprintStad.DOMAIN + "data/values.php");
-			}
+			parent.values_movie.continue_button.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverEvent);
+			parent.values_movie.continue_button.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutEvent);
+			DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
 		}
 		
 		public function Deactivate():void

@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.StationTypes 
 {
-	public class StationTypes
+	import SprintStad.Data.IDataCollection;
+	public class StationTypes implements IDataCollection
 	{
 		private var stationTypes:Array = new Array();
 		
@@ -40,8 +41,16 @@
 			return stationTypes.length;
 		}
 		
-		public function ParseXML(xmlList:XMLList):void
+		public function Clear():void
 		{
+			stationTypes = new Array();
+		}
+		
+		public function ParseXML(xmlData:XML):void
+		{
+			Clear();
+			
+			var xmlList:XMLList = xmlData.station_type.children();
 			var stationType:StationType = new StationType();
 			var xml:XML = null;
 			var firstTag:String = "";

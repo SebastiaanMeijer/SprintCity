@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Types 
 {
-	public class Types
+	import SprintStad.Data.IDataCollection;
+	public class Types implements IDataCollection
 	{
 		private var types:Array = new Array();
 		
@@ -40,8 +41,16 @@
 			return types.length;
 		}
 		
-		public function ParseXML(xmlList:XMLList):void
+		public function Clear():void
 		{
+			types = new Array();
+		}
+		
+		public function ParseXML(xmlData:XML):void
+		{
+			Clear();
+			
+			var xmlList:XMLList = xmlData.type.children();
 			var type:Type = new Type();
 			var xml:XML = null;
 			var firstTag:String = "";

@@ -20,7 +20,8 @@
 		'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed',
 		'transform_area_undeveloped_urban', 'transform_area_undeveloped_mixed',
 		'count_home_total', 'count_home_transform',
-		'count_work_total', 'count_work_transform'
+		'count_work_total', 'count_work_transform',
+		'team_id'
 		);
 		
 		$round_fields = array(
@@ -29,7 +30,7 @@
 		
 		$db = Database::getDatabase();
 		
-		$station_result = getStationsOfClient(session_id());
+		$station_result = getStations(session_id());
 		
 		echo '<stations>';
 		
@@ -60,20 +61,19 @@
 		echo '</stations>';
 	}
 	
-	function getStationsOfClient($session_id)
+	function getStations($session_id)
 	{
 		$db = Database::getDatabase();
+		$game_id = Game::getGameIdOfSession($session_id);
 		$query = "
-			SELECT Station.* 
+			SELECT Station.*, TeamInstance.team_id AS team_id
 			FROM Station 
 			INNER JOIN StationInstance 
 			ON StationInstance.station_id = Station.id 
 			INNER JOIN TeamInstance 
 			ON TeamInstance.id = StationInstance.team_instance_id 
-			INNER JOIN ClientSession 
-			ON ClientSession.team_instance_id = TeamInstance.id 
-			WHERE ClientSession.id = :id";
-		$args = array('id' => $session_id);
+			WHERE TeamInstance.game_id = :game_id";
+		$args = array('game_id' => $game_id);
 		return $db->query($query, $args);
 	}
 	

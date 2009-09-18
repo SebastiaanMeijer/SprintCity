@@ -14,6 +14,7 @@
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
+	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.StationTypes.StationType;
@@ -59,45 +60,6 @@
 			PreviousStation();
 		}
 		
-		private function LoadStations()
-		{
-			try
-			{
-				// prepare loader vars
-				var vars:URLVariables = new URLVariables();
-				vars.session = parent.session;
-				// load station data
-				var stationLoader:URLLoader = new URLLoader();
-				var stationRequest:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/stations.php");
-				stationRequest.data = vars;
-				stationLoader.addEventListener(Event.COMPLETE, StationsLoaded);
-				stationLoader.addEventListener(IOErrorEvent.IO_ERROR , OnStationLoadError);
-				stationLoader.load(stationRequest);
-			}
-			catch (e:Error)
-			{
-				ErrorDisplay.Get().DisplayError("error loading: stations; " + SprintStad.DOMAIN + "data/stations.php");
-			}
-		}
-	
-		private function StationsLoaded(event:Event):void 
-		{
-			var xmlData:XML = new XML(event.target.data);
-			Data.Get().GetStations().ParseXML(xmlData.station.children());
-			Data.Get().GetStations().PostConstruct();
-			PostLoad();
-		}
-		
-		private function PostLoad()
-		{
-			var view:MovieClip = parent.station_info_movie;
-			DrawUI(currentStation);
-			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
-			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
-		}
-		
 		private function DrawUI(index:int):void
 		{
 			//draw stuff
@@ -105,9 +67,9 @@
 			var station:Station = Data.Get().GetStations().GetStation(index); 
 			
 			// station sign
-			view.name_field.text = station.name;
-			view.region_field.text = station.region;
-			view.town_field.text = station.town;
+			view.board.name_field.text = station.name;
+			view.board.region_field.text = station.region;
+			view.board.town_field.text = station.town;
 			
 			var textAreaFormat:TextFormat = new TextFormat();
 			textAreaFormat.align = TextFormatAlign.JUSTIFY;
@@ -186,7 +148,7 @@
 		
 		private function OnNextButton(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnValuesButton(event:MouseEvent):void
@@ -194,16 +156,27 @@
 			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
 		}
 		
+		public function OnLoadingDone(data:int)
+		{
+			var view:MovieClip = parent.station_info_movie;
+			DrawUI(currentStation);
+			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
+			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
+			//remove loading screen
+			parent.removeChild(SprintStad.LOADER);
+		}
+		
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void
 		{
-			Debug.out("Activate StationInfoState");
 			var view:MovieClip = parent.station_info_movie;
 			parent.addChild(SprintStad.LOADER);
-			LoadStations();
+			view.next_button.buttonMode = true;
 			view.next_button.addEventListener(MouseEvent.CLICK, OnNextButton);
+			view.values_button.buttonMode = true;
 			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		
 		public function Deactivate():void
