@@ -127,6 +127,19 @@
 		{
 			return DBObject::glob("Game", "SELECT * FROM `game` WHERE `active` = 1 ORDER BY `name` ASC;");
 		}
+		
+		public static function getGameIdOfSession($session_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT game_id 
+				FROM TeamInstance 
+				INNER JOIN ClientSession
+				ON ClientSession.team_instance_id = TeamInstance.id
+				WHERE ClientSession.id = :session_id", 
+				array('session_id' => $session_id));
+			return $db->getValue($result);
+		}
 	}
 	
 	class Round extends DBObject

@@ -5,7 +5,7 @@ if(!$Auth->loggedIn()) redirect('login.php');
 
 
 $action = isset($_REQUEST['Action']) ? $_REQUEST['Action'] : "";
-$vars = split(",", $action);
+$vars = preg_split('/,/', $action);
 
 switch( $vars[0] )
 {

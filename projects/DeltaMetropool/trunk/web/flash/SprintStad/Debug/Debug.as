@@ -8,10 +8,10 @@
 		{			
 		}
 		
-		public static function out(message:String)
+		public static function out(message:Object)
 		{
-			trace(message);
-			ExternalInterface.call("console.log", message);
+			trace(String(message));
+			ExternalInterface.call("console.log", String(message));
 		}
 		
 	}

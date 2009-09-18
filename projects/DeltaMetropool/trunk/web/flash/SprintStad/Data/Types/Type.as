@@ -12,6 +12,7 @@
 		public var name:String = "";
 		public var type:String = "";
 		public var description:String = "";
+		public var color:String = "0x000000";
 		public var image:String = "";
 		public var imageData:Sprite = new Sprite();
 		public var density:Number = 0;

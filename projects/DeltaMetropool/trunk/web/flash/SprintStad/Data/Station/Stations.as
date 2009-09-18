@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Station 
 {
-	public class Stations
+	import SprintStad.Data.IDataCollection;
+	public class Stations implements IDataCollection
 	{	
 		private var stations:Array = new Array();	
 		
@@ -44,6 +45,14 @@
 			return null;
 		}
 		
+		public function GetStationByName(name:String):Station
+		{
+			for each (var station:Station in stations)
+				if (station.name == name)
+					return station;
+			return null;
+		}
+		
 		public function GetStationCount():int
 		{
 			return stations.length;
@@ -54,10 +63,11 @@
 			stations = new Array();
 		}
 		
-		public function ParseXML(xmlList:XMLList):void
+		public function ParseXML(xmlData:XML):void
 		{
 			Clear();
 			
+			var xmlList:XMLList = xmlData.station.children();
 			var station:Station = new Station();
 			var xml:XML = null;
 			var firstTag:String = "";

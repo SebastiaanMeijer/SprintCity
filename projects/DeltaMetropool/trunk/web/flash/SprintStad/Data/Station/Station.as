@@ -7,18 +7,21 @@
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	import flash.utils.Proxy;
+	import SprintStad.Data.Data;
+	import SprintStad.Data.Team.Team;
 	import SprintStad.Data.Round.Round;
+	import SprintStad.Data.Team.Team;
 	import SprintStad.Debug.ErrorDisplay;
 	public class Station
 	{	
 		public var id:int = 0;
+		public var team_id:int = 0;
 		public var code:String = "";
 		public var name:String = "";
 		public var description_facts:String = "";
 		public var description_background:String = "";
 		public var description_future:String = "";
 		public var image:String = "";
-		public var imageData:Sprite = new Sprite();
 		public var town:String = "";
 		public var region:String = "";
 		public var POVN:Number = 0;
@@ -43,6 +46,10 @@
 		private var rounds:Array = new Array();
 		
 		private var loader:Loader = null;
+		
+		// post data
+		public var imageData:Sprite = new Sprite();
+		public var team:Team;
 		
 		public function Station() 
 		{			
@@ -76,6 +83,7 @@
 		{
 			try
 			{
+				this.team = Data.Get().GetTeams().GetTeamById(team_id);
 				this.loader = new Loader();
 				this.loader.load(new URLRequest(image));
 				this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);

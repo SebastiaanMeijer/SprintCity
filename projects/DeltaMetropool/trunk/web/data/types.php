@@ -11,7 +11,7 @@
 	function printTypes()
 	{
 		$type_fields = array(
-			'id', 'name', 'type', 'description', 'image', 'density'
+			'id', 'name', 'type', 'description', 'color', 'image', 'density'
 		);
 		
 		$db = Database::getDatabase();
