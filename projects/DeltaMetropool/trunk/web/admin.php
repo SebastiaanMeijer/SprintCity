@@ -14,6 +14,7 @@
 <link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 <link rel="stylesheet" type="text/css" href="style/base.css">
 <link rel="stylesheet" type="text/css" href="style/style.css">
+<script type="text/javascript" src="script/jscolor/jscolor.js"></script>
 </head>
 <body>
 <div id="doc4" class="yui-t2">

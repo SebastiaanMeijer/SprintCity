@@ -7,6 +7,7 @@
 		public var id:int = 0;
 		public var name:String = "";
 		public var description:String = "";
+		public var color:String = "";
 		public var cpu:Boolean = false;
 		public var created:String = "";
 		public var is_player:Boolean = false;

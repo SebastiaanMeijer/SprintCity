@@ -1,8 +1,10 @@
 ﻿package SprintStad.State 
 {
+	import fl.motion.Color;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
@@ -111,6 +113,10 @@
 			{
 				var station:Station = stations.GetStation(i);
 				var movie:MovieClip = GetStationMovieClip(station);
+				
+				var colorTransform:ColorTransform = new ColorTransform();
+				colorTransform.color = parseInt("0x" + station.owner.color, 16);
+				movie.outline.transform.colorTransform = colorTransform;				
 				
 				AreaBarDrawer.DrawBar(movie.graph,
 					station.area_cultivated_home,

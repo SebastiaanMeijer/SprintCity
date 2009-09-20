@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Team
 {
 	import SprintStad.Data.IDataCollection;
+	import SprintStad.Debug.Debug;
 	
 	public class Teams implements IDataCollection
 	{
@@ -8,7 +9,6 @@
 		
 		public function Teams() 
 		{
-			
 		}
 		
 		public function AddTeam(team:Team):void
@@ -49,7 +49,7 @@
 		{
 			Clear();
 			
-			var xmlList:XMLList = xmlData.type.children();
+			var xmlList:XMLList = xmlData.team.children();
 			var team:Team = new Team();
 			var xml:XML = null;
 			var firstTag:String = "";

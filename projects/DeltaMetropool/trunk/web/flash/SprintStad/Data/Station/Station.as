@@ -11,6 +11,7 @@
 	import SprintStad.Data.Team.Team;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Team.Team;
+	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	public class Station
 	{	
@@ -49,7 +50,7 @@
 		
 		// post data
 		public var imageData:Sprite = new Sprite();
-		public var team:Team;
+		public var owner:Team;
 		
 		public function Station() 
 		{			
@@ -83,7 +84,7 @@
 		{
 			try
 			{
-				this.team = Data.Get().GetTeams().GetTeamById(team_id);
+				this.owner = Data.Get().GetTeams().GetTeamById(team_id);
 				this.loader = new Loader();
 				this.loader.load(new URLRequest(image));
 				this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
