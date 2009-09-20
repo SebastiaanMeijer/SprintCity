@@ -23,6 +23,10 @@
 				<td><textarea name="description" rows="6"></textarea></td>
 			</tr>
 			<tr>
+				<td>Kleur</td>
+				<td><input class="color" name="color"></input></td>
+			</tr>
+			<tr>
 				<td>Computer</td>
 				<td><input type="checkbox" name="cpu"></td>
 			</tr>
@@ -44,6 +48,7 @@
 		<tr>
 			<th>ID</th>
 			<th>Naam</th>
+			<th>Kleur</th>
 			<th>Opmerkingen</th>
 			<th>Datum</th>
 			<th>Computer</th>
@@ -54,6 +59,10 @@
 		<tr class="<?php echo $class; ?>">
 			<td><?php echo $key; ?></td>
 			<td><?php echo $value->name; ?></td>
+			<td><div style="display:block; 
+							width: 16px; 
+							height: 16px; 
+							background-color: <?php echo '#' . $value->color; ?>"></div></td>
 			<td><?php echo $value->description; ?></td>
 			<td><?php echo $value->created; ?></td>
 			<td><?php echo $value->cpu; ?></td>

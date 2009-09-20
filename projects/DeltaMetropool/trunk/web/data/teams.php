@@ -10,14 +10,13 @@
 	
 	function printTeams()
 	{
-		$team_fields = array('id', 'name', 'description', 'cpu', 'created', 'is_player');
+		$team_fields = array('id', 'name', 'description', 'color', 'cpu', 'created', 'is_player');
 		
 		$db = Database::getDatabase();
 		
 		$team_result = getTeams(session_id());
 		
 		echo '<teams>';
-		
 		while ($team_row = mysql_fetch_array($team_result))
 		{
 			echo '<team>';

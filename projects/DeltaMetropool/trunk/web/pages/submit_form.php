@@ -196,12 +196,13 @@ function NewTeam()
 	
 	$query = "
 		INSERT INTO `team` 
-			(`name` , `description` , `cpu`, `created`)
+			(`name` , `description` , `color` , `cpu` , `created`)
 		VALUES 
-			(:name, :description, :cpu, :created);";
+			(:name, :description, :color, :cpu, :created);";
 	$args = array(
 		'name' => $_REQUEST['name'], 
 		'description' => $_REQUEST['description'], 
+		'color' => $_REQUEST['color'], 
 		'cpu' => isset($_REQUEST['cpu']),
 		'created' => date('Y-m-d H:i:s'));
 	$db->query($query, $args);

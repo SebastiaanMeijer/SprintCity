@@ -32,7 +32,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Team', array('id', 'name', 'description', 'cpu', 'created'), $id);
+			parent::__construct('Team', array('id', 'name', 'description', 'color', 'cpu', 'created'), $id);
 		}
 		
 		public static function rowCount()
