@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Station 
 {
 	import SprintStad.Data.IDataCollection;
+	import SprintStad.Data.Team.Team;
 	public class Stations implements IDataCollection
 	{	
 		private var stations:Array = new Array();	
@@ -56,6 +57,48 @@
 		public function GetStationCount():int
 		{
 			return stations.length;
+		}
+		
+		public function GetNextStationOfTeam(currentStation:Station, team:Team):Station
+		{
+			var index:int = stations.indexOf(currentStation);
+			var station:Station = currentStation;
+			do
+			{
+				index = (index + 1) % stations.length;
+				station = stations[index];
+				if (station.team_id == currentStation.team_id)
+					return station;
+			}
+			while (station != currentStation)
+			return currentStation;
+		}
+		
+		public function GetPreviousStationOfTeam(currentStation:Station, team:Team):Station
+		{
+			var index:int = stations.indexOf(currentStation);
+			var station:Station = currentStation;
+			do
+			{
+				index = (stations.length + index - 1) % stations.length;
+				station = stations[index];
+				if (station.team_id == currentStation.team_id)
+					return station;
+			}
+			while (station != currentStation)
+			return currentStation;
+		}
+		
+		public function GetNextStation(currentStation:Station):Station
+		{
+			var index:int = stations.indexOf(currentStation);
+			return stations[(index + 1) % stations.length];
+		}
+		
+		public function GetPreviousStation(currentStation:Station):Station
+		{
+			var index:int = stations.indexOf(currentStation);
+			return stations[(stations.length + index - 1) % stations.length];
 		}
 		
 		public function Clear():void

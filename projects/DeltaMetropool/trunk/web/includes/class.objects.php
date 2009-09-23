@@ -232,7 +232,7 @@
 				ON TeamInstance.id=StationInstance.team_instance_id
 				WHERE TeamInstance.game_id=" . $game_id . "
 				AND RoundInstance.round_id=" . $round_id . "
-				AND program_id IS NOT NULL");
+				AND RoundInstance.program_id IS NOT NULL");
 		}
 	}
 

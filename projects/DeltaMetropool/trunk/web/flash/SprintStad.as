@@ -30,7 +30,7 @@
 		public static const FRAME_OVERVIEW:int = 51;
 		
 		private var currentState:IState = null;
-		private var currentStation:Station = null;
+		public var currentStation:Station = null;
 		private var states:Array = new Array();
 		
 		public function SprintStad()

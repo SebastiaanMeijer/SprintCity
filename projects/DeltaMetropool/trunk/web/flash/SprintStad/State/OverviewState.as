@@ -27,43 +27,30 @@
 		{
 			var view:MovieClip = parent.overview_movie;
 			var stationMovie:MovieClip = MovieClip(view.getChildByName(station.name.replace(" ", "_")));
+			parent.currentStation = station;
 			selection.x = stationMovie.x;
 			selection.y = stationMovie.y;
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
+			if (station.owner.is_player)
+			{
+				view.program_button.visible = true;
+				view.program_button.buttonMode = true;
+				view.program_button.addEventListener(MouseEvent.CLICK, OnProgramButton);
+			}
+			else
+			{
+				view.program_button.visible = false;
+				view.program_button.buttonMode = false;
+				view.program_button.removeEventListener(MouseEvent.CLICK, OnProgramButton);
+			}
 		}
 		
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
 			var movie_name:String = station.name.replace(" ", "_");
 			return MovieClip(parent.overview_movie.getChildByName(movie_name));
-		}
-		
-		private function OnStationLeidenButton(event:MouseEvent):void
-		{
-			var view:MovieClip = parent.overview_movie;
-			var station:Station = Data.Get().GetStations().GetStation(0);
-			stationIndex = 0;
-			view.station_name.text = station.name;
-			view.town_name.text = station.town;
-			view.region_name.text = station.region;
-			
-			//StationInfoState(parent.GetState(SprintStad.STATE_STATION_INFO)).SetCurrentStation(0);
-			//parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
-		}
-		
-		private function OnStationSassenheimButton(event:MouseEvent):void
-		{
-			var view:MovieClip = parent.overview_movie;
-			var station:Station = Data.Get().GetStations().GetStation(1);
-			stationIndex = 1;
-			view.station_name.text = station.name;
-			view.town_name.text = station.town;
-			view.region_name.text = station.region;
-			
-			//StationInfoState(parent.GetState(SprintStad.STATE_STATION_INFO)).SetCurrentStation(1);
-			//parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
 		private function OnProgramButton(event:MouseEvent):void
@@ -74,7 +61,6 @@
 		
 		private function OnInfoButton(event:MouseEvent):void
 		{
-			StationInfoState(parent.GetState(SprintStad.STATE_STATION_INFO)).SetCurrentStation(stationIndex);
 			parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
@@ -157,13 +143,12 @@
 				}
 				
 				// initial selection
-				station = Data.Get().GetStations().GetStation(stationIndex);
 				parent.overview_movie.addChild(selection);
 				selection.x = 500;
 				selection.y = 500;
-				selection.width = 40;
-				selection.height = 40;
-				SelectStation(station);
+				selection.width = 42;
+				selection.height = 42;
+				SelectStation(parent.currentStation);
 			}
 			catch (e:Error)
 			{

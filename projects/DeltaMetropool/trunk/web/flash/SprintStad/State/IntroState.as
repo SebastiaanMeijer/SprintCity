@@ -14,6 +14,7 @@
 	public class IntroState implements IState
 	{
 		private var parent:SprintStad = null;
+		private var loadCount:int = 0;
 		
 		public function IntroState(parent:SprintStad) 
 		{
@@ -28,6 +29,19 @@
 		public function OnLoadingDone(data:int)
 		{
 			Debug.out(this + " I know " + data);
+			loadCount++;
+			if (loadCount == 6)
+			{
+				parent.currentStation = 
+					Data.Get().GetStations().GetStation(
+						Data.Get().GetStations().GetStationCount() - 1);
+				parent.currentStation = 
+					Data.Get().GetStations().GetNextStationOfTeam(
+						parent.currentStation, 
+						Data.Get().GetTeams().GetOwnTeam());
+				parent.intro_movie.buttonMode = true;
+				parent.intro_movie.addEventListener(MouseEvent.CLICK, OnContinueEvent);
+			}
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
@@ -40,8 +54,6 @@
 			DataLoader.Get().AddJob(DataLoader.DATA_STATION_TYPES, OnLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_CONSTANTS, OnLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
-			parent.intro_movie.buttonMode = true;
-			parent.intro_movie.addEventListener(MouseEvent.CLICK, OnContinueEvent);
 		}
 		
 		public function Deactivate():void
