@@ -29,6 +29,14 @@
 			return null;
 		}
 		
+		public function GetOwnTeam():Team
+		{
+			for each (var team:Team in teams)
+				if (team.is_player)
+					return team;
+			return null;
+		}
+		
 		public function GetTeamCount():int
 		{
 			return teams.length;
@@ -66,8 +74,11 @@
 				
 				if (firstTag == "")
 					firstTag = xml.name();
-					
-				team[xml.name()] = xml;
+				
+				if (tag == "is_player")
+					team[tag] = (int(xml) == 0 ? false : true);
+				else
+					team[tag] = xml;
 			}
 			AddTeam(team);
 		}		

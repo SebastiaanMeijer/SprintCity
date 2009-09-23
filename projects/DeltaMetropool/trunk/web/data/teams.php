@@ -22,6 +22,8 @@
 			echo '<team>';
 			foreach ($team_fields as $team_field)
 			{
+				if ($team_field == 'is_player')
+					$team_row[$team_field] = $team_row[$team_field] == 1 ? 1 : 0;
 				echo '<' . $team_field . '>' . $team_row[$team_field] . '</' . $team_field . '>';
 			}			
 			echo '</team>';
