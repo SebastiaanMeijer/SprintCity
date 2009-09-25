@@ -7,19 +7,22 @@
 	{
 		private const SLIDER_WIDTH:int = 5;
 		
+		public var changeCallback:Function = null;
 		public var clip:MovieClip = null;
 		public var canvasX:Number = 0;
 		public var canvasY:Number = 0;
 		public var canvasWidth:Number = 100;
 		public var canvasHeight:Number = 100;
 		public var sliders:Array = new Array();	
+		public var totalArea:int = 0;
 		
 		private var activeSlider:ProgramSlider = null;
 		private var startMouseX:Number = 0;
 		private var startSliderSize:Number = 0;
 		
-		public function ProgramEditor(clip:MovieClip) 
+		public function ProgramEditor(clip:MovieClip, changeCallback:Function) 
 		{
+			this.changeCallback = changeCallback;
 			this.clip = clip;
 			this.canvasX = clip.x + clip.graph.x;
 			this.canvasY = clip.y + clip.graph.y;
@@ -36,6 +39,18 @@
 			sliders.push(slider);
 		}
 		
+		public function SetArea(area:int)
+		{
+			this.totalArea = area;
+			for each (var slider:ProgramSlider in sliders)
+				slider.size -= slider.size % (1 / totalArea);
+		}
+		
+		public function GetSliderArea(slider:ProgramSlider):int
+		{
+			return Math.round(slider.size * totalArea);
+		}
+		
 		public function Draw():void
 		{
 			var x:Number = 0;
@@ -43,13 +58,14 @@
 			clip.graph.graphics.clear();
 			for each (var slider:ProgramSlider in sliders)
 			{
-				clip.graph.graphics.beginFill(slider.color);
+				clip.graph.graphics.beginFill(parseInt("0x" + slider.type.color, 16));
 				clip.graph.graphics.drawRect(x, 0, slider.size * 100, 100);
 				clip.graph.graphics.endFill();
 				x += slider.size * 100;
 				clip.parent.addChild(slider.clip);
 				slider.clip.x = canvasX + (x / 100) * canvasWidth;
 				slider.clip.y = canvasY - 3;
+				slider.clip.area.text = GetSliderArea(slider);
 			}
 		}
 		
@@ -71,7 +87,10 @@
 			if (activeSlider != null)
 			{
 				var mouseDelta:Number = e.stageX - startMouseX;
+				var startSize:Number = activeSlider.size;
+				var dirty:Boolean = false;
 				activeSlider.size = startSliderSize + mouseDelta / canvasWidth;
+				activeSlider.size -= activeSlider.size % (1 / totalArea);
 				// min bound
 				var i:int = sliders.indexOf(activeSlider) - 1;
 				while (i >= 0 && activeSlider.size < 0)
@@ -82,6 +101,7 @@
 						activeSlider.size = 0;
 						startSliderSize = 0;
 						startMouseX = e.stageX;
+						dirty = true;
 					}
 					else
 					{
@@ -97,7 +117,10 @@
 				{
 					sliders[i].size -= Math.min(sliders[i].size, TotalSliderSize() - 1.0);
 					i--;
-				}				
+					dirty = true;
+				}
+				if (dirty || activeSlider.size != startSize)
+					changeCallback.call(this);
 			}
 			Draw();
 		}

@@ -56,7 +56,6 @@
 		{			
 		}
 		
-				
 		public function AddRound(round:Round):void
 		{
 			rounds.push(round);
@@ -78,6 +77,15 @@
 		public function GetRoundCount():int
 		{
 			return rounds.length;
+		}
+		
+		public function GetTotalTransformArea():int
+		{
+			return transform_area_cultivated_home + 
+				transform_area_cultivated_mixed +
+				transform_area_cultivated_work +
+				transform_area_undeveloped_mixed + 
+				transform_area_undeveloped_urban;
 		}
 		
 		public function PostConstruct():void

@@ -36,14 +36,15 @@
 	{
 		$db = Database::getDatabase();
 		$query = "
-			SELECT Team.*, ClientSession.id = :id AS is_player
+			SELECT Team.*, MAX(ClientSession.id = :id) AS is_player
 			FROM Team
 			INNER JOIN TeamInstance 
 			ON TeamInstance.team_id = Team.id 
 			INNER JOIN Game 
 			ON Game.id = TeamInstance.game_id 
 			LEFT JOIN ClientSession 
-			ON ClientSession.team_instance_id = TeamInstance.id";
+			ON ClientSession.team_instance_id = TeamInstance.id
+			GROUP BY TeamInstance.id";
 		$args = array('id' => $session_id);
 		return $db->query($query, $args);
 	}

@@ -3,6 +3,7 @@
 	import SprintStad.Calculators.Result.StationTypeEntry;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.Station.StationInstance;
 	import SprintStad.Data.StationTypes.StationType;
 	import SprintStad.Data.StationTypes.StationTypes;
 	import SprintStad.Debug.Debug;
@@ -12,7 +13,7 @@
 		{			
 		}
 		
-		public static function GetStationTypeTop(station:Station):Array
+		public static function GetStationTypeTop(station:StationInstance):Array
 		{
 			var data:Data = Data.Get();
 			var stationTypes:StationTypes = data.GetStationTypes();

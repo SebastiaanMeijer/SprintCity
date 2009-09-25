@@ -7,7 +7,10 @@
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.Station.StationInstance;
+	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Drawer.ProgramEditor;
@@ -44,10 +47,13 @@
 				station.transform_area_undeveloped_mixed);
 			
 			// left info
-			DrawStationInfo(station, view.current_info, "HUIDIG");
+			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
+			
+			// update editor
+			editor.SetArea(station.GetTotalTransformArea());
 		}
 		
-		private function DrawStationInfo(station:Station, clip:MovieClip, title:String)
+		private function DrawStationInfo(station:StationInstance, clip:MovieClip, title:String)
 		{
 			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
 			
@@ -74,7 +80,7 @@
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
 				station.area_undeveloped_rural);
-			clip.area.text = "(" + (
+			clip.area.text = "(" + Math.round(
 				station.area_cultivated_home +
 				station.area_cultivated_work +
 				station.area_cultivated_mixed + 
@@ -86,7 +92,7 @@
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			clip.transform_area.text = "(" + ( 
+			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
@@ -96,8 +102,43 @@
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
 			clip.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
-			clip.amount_houses.text = station.count_home_total;
-			clip.bvo_work.text = station.count_work_total;
+			clip.amount_houses.text = Math.round(station.count_home_total);
+			clip.bvo_work.text = Math.round(station.count_work_total);
+		}
+		
+		private function OnEditorChange():void
+		{
+			var program:Program = CreateProgram();
+			var stationInstance:StationInstance = 
+				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, program);
+			DrawStationInfo(stationInstance, parent.program_movie.future_info, "TOEKOMST");	
+		}
+		
+		private function CreateProgram():Program
+		{
+			var program:Program = new Program();
+			for each (var slider:ProgramSlider in editor.sliders)
+			{
+				switch (slider.type.type)
+				{
+					case "home":
+					case "average_home":
+						program.home_type = slider.type;
+						program.home_area = Math.round(slider.size * editor.totalArea);
+						break;
+					case "work":
+					case "average_work":
+						program.work_type = slider.type;
+						program.work_area = Math.round(slider.size * editor.totalArea);
+						break;
+					case "leisure":
+					case "average_leisure":
+						program.leisure_type = slider.type;
+						program.leisure_area = Math.round(slider.size * editor.totalArea);
+						break;
+				}
+			}
+			return program;
 		}
 		
 		private function OnOkButton(event:MouseEvent):void
@@ -146,10 +187,11 @@
 			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
 			
 			// draw editor
-			editor = new ProgramEditor(view.program_graph);
-			editor.AddSlider(new ProgramSlider(0xD85D5D));
-			editor.AddSlider(new ProgramSlider(0xBB88B1));
-			editor.AddSlider(new ProgramSlider(0xFCF38D));
+			var types:Types = Data.Get().GetTypes();
+			editor = new ProgramEditor(view.program_graph, OnEditorChange);
+			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_home")[0]));
+			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_work")[0]));
+			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_leisure")[0]));
 			
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}

@@ -2,16 +2,17 @@
 {
 	import fl.controls.Slider;
 	import flash.display.MovieClip;
+	import SprintStad.Data.Types.Type;
 	public class ProgramSlider
 	{
 		public var clip:MovieClip = new Slider();
-		public var size:Number;
-		public var color:uint;
+		public var type:Type;
+		public var size:Number;		
 		
-		public function ProgramSlider(color:uint = 0xffffff, size:Number = 0.1) 
+		public function ProgramSlider(type:Type, size:Number = 0.1) 
 		{
+			this.type = type;
 			this.size = size;
-			this.color = color;
 		}		
 	}
 }

@@ -17,6 +17,7 @@
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.Station.StationInstance;
 	import SprintStad.Data.StationTypes.StationType;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
@@ -48,6 +49,7 @@
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
+			var stationInstance:StationInstance = StationInstance.Create(station);
 			
 			// station sign
 			view.board.name_field.text = station.name;
@@ -72,7 +74,7 @@
 
 			//left info
 			view.current_info.title.text = "";
-			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
+			var top:Array = StationTypeCalculator.GetStationTypeTop(stationInstance);
 			
 			view.current_info.station_type_1_percent.text = top[0].similarity + "%";
 			top[0].stationType.imageData.width = 100;
@@ -114,7 +116,7 @@
 				station.transform_area_undeveloped_urban +
 				station.transform_area_undeveloped_mixed) + " ha.)";
 				
-			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
+			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
 			view.current_info.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
 			view.current_info.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
 			view.current_info.amount_houses.text = station.count_home_total;
