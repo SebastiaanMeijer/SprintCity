@@ -28,14 +28,17 @@
 		{
 			try
 			{
-				this.loader = new Loader();
-				this.loader.load(new URLRequest(image));
-				this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
-				this.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR , OnLoadError);
+				if (image != "")
+				{
+					this.loader = new Loader();
+					this.loader.load(new URLRequest(image));
+					this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
+					this.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR , OnLoadError);
+				}
 			}
 			catch (e:Error)
 			{
-				ErrorDisplay.Get().DisplayError("error loading: " + image);
+				ErrorDisplay.Get().DisplayError("error loading Type.image: " + image);
 			}
  		}
 		
@@ -46,7 +49,7 @@
 
 		function OnLoadError(e:IOErrorEvent):void 
 		{
-			ErrorDisplay.Get().DisplayError("error loading: " + image);
+			ErrorDisplay.Get().DisplayError("error loading Type.image: " + image);
 		}
 	}
 

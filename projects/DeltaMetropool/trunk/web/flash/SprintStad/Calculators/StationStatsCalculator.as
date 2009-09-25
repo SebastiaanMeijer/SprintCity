@@ -2,7 +2,9 @@
 {
 	import SprintStad.Data.Constants.Constants;
 	import SprintStad.Data.Data;
+	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.Station.StationInstance;
 	public class StationStatsCalculator
 	{
 		public function StationStatsCalculator() 
@@ -10,7 +12,14 @@
 			
 		}
 		
-		public static function GetTravelersStats(station:Station):int
+		public static function GetStationAfterProgram(station:Station, program:Program):StationInstance
+		{
+			var stationInstance:StationInstance = StationInstance.Create(station);
+			stationInstance.ApplyProgram(program);
+			return stationInstance;
+		}
+		
+		public static function GetTravelersStats(station:StationInstance):int
 		{
 			var constants:Constants = Data.Get().GetConstants();
 			if (station.POVN >= 3000)

@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Types 
 {
 	import SprintStad.Data.IDataCollection;
+	import SprintStad.Debug.Debug;
 	public class Types implements IDataCollection
 	{
 		private var types:Array = new Array();
@@ -39,6 +40,17 @@
 		public function GetTypeCount():int
 		{
 			return types.length;
+		}
+		
+		public function GetTypesOfCategory(category:String):Array
+		{
+			var result:Array = new Array();
+			for each (var type:Type in types)
+			{
+				if (type.type == category)
+					result.push(type);
+			}
+			return result;
 		}
 		
 		public function Clear():void
