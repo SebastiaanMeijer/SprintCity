@@ -35,17 +35,21 @@
 	function getTeams($session_id)
 	{
 		$db = Database::getDatabase();
+		$game_id = Game::getGameIdOfSession($session_id);
 		$query = "
-			SELECT Team.*, MAX(ClientSession.id = :id) AS is_player
+			SELECT Team.*, TeamInstance.game_id, MAX(ClientSession.id = :id) AS is_player
 			FROM Team
 			INNER JOIN TeamInstance 
 			ON TeamInstance.team_id = Team.id 
 			INNER JOIN Game 
 			ON Game.id = TeamInstance.game_id 
 			LEFT JOIN ClientSession 
-			ON ClientSession.team_instance_id = TeamInstance.id
-			GROUP BY TeamInstance.id";
-		$args = array('id' => $session_id);
+			ON ClientSession.team_instance_id = TeamInstance.id 
+			GROUP BY TeamInstance.id 
+			HAVING TeamInstance.game_id = :game_id";
+		$args = array(
+			'id' => $session_id,
+			'game_id' => $game_id);
 		return $db->query($query, $args);
 	}
 ?>
