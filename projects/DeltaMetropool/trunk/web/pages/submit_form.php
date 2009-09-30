@@ -39,19 +39,18 @@ switch( $vars[0] )
 function NewGame()
 {
 	$db = Database::getDatabase();
-	$firstRoundId = RoundInfo::GetRoundId(0);
+	$firstRoundId = 'NULL';
 	
 	// add new game record to the Game table
 	$query = "
 		INSERT INTO `Game` 
-			(`name`, `notes`, `starttime`, `current_round_id`, `active`)
+			(`name`, `notes`, `starttime`, `active`)
 		VALUES 
-			(:name, :notes, :starttime, :firstround, :active);";
+			(:name, :notes, :starttime, :active);";
 	$args = array(
 		'name' => $_REQUEST['name'], 
 		'notes' => $_REQUEST['notes'], 
 		'starttime' => date( 'Y-m-d H:i:s'), 
-		'firstround' => $firstRoundId,
 		'active' => 1);
 	$db->query($query, $args);
 	

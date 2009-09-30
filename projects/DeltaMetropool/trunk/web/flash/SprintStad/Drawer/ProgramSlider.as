@@ -1,6 +1,5 @@
 ﻿package SprintStad.Drawer 
 {
-	import fl.controls.Slider;
 	import flash.display.MovieClip;
 	import SprintStad.Data.Types.Type;
 	public class ProgramSlider
