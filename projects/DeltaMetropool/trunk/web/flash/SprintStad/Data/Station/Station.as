@@ -8,6 +8,7 @@
 	import flash.net.URLRequest;
 	import flash.utils.Proxy;
 	import SprintStad.Data.Data;
+	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Team.Team;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Team.Team;
@@ -51,6 +52,9 @@
 		// post data
 		public var imageData:Sprite = new Sprite();
 		public var owner:Team;
+		
+		// game data
+		public var program:Program = null;
 		
 		public function Station() 
 		{			

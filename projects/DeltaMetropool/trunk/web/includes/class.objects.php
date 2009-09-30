@@ -192,6 +192,25 @@
 			$db = Database::getDatabase();
 			return $db->getValue("SELECT `id` FROM `roundinfo` ORDER BY `number` ASC LIMIT " . $round_number . ", 1");
 		}
+		
+		public static function getCurrentRoundIdBySessionId($session_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT RoundInfo.id 
+				FROM RoundInfo 
+				INNER JOIN Game 
+				ON Game.current_round_id = RoundInfo.id 
+				INNER JOIN TeamInstance 
+				ON TeamInstance.game_id = Game.id 
+				INNER JOIN ClientSession 
+				ON ClientSession.team_instance_id = TeamInstance.id 
+				WHERE ClientSession.id = :session_id", 
+				array('session_id' => $session_id));
+			if ($db->getValue($result) == "")
+				return 0;
+			return $db->getValue($result);
+		}
 	}
 	
 	class StationInstance extends DBObject
@@ -222,6 +241,10 @@
 		
 		public static function getCommittedRounds($game_id, $round_id)
 		{
+			if ($round_id == "")
+				$round_id_condition = " IS NULL";
+			else
+				$round_id_condition = "=" . $round_id;
 			$db = Database::getDatabase();
 			return $db->getValue("
 				SELECT count(*)
@@ -231,7 +254,7 @@
 				INNER JOIN TeamInstance
 				ON TeamInstance.id=StationInstance.team_instance_id
 				WHERE TeamInstance.game_id=" . $game_id . "
-				AND RoundInstance.round_id=" . $round_id . "
+				AND RoundInstance.round_id" . $round_id_condition . "
 				AND RoundInstance.program_id IS NOT NULL");
 		}
 	}

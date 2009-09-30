@@ -125,13 +125,28 @@ function BackStepGame($vars)
 	$game = new Game($vars[1]);
 	
 	$temp_key = -1;
-	foreach ($rounds as $key => $value)
+	if ($game->current_round_id == 1)
+		$temp_key = "NULL";
+	else if ($game->current_round_id != "")
 	{
-		if ($game->current_round_id == $key)
-			break;
-		$temp_key = $key;
+		foreach ($rounds as $key => $value)
+		{
+			if ($game->current_round_id == $key)
+				break;
+			$temp_key = $key;
+		}
 	}
-	if ($temp_key > -1)
+	
+	if ($temp_key == "NULL")
+	{
+		$query = "
+			UPDATE `game` 
+			SET `current_round_id` = NULL
+			WHERE `id` = :game_id;";
+		$args = array('game_id' => $game->id);
+		$db->query($query, $args);
+	}
+	else if ($temp_key > -1)
 	{
 		$query = "
 			UPDATE `game` 
@@ -151,17 +166,23 @@ function NextStepGame($vars)
 	$game = new Game($vars[1]);
 
 	$temp_key = -1;
-	foreach ($rounds as $key => $value)
+	if ($game->current_round_id == "")
+		$temp_key = 1;
+	else
 	{
-		// dirty code starts here
-		if ($temp_key > -1)
+		foreach ($rounds as $key => $value)
 		{
-			$temp_key = $key;
-			break;
+			// dirty code starts here
+			if ($temp_key > -1)
+			{
+				$temp_key = $key;
+				break;
+			}
+			if ($game->current_round_id == $key)
+				$temp_key = $key;
 		}
-		if ($game->current_round_id == $key)
-			$temp_key = $key;
 	}
+	
 	if ($temp_key > -1)
 	{
 		$query = "
