@@ -101,8 +101,8 @@
 			area_cultivated_work += program.work_area;
 			area_cultivated_mixed += program.leisure_area;
 			
-			count_home_total += program.home_area * program.home_type.density;
-			count_work_total += program.work_area * program.work_type.density;			
+			count_home_total += program.home_area * GetHomeDensity(program);
+			count_work_total += program.work_area * GetWorkDensity(program);			
 			
 			if (round != null)
 			{
@@ -115,7 +115,23 @@
 				(area_cultivated_home + area_cultivated_work);
 			var citizens:Number = count_home_total * constants.average_citizens_per_home;
 			var workers:Number = count_work_total * constants.average_workers_per_bvo;
-			MNG = Math.min(citizens, workers) / Math.max(citizens, workers) * 100;
+			MNG = Math.min(citizens * 5, workers) / Math.max(citizens * 5, workers) * 100;
+		}
+		
+		private function GetHomeDensity(program:Program):Number
+		{
+			if (program.home_type.type.search("average_") > -1)
+				return station.count_home_total / area_cultivated_home;
+			else
+				return program.home_type.density;
+		}
+		
+		private function GetWorkDensity(program:Program):Number
+		{
+			if (program.work_type.type.search("average_") > -1)
+				return station.count_work_total / area_cultivated_work;
+			else
+				return program.work_type.density;
 		}
 		
 		public function SetRound(round:Round):void

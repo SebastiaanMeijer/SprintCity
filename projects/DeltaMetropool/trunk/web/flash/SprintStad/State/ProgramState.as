@@ -60,16 +60,19 @@
 			clip.title.text = title;
 			
 			clip.station_type_1_percent.text = top[0].similarity + "%";
+			clip.station_type_1_name.text = top[0].stationType.name;
 			top[0].stationType.imageData.width = 100;
 			top[0].stationType.imageData.height = 100;
 			clip.station_type_1_image.addChild(top[0].stationType.imageData);
 			
 			clip.station_type_2_percent.text = top[1].similarity + "%";
+			clip.station_type_2_name.text = top[1].stationType.name;
 			top[1].stationType.imageData.width = 100;
 			top[1].stationType.imageData.height = 100;
 			clip.station_type_2_image.addChild(top[1].stationType.imageData);
 			
 			clip.station_type_3_percent.text = top[2].similarity + "%";
+			clip.station_type_3_name.text = top[2].stationType.name;
 			top[2].stationType.imageData.width = 100;
 			top[2].stationType.imageData.height = 100;
 			clip.station_type_3_image.addChild(top[2].stationType.imageData);
@@ -111,7 +114,7 @@
 			var program:Program = CreateProgram();
 			var stationInstance:StationInstance = 
 				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, program);
-			DrawStationInfo(stationInstance, parent.program_movie.future_info, "TOEKOMST");	
+			DrawStationInfo(stationInstance, parent.program_movie.future_info, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
@@ -143,7 +146,8 @@
 		
 		private function OnOkButton(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_ROUND);
+			parent.currentStation.program = CreateProgram();
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnValuesButton(event:MouseEvent):void

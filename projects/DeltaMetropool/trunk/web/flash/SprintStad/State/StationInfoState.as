@@ -50,7 +50,6 @@
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
 			var stationInstance:StationInstance = StationInstance.Create(station);
-			
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
@@ -71,22 +70,25 @@
 			
 			// background
 			view.sheet.addChild(station.imageData);
-
+			
 			//left info
 			view.current_info.title.text = "";
 			var top:Array = StationTypeCalculator.GetStationTypeTop(stationInstance);
 			
 			view.current_info.station_type_1_percent.text = top[0].similarity + "%";
+			view.current_info.station_type_1_name.text = top[0].stationType.name;
 			top[0].stationType.imageData.width = 100;
 			top[0].stationType.imageData.height = 100;
 			view.current_info.station_type_1_image.addChild(top[0].stationType.imageData);
 			
 			view.current_info.station_type_2_percent.text = top[1].similarity + "%";
+			view.current_info.station_type_2_name.text = top[1].stationType.name;
 			top[1].stationType.imageData.width = 100;
 			top[1].stationType.imageData.height = 100;
 			view.current_info.station_type_2_image.addChild(top[1].stationType.imageData);
 			
 			view.current_info.station_type_3_percent.text = top[2].similarity + "%";
+			view.current_info.station_type_3_name.text = top[2].stationType.name;
 			top[2].stationType.imageData.width = 100;
 			top[2].stationType.imageData.height = 100;
 			view.current_info.station_type_3_image.addChild(top[2].stationType.imageData);
@@ -115,7 +117,7 @@
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
 				station.transform_area_undeveloped_mixed) + " ha.)";
-				
+			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
 			view.current_info.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
 			view.current_info.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);

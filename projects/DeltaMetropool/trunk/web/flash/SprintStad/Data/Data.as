@@ -6,9 +6,13 @@
 	import SprintStad.Data.Team.Teams;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Data.Values.Values;
-	public class Data
+	import SprintStad.Debug.Debug;
+	
+	public class Data implements IDataCollection
 	{
 		private static var instance:Data = new Data();
+		
+		public var current_round_id = 0;
 		
 		private var teams:Teams = new Teams();
 		private var values:Values = new Values();
@@ -55,6 +59,22 @@
 		public function GetConstants():Constants
 		{
 			return constants;
+		}
+		
+		public function PostConstruct():void
+		{
+		}
+		
+		public function Clear():void
+		{			
+		}
+		
+		public function ParseXML(xmlData:XML):void
+		{
+			Clear();
+			
+			var xmlList:XMLList = xmlData.children();
+			this.current_round_id = xmlList;
 		}
 	}
 }

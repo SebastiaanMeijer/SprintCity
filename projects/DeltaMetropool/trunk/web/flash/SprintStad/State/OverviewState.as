@@ -55,8 +55,7 @@
 		
 		private function OnProgramButton(event:MouseEvent):void
 		{
-			//StationInfoState(parent.GetState(SprintStad.STATE_STATION_INFO)).SetCurrentStation(1);
-			parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
+			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnCurrentRoundKnown);
 		}
 		
 		private function OnInfoButton(event:MouseEvent):void
@@ -90,7 +89,15 @@
 			}
 		}
 		
-		public function OnLoadingDone(data:int)
+		public function OnCurrentRoundKnown(data:int):void
+		{
+			if (Data.Get().current_round_id == 0)
+				parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
+			else
+				parent.gotoAndPlay(SprintStad.FRAME_ROUND);
+		}
+		
+		public function OnLoadingDone(data:int):void
 		{
 			Debug.out(this + " I know " + data);
 			var view:MovieClip = parent.overview_movie;
