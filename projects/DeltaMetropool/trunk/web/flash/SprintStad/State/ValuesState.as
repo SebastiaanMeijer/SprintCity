@@ -92,7 +92,8 @@
 		private function onMouseOutEvent(event:MouseEvent):void
 		{
 			filter.strength = 1;
-			parent.values_movie.continue_button.filters = [filter];
+			if (parent.values_movie != null && parent.values_movie.continue_button != null)
+				parent.values_movie.continue_button.filters = [filter];
 		}
 		
 		private function checkBoxChanged(event:Event):void
