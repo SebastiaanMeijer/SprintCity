@@ -29,15 +29,15 @@
 		{
 			// draw stuff
 			var view:MovieClip = parent.program_movie;
-			
+
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
-			
+
 			// background
 			view.sheet.addChild(station.imageData);
-			
+
 			// graphs
 			AreaBarDrawer.DrawBar(view.transform_graph,
 				station.transform_area_cultivated_home, 
@@ -45,12 +45,12 @@
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			
+				
 			// left info
 			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
 			
 			// update editor
-			editor.SetArea(station.GetTotalTransformArea());
+			editor.SetStation(station);
 		}
 		
 		private function DrawStationInfo(station:StationInstance, clip:MovieClip, title:String)
@@ -150,31 +150,16 @@
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
-		private function OnValuesButton(event:MouseEvent):void
+		private function OnCancelButton(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
-		}
-		
-		public function NextStationEvent(e:Event):void
-		{
-			parent.currentStation = Data.Get().GetStations().GetNextStationOfTeam(
-				parent.currentStation, Data.Get().GetTeams().GetOwnTeam());
-			DrawUI(parent.currentStation);
-		}
-		
-		public function PreviousStationEvent(e:Event):void
-		{
-			parent.currentStation = Data.Get().GetStations().GetPreviousStationOfTeam(
-				parent.currentStation, Data.Get().GetTeams().GetOwnTeam());
-			DrawUI(parent.currentStation);
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		public function OnLoadingDone(data:int):void
 		{
 			var view:MovieClip = parent.program_movie;
 			DrawUI(parent.currentStation);
-			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
-			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
+			
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);
 		}
@@ -185,10 +170,11 @@
 		{
 			var view:MovieClip = parent.program_movie;
 			parent.addChild(SprintStad.LOADER);
+			
 			view.ok_button.buttonMode = true;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
-			view.values_button.buttonMode = true;
-			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+			view.cancel_button.buttonMode = true;
+			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
 			
 			// draw editor
 			var types:Types = Data.Get().GetTypes();

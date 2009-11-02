@@ -2,6 +2,9 @@
 {
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
+	import SprintStad.Data.Data;
+	import SprintStad.Data.Round.Round;
+	import SprintStad.Data.Station.Station;
 	import SprintStad.Debug.Debug;
 	public class ProgramEditor
 	{
@@ -15,10 +18,13 @@
 		public var canvasHeight:Number = 100;
 		public var sliders:Array = new Array();	
 		public var totalArea:int = 0;
+		public var availableTransformArea:int = 0;
 		
 		private var activeSlider:ProgramSlider = null;
 		private var startMouseX:Number = 0;
 		private var startSliderSize:Number = 0;
+		
+		private var station:Station = null;
 		
 		public function ProgramEditor(clip:MovieClip, changeCallback:Function) 
 		{
@@ -51,22 +57,76 @@
 			return Math.round(slider.size * totalArea);
 		}
 		
+		public function SetStation(station:Station)
+		{
+			this.station = station;
+			SetArea(station.GetTotalTransformArea());
+			availableTransformArea = GetAvailableTransformArea();
+		}
+		
 		public function Draw():void
 		{
 			var x:Number = 0;
 
 			clip.graph.graphics.clear();
+			
+			if (station != null)
+			{
+				for (var i:int = 0; i < Data.Get().current_round_id - 1; i++)
+				{
+					var round:Round = station.GetRound(i);
+					if (round.program != null)
+					{
+						Debug.out("program: " + round.program);
+						var size:Number;
+						size = round.program.home_area / totalArea;
+						if (size > 0)
+							DrawBlock(x, size, round.program.home_type.color);
+						x += size;
+						Debug.out(" size: " + size);
+						size = round.program.work_area / totalArea;
+						if (size > 0)
+							DrawBlock(x, size, round.program.work_type.color);
+						x += size;
+						Debug.out(" size: " + size);
+						size = round.program.leisure_area / totalArea;
+						if (size > 0)
+							DrawBlock(x, size, round.program.leisure_type.color);
+						x += size;
+						Debug.out(" size: " + size);
+					}
+				}
+			}
+			
 			for each (var slider:ProgramSlider in sliders)
 			{
-				clip.graph.graphics.beginFill(parseInt("0x" + slider.type.color, 16));
-				clip.graph.graphics.drawRect(x, 0, slider.size * 100, 100);
-				clip.graph.graphics.endFill();
+				DrawBlock(x, slider.size, slider.type.color);
 				x += slider.size * 100;
 				clip.parent.addChild(slider.clip);
 				slider.clip.x = canvasX + (x / 100) * canvasWidth;
 				slider.clip.y = canvasY - 3;
 				slider.clip.area.text = GetSliderArea(slider);
 			}
+		}
+		
+		private function GetAvailableTransformArea():int
+		{
+			var result:int = 0;
+			for (var i:int = 0; i < Data.Get().current_round_id; i++)
+			{
+				var round:Round = station.GetRound(i);
+				result += round.new_transform_area;
+				if (round.program != null)
+					result -= round.program.home_area + round.program.work_area + round.program.leisure_area;
+			}
+			return result;
+		}
+		
+		private function DrawBlock(x:Number, size:Number, color:String)
+		{
+			clip.graph.graphics.beginFill(parseInt("0x" + color, 16));
+			clip.graph.graphics.drawRect(x, 0, size * 100, 100);
+			clip.graph.graphics.endFill();
 		}
 		
 		private function OnMouseDown(e:MouseEvent):void

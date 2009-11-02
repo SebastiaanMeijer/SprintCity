@@ -125,22 +125,21 @@
 			view.current_info.bvo_work.text = station.count_work_total;
 		}
 		
-		private function OnNextButton(event:MouseEvent):void
+		private function OnCancelButton(event:MouseEvent):void
 		{
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
-		}
-		
-		private function OnValuesButton(event:MouseEvent):void
-		{
-			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
 		}
 		
 		public function OnLoadingDone(data:int)
 		{
 			var view:MovieClip = parent.station_info_movie;
 			DrawUI(parent.currentStation);
+			
+			view.previous_station_button.buttonMode = true;
 			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
+			view.next_station_button.buttonMode = true;
 			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
+			
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);
 		}
@@ -151,10 +150,8 @@
 		{
 			var view:MovieClip = parent.station_info_movie;
 			parent.addChild(SprintStad.LOADER);
-			view.next_button.buttonMode = true;
-			view.next_button.addEventListener(MouseEvent.CLICK, OnNextButton);
-			view.values_button.buttonMode = true;
-			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+			view.cancel_button.buttonMode = true;
+			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		

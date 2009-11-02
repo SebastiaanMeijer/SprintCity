@@ -128,7 +128,7 @@
 					firstTag = xml.name();
 					
 				if (xml.name() == "rounds")
-					station.ParseXML(xml.rounds.children());
+					station.ParseXML(xml.round.children());
 				else
 					station[xml.name()] = xml;
 			}
