@@ -6,6 +6,7 @@
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
+	import flash.ui.Mouse;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Station.Station;
@@ -51,6 +52,11 @@
 		{
 			var movie_name:String = station.name.replace(" ", "_");
 			return MovieClip(parent.overview_movie.getChildByName(movie_name));
+		}
+		
+		private function OnValuesButton(event:MouseEvent):void
+		{
+			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
 		}
 		
 		private function OnProgramButton(event:MouseEvent):void
@@ -138,6 +144,8 @@
 				view.program_button.addEventListener(MouseEvent.CLICK, OnProgramButton);
 				view.info_button.buttonMode = true;
 				view.info_button.addEventListener(MouseEvent.CLICK, OnInfoButton);
+				view.values_button.buttonMode = true;
+				view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();

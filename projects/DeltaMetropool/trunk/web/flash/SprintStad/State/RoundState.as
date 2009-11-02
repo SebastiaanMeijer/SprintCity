@@ -50,9 +50,9 @@
 			
 			// left info
 			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
-			
+
 			// update editor
-			editor.SetArea(station.GetTotalTransformArea());
+			editor.SetStation(station);
 		}
 		
 		private function DrawStationInfo(station:StationInstance, clip:MovieClip, title:String)
@@ -209,13 +209,19 @@
 		
 		private function OnOkButton(event:MouseEvent):void
 		{
-			parent.currentStation.program = CreateProgram();
+			Debug.out(parent);
+			Debug.out(parent.currentStation);
+			Debug.out(Data.Get().current_round_id);
+			Debug.out(parent.currentStation.GetRound(Data.Get().current_round_id));
+			Debug.out(parent.currentStation.GetRound(Data.Get().current_round_id).program);
+			parent.currentStation.GetRound(Data.Get().current_round_id).program = CreateProgram();
+			
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
-		private function OnValuesButton(event:MouseEvent):void
+		private function OnCancelButton(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnHomeButton(event:MouseEvent):void
@@ -274,8 +280,8 @@
 			parent.addChild(SprintStad.LOADER);
 			view.ok_button.buttonMode = true;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
-			view.values_button.buttonMode = true;
-			view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+			view.cancel_button.buttonMode = true;
+			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
 			
 			view.home_button.buttonMode = true;
 			view.home_button.addEventListener(MouseEvent.CLICK, OnHomeButton);

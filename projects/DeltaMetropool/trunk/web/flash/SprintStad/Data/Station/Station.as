@@ -125,7 +125,6 @@
 			var round:Round = new Round();
 			var xml:XML = null;
 			var firstTag:String = "";
-			AddRound(round);
 			
 			for each (xml in xmlList) 
 			{
