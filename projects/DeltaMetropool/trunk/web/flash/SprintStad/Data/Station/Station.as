@@ -54,7 +54,7 @@
 		public var owner:Team;
 		
 		// game data
-		public var program:Program = null;
+		public var program:Program = new Program();
 		
 		public function Station() 
 		{			
@@ -120,26 +120,29 @@
 			ErrorDisplay.Get().DisplayError("error loading: " + image);
 		}
 		
-		public function ParseXML(xmlList:XMLList):void
+		public function ParseXML(xmlData:XML):void
 		{
 			var round:Round = new Round();
-			var xml:XML = null;
-			var firstTag:String = "";
-			
-			for each (xml in xmlList) 
+			var roundXml:XML = null;
+			var index:int = 0;
+			roundXml = xmlData.round[index];
+			while (roundXml != null)
 			{
-				var tag:String = xml.name();
-				
-				if (xml.name() == firstTag)
+				for each (var xml:XML in roundXml.children())
 				{
-					AddRound(round);
-					round = new Round();
+					if (xml.name() == "program")
+					{
+						round.program.ParseXML(roundXml.program[0]);
+					}
+					else
+					{
+						round[xml.name()] = xml;
+					}
 				}
-				
-				if (firstTag == "")
-					firstTag = xml.name();
-					
-				round[xml.name()] = xml;
+				AddRound(round);
+				round = new Round();
+				index++;
+				roundXml = xmlData.round[index];
 			}
 		}
 	}

@@ -230,6 +230,14 @@
 				ON TeamInstance.id=StationInstance.team_instance_id
 				WHERE TeamInstance.game_id = " . $game_id);
 		}
+		
+		public static function getMaxId()
+		{
+			$db = Database::getDatabase();
+			return $db->getValue("
+				SELECT Max(id) 
+				FROM StationInstance");
+		}
 	}
 	
 	class RoundInstance extends DBObject
@@ -256,6 +264,22 @@
 				WHERE TeamInstance.game_id=" . $game_id . "
 				AND RoundInstance.round_id" . $round_id_condition . "
 				AND RoundInstance.program_id IS NOT NULL");
+		}
+	}
+	
+	class Program extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Program', array('id', 'area_home', 'area_work', 'area_leisure', 'type_home', 'type_work', 'type_leisure'), $id);
+		}
+		
+		public static function getMaxId()
+		{
+			$db = Database::getDatabase();
+			return $db->getValue("
+				SELECT Max(id) 
+				FROM Program");
 		}
 	}
 

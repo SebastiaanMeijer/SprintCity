@@ -2,6 +2,7 @@
 {
 	import SprintStad.Data.IDataCollection;
 	import SprintStad.Data.Team.Team;
+	import SprintStad.Debug.Debug;
 	public class Stations implements IDataCollection
 	{	
 		private var stations:Array = new Array();	
@@ -110,29 +111,32 @@
 		{
 			Clear();
 			
-			var xmlList:XMLList = xmlData.station.children();
 			var station:Station = new Station();
-			var xml:XML = null;
-			var firstTag:String = "";
-
-			for each (xml in xmlList) 
+			var stationXml:XML = null;
+			var index:int = 0;
+			stationXml = xmlData.station[index];
+			while (stationXml != null)
 			{
-				var tag:String = xml.name();
-				if (xml.name() == firstTag)
+				for each (var xml:XML in stationXml.children())
 				{
-					AddStation(station);
-					station = new Station();
+					if (xml.name() == "program")
+					{
+						station.program.ParseXML(stationXml.program[0]);
+					}
+					else if (xml.name() == "rounds")
+					{
+						station.ParseXML(xml);
+					}
+					else
+					{
+						station[xml.name()] = xml;
+					}
 				}
-				
-				if (firstTag == "")
-					firstTag = xml.name();
-					
-				if (xml.name() == "rounds")
-					station.ParseXML(xml.round.children());
-				else
-					station[xml.name()] = xml;
+				AddStation(station);
+				station = new Station();
+				index++;
+				stationXml = xmlData.station[index];
 			}
-			AddStation(station);
 		}
 	}
 }

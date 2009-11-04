@@ -97,12 +97,12 @@
 			count_work_total = area_cultivated_work * work_per_area;
 			count_work_transform = transform_area_cultivated_work * work_per_area;
 			
-			area_cultivated_home += program.home_area;
-			area_cultivated_work += program.work_area;
-			area_cultivated_mixed += program.leisure_area;
+			area_cultivated_home += program.area_home;
+			area_cultivated_work += program.area_work;
+			area_cultivated_mixed += program.area_leisure;
 			
-			count_home_total += program.home_area * GetHomeDensity(program);
-			count_work_total += program.work_area * GetWorkDensity(program);			
+			count_home_total += program.area_home * GetHomeDensity(program);
+			count_work_total += program.area_work * GetWorkDensity(program);			
 			
 			if (round != null)
 			{
@@ -122,18 +122,18 @@
 		
 		private function GetHomeDensity(program:Program):Number
 		{
-			if (program.home_type.type.search("average_") > -1)
+			if (program.type_home.type.search("average_") > -1)
 				return station.count_home_total / area_cultivated_home;
 			else
-				return program.home_type.density;
+				return program.type_home.density;
 		}
 		
 		private function GetWorkDensity(program:Program):Number
 		{
-			if (program.work_type.type.search("average_") > -1)
+			if (program.type_work.type.search("average_") > -1)
 				return station.count_work_total / area_cultivated_work;
 			else
-				return program.work_type.density;
+				return program.type_work.density;
 		}
 		
 		public function SetRound(round:Round):void

@@ -79,19 +79,19 @@
 					{
 						Debug.out("program: " + round.program);
 						var size:Number;
-						size = round.program.home_area / totalArea;
+						size = round.program.area_home / totalArea;
 						if (size > 0)
-							DrawBlock(x, size, round.program.home_type.color);
+							DrawBlock(x, size, round.program.type_home.color);
 						x += size;
 						Debug.out(" size: " + size);
-						size = round.program.work_area / totalArea;
+						size = round.program.area_work / totalArea;
 						if (size > 0)
-							DrawBlock(x, size, round.program.work_type.color);
+							DrawBlock(x, size, round.program.type_work.color);
 						x += size;
 						Debug.out(" size: " + size);
-						size = round.program.leisure_area / totalArea;
+						size = round.program.area_leisure / totalArea;
 						if (size > 0)
-							DrawBlock(x, size, round.program.leisure_type.color);
+							DrawBlock(x, size, round.program.type_leisure.color);
 						x += size;
 						Debug.out(" size: " + size);
 					}
@@ -117,7 +117,7 @@
 				var round:Round = station.GetRound(i);
 				result += round.new_transform_area;
 				if (round.program != null)
-					result -= round.program.home_area + round.program.work_area + round.program.leisure_area;
+					result -= round.program.area_home + round.program.area_work + round.program.area_leisure;
 			}
 			return result;
 		}

@@ -126,18 +126,18 @@
 				{
 					case "home":
 					case "average_home":
-						program.home_type = slider.type;
-						program.home_area = Math.round(slider.size * editor.totalArea);
+						program.type_home = slider.type;
+						program.area_home = Math.round(slider.size * editor.totalArea);
 						break;
 					case "work":
 					case "average_work":
-						program.work_type = slider.type;
-						program.work_area = Math.round(slider.size * editor.totalArea);
+						program.type_work = slider.type;
+						program.area_work = Math.round(slider.size * editor.totalArea);
 						break;
 					case "leisure":
 					case "average_leisure":
-						program.leisure_type = slider.type;
-						program.leisure_area = Math.round(slider.size * editor.totalArea);
+						program.type_leisure = slider.type;
+						program.area_leisure = Math.round(slider.size * editor.totalArea);
 						break;
 				}
 			}
