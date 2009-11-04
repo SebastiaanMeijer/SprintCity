@@ -54,7 +54,8 @@ function NewGame()
 		'active' => 1);
 	$db->query($query, $args);
 	
-	// create a game tree containing the team_instances which in turn contain the staion_instances
+	// create a game tree containing the team_instances which in turn contain the station_instances
+	// game tree format: $game_tree[team id][index] = station id
 	$game_id = mysql_insert_id($db->db);
 	$stations = Station::getStations(0, Station::rowCount());
 	$game_tree = Array();
@@ -74,6 +75,7 @@ function NewGame()
 	// insert the game tree in the database
 	foreach($game_tree as $team_id => $station_collection)
 	{
+		// create team instances for participating teams
 		$query = "
 			INSERT INTO `TeamInstance` 
 				(`game_id`, `team_id`) 
@@ -86,21 +88,53 @@ function NewGame()
 		
 		$team_instance_id = mysql_insert_id($db->db);
 		
+		// create station instances for participating stations
 		foreach ($station_collection as $station_id)
 		{
+			// 'masterplan' program
+			$query = "INSERT INTO `Program` () VALUES ();";
+			$db->query($query);
+			$program_id = Program::getMaxId();
+			
+			// station instance
 			$query = "
 				INSERT INTO `StationInstance` 
-					(`station_id`, `team_instance_id`) 
+					(`station_id`, `team_instance_id`, `program_id`) 
 				VALUES 
-					(:station_id, :team_instance_id);";
+					(:station_id, :team_instance_id, :program_id);";
 			$args = array(
 				'station_id' => $station_id,
-				'team_instance_id' => $team_instance_id);
+				'team_instance_id' => $team_instance_id,
+				'program_id' => $program_id);
 			$db->query($query, $args);
+			
+			// add empty round_instances and programs for every station
+			$station_instance_id = StationInstance::getMaxId();
+			$rounds = Round::getRoundsByStation($station_id);
+			foreach ($rounds as $round_key => $round_value)
+			{
+				// rounds program
+				$query = "INSERT INTO `Program` () VALUES ();";
+				$db->query($query);
+				$program_id = Program::getMaxId();
+				
+				// round instance
+				$query = "
+					INSERT INTO `RoundInstance` 
+						(`round_id`, `station_instance_id`, `program_id`, `starttime`)
+					VALUES 
+						(:round_id, :station_instance_id, :program_id, :starttime);";
+				$args = array(
+					'round_id' => $round_key, 
+					'station_instance_id' => $station_instance_id, 
+					'program_id' => $program_id, 
+					'starttime' => date( 'Y-m-d H:i:s'));
+				$db->query($query, $args);
+			}
 		}
 		
-		$values = Value::getValues();
-		
+		// Add value instances for the participating teams
+		$values = Value::getValues();		
 		foreach ($values as $value_key => $value_value) 
 		{
 			$query = "

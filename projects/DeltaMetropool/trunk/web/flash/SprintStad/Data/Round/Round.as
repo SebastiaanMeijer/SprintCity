@@ -12,7 +12,7 @@
 		public var PWN:Number = 0;
 		
 		// game data
-		public var program:Program = null;
+		public var program:Program = new Program;
 		
 		public function Round() 
 		{			
