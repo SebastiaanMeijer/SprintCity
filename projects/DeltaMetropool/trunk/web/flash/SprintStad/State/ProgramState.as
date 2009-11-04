@@ -3,6 +3,9 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
@@ -19,6 +22,7 @@
 	{		
 		private var parent:SprintStad = null;
 		private var editor:ProgramEditor;
+		private var currentProgram:Program;
 		
 		public function ProgramState(parent:SprintStad) 
 		{
@@ -109,6 +113,18 @@
 			clip.bvo_work.text = Math.round(station.count_work_total);
 		}
 		
+		private function UploadXML():void 
+		{
+			var loader:URLLoader = new URLLoader();
+			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
+			var vars:URLVariables = new URLVariables();
+			vars.session = parent.session;
+			vars.data = parent.currentStation.program.GetXmlString();
+			Debug.out("Send: " + vars.session + " data: " + vars.data);
+			request.data = vars;
+			loader.load(request);
+		}
+		
 		private function OnEditorChange():void
 		{
 			var program:Program = CreateProgram();
@@ -119,7 +135,7 @@
 		
 		private function CreateProgram():Program
 		{
-			var program:Program = new Program();
+			var program:Program = parent.currentStation.program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
 				switch (slider.type.type)
@@ -147,6 +163,7 @@
 		private function OnOkButton(event:MouseEvent):void
 		{
 			parent.currentStation.program = CreateProgram();
+			UploadXML();
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
