@@ -281,5 +281,43 @@
 				SELECT Max(id) 
 				FROM Program");
 		}
+		
+		public static function isOwnedBySession($id, $session_id)
+		{
+			$db = Database::getDatabase();
+			
+			// first attempt: stations
+			$result = $db->query("
+					SELECT COUNT(*) 
+					FROM ClientSession 
+					INNER JOIN TeamInstance 
+					ON ClientSession.team_instance_id = TeamInstance.id 
+					INNER JOIN StationInstance 
+					ON TeamInstance.id = StationInstance.team_instance_id 
+					INNER JOIN Program 
+					ON StationInstance.program_id = Program.id 
+					WHERE ClientSession.id = :session_id AND 
+					Program.id = :id;", 
+					array('session_id' => $session_id, 'id' => $id));
+			if ($db->getValue($result) > 0)
+				return true;
+			
+			// second attempt: rounds
+			$result = $db->query("
+					SELECT COUNT(*) 
+					FROM ClientSession 
+					INNER JOIN TeamInstance 
+					ON ClientSession.team_instance_id = TeamInstance.id 
+					INNER JOIN StationInstance 
+					ON TeamInstance.id = StationInstance.team_instance_id 
+					INNER JOIN RoundInstance
+					ON StationInstance.id = RoundInstance.station_instance_id
+					INNER JOIN Program 
+					ON RoundInstance.program_id = Program.id 
+					WHERE ClientSession.id = :session_id AND 
+					Program.id = :id;", 
+					array('session_id' => $session_id, 'id' => $id));
+			return $db->getValue($result) > 0;
+		}
 	}
 

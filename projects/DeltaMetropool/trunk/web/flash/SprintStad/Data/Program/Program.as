@@ -37,5 +37,22 @@
 			area_work = xmlData.area_work;
 			area_leisure = xmlData.area_leisure;
 		}
+		
+		public function GetXmlString():String
+		{
+			var xmlString:String = "";
+			
+			xmlString += "<program>";
+			xmlString += "<program_id>" + program_id + "</program_id>";
+			xmlString += "<type_home>" + type_home.id + "</type_home>";
+			xmlString += "<type_work>" + type_work.id + "</type_work>";
+			xmlString += "<type_leisure>" + type_leisure.id + "</type_leisure>";
+			xmlString += "<area_home>" + area_home + "</area_home>";
+			xmlString += "<area_work>" + area_work + "</area_work>";
+			xmlString += "<area_leisure>" + area_leisure + "</area_leisure>";
+			xmlString += "</program>";
+			
+			return xmlString;
+		}
 	}
 }
