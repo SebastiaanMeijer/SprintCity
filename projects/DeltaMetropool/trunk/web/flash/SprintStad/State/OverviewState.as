@@ -116,13 +116,8 @@
 				var colorTransform:ColorTransform = new ColorTransform();
 				colorTransform.color = parseInt("0x" + station.owner.color, 16);
 				movie.outline.transform.colorTransform = colorTransform;				
-				
-				AreaBarDrawer.DrawBar(movie.graph,
-					station.area_cultivated_home,
-					station.area_cultivated_work,
-					station.area_cultivated_mixed, 
-					station.area_undeveloped_urban,
-					station.area_undeveloped_rural);
+				station.RefreshAreaBar();
+				movie.graph.addChild(station.areaBar.GetClip());
 			}
 		}
 			

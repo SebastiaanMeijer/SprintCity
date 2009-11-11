@@ -30,9 +30,9 @@
 		{
 			var types:Types = Data.Get().GetTypes();
 			program_id = xmlData.program_id;
-			type_home = types.GetType(xmlData.type_home);
-			type_work = types.GetType(xmlData.type_work);
-			type_leisure = types.GetType(xmlData.type_leisure);
+			type_home = types.GetTypeById(xmlData.type_home);
+			type_work = types.GetTypeById(xmlData.type_work);
+			type_leisure = types.GetTypeById(xmlData.type_leisure);
 			area_home = xmlData.area_home;
 			area_work = xmlData.area_work;
 			area_leisure = xmlData.area_leisure;

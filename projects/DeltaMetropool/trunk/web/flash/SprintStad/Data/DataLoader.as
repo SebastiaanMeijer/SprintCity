@@ -125,24 +125,27 @@
 				var xmlData:XML = new XML(event.target.data);
 				IDataCollection(targets[currentJob]).ParseXML(xmlData);
 				IDataCollection(targets[currentJob]).PostConstruct();
-				for each (var callback:Function in jobs[currentJob])
-				{
-					callback.call(this, currentJob);
-				}
-				jobs[currentJob] = new Array();			
-				NextJob();
-				DoJob();
 			}
 			catch (e:Error)
 			{
 				Debug.out("error in dataloader, LoadingDone() on Job:" + currentJob);
-				Debug.out(e);
-				Debug.out(e.name);
-				Debug.out(e.message);
-				Debug.out(e.errorID);
-				Debug.out(e.getStackTrace());
 				Debug.out(event.target.data);
 			}
+			
+			try
+			{
+				for each (var callback:Function in jobs[currentJob])
+				{
+					callback.call(this, currentJob);
+				}
+			}
+			catch (e:Error)
+			{
+				Debug.out("error in dataloader callback functions, LoadingDone() on Job:" + currentJob);
+			}			
+			jobs[currentJob] = new Array();			
+			NextJob();
+			DoJob();
 		}
 		
 		function OnLoadError(e:IOErrorEvent):void 

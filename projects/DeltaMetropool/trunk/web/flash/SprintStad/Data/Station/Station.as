@@ -14,6 +14,7 @@
 	import SprintStad.Data.Team.Team;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
+	import SprintStad.Drawer.AreaBarDrawer;
 	public class Station
 	{	
 		public var id:int = 0;
@@ -51,13 +52,20 @@
 		
 		// post data
 		public var imageData:Sprite = new Sprite();
+		public var areaBar:AreaBarDrawer;
 		public var owner:Team;
 		
 		// game data
 		public var program:Program = new Program();
 		
 		public function Station() 
-		{			
+		{
+			areaBar = new AreaBarDrawer(new Placeholder());
+		}
+		
+		public function RefreshAreaBar():void
+		{
+			areaBar.DrawBar(area_cultivated_home, area_cultivated_work, area_cultivated_mixed, area_undeveloped_urban, area_undeveloped_rural);
 		}
 		
 		public function AddRound(round:Round):void
