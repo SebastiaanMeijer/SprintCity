@@ -3,28 +3,35 @@
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
 	import SprintStad.Data.Data;
+	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
+	import SprintStad.Data.Types.Type;
+	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
 	public class ProgramEditor
-	{
-		private const SLIDER_WIDTH:int = 5;
-		
+	{		
 		public var changeCallback:Function = null;
 		public var clip:MovieClip = null;
 		public var canvasX:Number = 0;
 		public var canvasY:Number = 0;
 		public var canvasWidth:Number = 100;
 		public var canvasHeight:Number = 100;
-		public var sliders:Array = new Array();	
-		public var totalArea:int = 0;
-		public var availableTransformArea:int = 0;
 		
+		public var totalArea:int = 0;
+		public var availableArea:int = 0;
+		public var editAreaStart:int = 0;
+		
+		public var sliders:Array = new Array();
 		private var activeSlider:ProgramSlider = null;
 		private var startMouseX:Number = 0;
 		private var startSliderSize:Number = 0;
+				
+		private var station:Station;
+		private var currentRound:int = 0;		
+		private var programHistory:Array;
 		
-		private var station:Station = null;
+		private var lastTime:Number = 0;
 		
 		public function ProgramEditor(clip:MovieClip, changeCallback:Function) 
 		{
@@ -40,93 +47,125 @@
 			clip.parent.addEventListener(MouseEvent.MOUSE_MOVE, OnMouseMove);
 		}
 		
-		public function AddSlider(slider:ProgramSlider):void
-		{
-			sliders.push(slider);
-		}
-		
-		public function SetArea(area:int)
+		public function SetTotalArea(area:int):void
 		{
 			this.totalArea = area;
-			for each (var slider:ProgramSlider in sliders)
-				slider.size -= slider.size % (1 / totalArea);
 		}
 		
-		public function GetSliderArea(slider:ProgramSlider):int
-		{
-			return Math.round(slider.size * totalArea);
-		}
-		
-		public function SetStation(station:Station)
+		public function SetStation(station:Station):void
 		{
 			this.station = station;
-			SetArea(station.GetTotalTransformArea());
-			availableTransformArea = GetAvailableTransformArea();
+			Init();
+		}
+		
+		public function ChangeSliderType(type:Type):void
+		{
+			var slider:ProgramSlider = null;
+			
+			if (type.type == "home" || type.type == "average_home")
+				slider = sliders[ProgramSlider.TYPE_HOME];
+			else if (type.type == "work" || type.type == "average_work")
+				slider = sliders[ProgramSlider.TYPE_WORK];
+			else if (type.type == "leisure" || type.type == "average_leisure")
+				slider = sliders[ProgramSlider.TYPE_LEISURE];
+			
+			clip.removeChild(slider.GetType().colorClip);
+			slider.SetType(type);
+			clip.addChild(slider.GetType().colorClip);
+		}
+		
+		private function Init():void
+		{
+			var types:Types = Data.Get().GetTypes();
+			
+			currentRound = Data.Get().current_round_id;
+			sliders = new Array();
+			
+			// create a history to be drawn in front of the slider edit area
+			programHistory = new Array();
+			for (var i:int = 0; i < types.GetTypeCount(); i++)
+				programHistory.push(0);
+			// total area is always the same
+			SetTotalArea(station.GetTotalTransformArea());
+			if (currentRound == 0)
+			{
+				// if at masterplan phase all the transform area is available
+				availableArea = station.GetTotalTransformArea();
+				// set sliders
+				sliders.push(new ProgramSlider(station.program.type_home, station.program.area_home));
+				sliders.push(new ProgramSlider(station.program.type_work, station.program.area_work));
+				sliders.push(new ProgramSlider(station.program.type_leisure, station.program.area_leisure));
+			}
+			else
+			{
+				// if in a game round
+				// - find out what transform are was left out in previous rounds
+				// - calc the starting point of the new transform area
+				var round:Round;
+				for (var i:int = 0; i < this.currentRound; i++)
+				{
+					round = station.GetRound(i);
+					availableArea += round.new_transform_area;
+					if (round.program != null)
+					{
+						var filledArea = round.program.area_home + round.program.area_work + round.program.area_leisure;
+						availableArea -= filledArea;
+						editAreaStart += filledArea;
+						programHistory[round.program.type_home.id - 1] += round.program.area_home;
+						programHistory[round.program.type_work.id - 1] += round.program.area_work;
+						programHistory[round.program.type_leisure.id - 1] += round.program.area_leisure;
+					}
+				}
+				availableArea += station.GetRound(this.currentRound).new_transform_area;
+				// set sliders
+				sliders.push(new ProgramSlider(round.program.type_home, round.program.area_home));
+				sliders.push(new ProgramSlider(round.program.type_work, round.program.area_work));
+				sliders.push(new ProgramSlider(round.program.type_leisure, round.program.area_leisure));
+			}
+			// add type bars
+			for (var i:int = 0; i < types.GetTypeCount(); i++)
+				clip.addChild(types.GetType(0).colorClip);
+			
+			// add area bars
+			clip.addChild(sliders[ProgramSlider.TYPE_HOME].barClip);
+			clip.addChild(sliders[ProgramSlider.TYPE_WORK].barClip);
+			clip.addChild(sliders[ProgramSlider.TYPE_LEISURE].barClip);
+			
+			// add slider clips
+			clip.parent.addChild(sliders[ProgramSlider.TYPE_HOME].GetClip());
+			clip.parent.addChild(sliders[ProgramSlider.TYPE_WORK].GetClip());
+			clip.parent.addChild(sliders[ProgramSlider.TYPE_LEISURE].GetClip());
 		}
 		
 		public function Draw():void
 		{
-			var x:Number = 0;
-
-			clip.graph.graphics.clear();
+			var types:Types = Data.Get().GetTypes();
+			var x:int = 0;
 			
-			if (station != null)
+			for (var i:int = 0; i < types.GetTypeCount(); i++)
 			{
-				for (var i:int = 0; i < Data.Get().current_round_id - 1; i++)
-				{
-					var round:Round = station.GetRound(i);
-					if (round.program != null)
-					{
-						Debug.out("program: " + round.program);
-						var size:Number;
-						size = round.program.area_home / totalArea;
-						if (size > 0)
-							DrawBlock(x, size, round.program.type_home.color);
-						x += size;
-						Debug.out(" size: " + size);
-						size = round.program.area_work / totalArea;
-						if (size > 0)
-							DrawBlock(x, size, round.program.type_work.color);
-						x += size;
-						Debug.out(" size: " + size);
-						size = round.program.area_leisure / totalArea;
-						if (size > 0)
-							DrawBlock(x, size, round.program.type_leisure.color);
-						x += size;
-						Debug.out(" size: " + size);
-					}
-				}
+				var clip:MovieClip = types.GetType(i).colorClip;
+				clip.x = (x / totalArea) * 100;
+				clip.y = 0;
+				clip.width = (programHistory[i] / totalArea) * 100;
+				clip.height = 100;
+				x += programHistory[i];
 			}
-			
+
 			for each (var slider:ProgramSlider in sliders)
 			{
-				DrawBlock(x, slider.size, slider.type.color);
-				x += slider.size * 100;
-				clip.parent.addChild(slider.clip);
-				slider.clip.x = canvasX + (x / 100) * canvasWidth;
-				slider.clip.y = canvasY - 3;
-				slider.clip.area.text = GetSliderArea(slider);
+				slider.barClip.x = (x / totalArea) * 100;
+				slider.barClip.y = 0;
+				slider.barClip.width = (slider.size / totalArea) * 100;
+				slider.barClip.height = 100;
+				
+				x += slider.size;
+				
+				var sliderClip:MovieClip = slider.GetClip();
+				sliderClip.x = canvasX + (x / totalArea) * canvasWidth;
+				sliderClip.y = canvasY - 3;
+				sliderClip.area.text = slider.size;
 			}
-		}
-		
-		private function GetAvailableTransformArea():int
-		{
-			var result:int = 0;
-			for (var i:int = 0; i < Data.Get().current_round_id; i++)
-			{
-				var round:Round = station.GetRound(i);
-				result += round.new_transform_area;
-				if (round.program != null)
-					result -= round.program.area_home + round.program.area_work + round.program.area_leisure;
-			}
-			return result;
-		}
-		
-		private function DrawBlock(x:Number, size:Number, color:String)
-		{
-			clip.graph.graphics.beginFill(parseInt("0x" + color, 16));
-			clip.graph.graphics.drawRect(x, 0, size * 100, 100);
-			clip.graph.graphics.endFill();
 		}
 		
 		private function OnMouseDown(e:MouseEvent):void
@@ -144,42 +183,23 @@
 		
 		private function OnMouseMove(e:MouseEvent):void
 		{
+			//Debug.out("PreDraw actions: " + (new Date().getTime() - lastTime) + " ms");
+			lastTime = new Date().getTime();
 			if (activeSlider != null)
 			{
 				var mouseDelta:Number = e.stageX - startMouseX;
-				var startSize:Number = activeSlider.size;
-				var dirty:Boolean = false;
-				activeSlider.size = startSliderSize + mouseDelta / canvasWidth;
-				activeSlider.size -= activeSlider.size % (1 / totalArea);
-				// min bound
-				var i:int = sliders.indexOf(activeSlider) - 1;
-				while (i >= 0 && activeSlider.size < 0)
-				{
-					if (sliders[i].size > Math.abs(activeSlider.size))
-					{
-						sliders[i].size += activeSlider.size;
-						activeSlider.size = 0;
-						startSliderSize = 0;
-						startMouseX = e.stageX;
-						dirty = true;
-					}
-					else
-					{
-						activeSlider.size += sliders[i].size;
-						sliders[i].size = 0;
-					}
-					i--;
-				}
+				var startSize:int = activeSlider.size;
+				activeSlider.size = startSliderSize + Math.round((mouseDelta / canvasWidth) * totalArea);
+				//activeSlider.size -= activeSlider.size % (1 / totalArea);
+				
+				// min bound, size value should be 0 or bigger
 				activeSlider.size = Math.max(activeSlider.size, 0);
+				
 				// max bound
-				i = sliders.length - 1;
-				while (TotalSliderSize() > 1.0)
-				{
-					sliders[i].size -= Math.min(sliders[i].size, TotalSliderSize() - 1.0);
-					i--;
-					dirty = true;
-				}
-				if (dirty || activeSlider.size != startSize)
+				if (TotalSliderSize() > availableArea)
+					activeSlider.size -= TotalSliderSize() - availableArea;
+				
+				if (activeSlider.size != startSize)
 					changeCallback.call(this);
 			}
 			Draw();
@@ -191,35 +211,38 @@
 			for (var i:int = sliders.length - 1; i >= 0; i--)
 			{
 				var slider:ProgramSlider = sliders[i];
-				var sliderY:Number = GetSliderY(slider);
-				if (mouseY > sliderY && mouseY < sliderY + canvasHeight)
+				if (mouseY > GetSliderTop(slider) && mouseY < GetSliderBottom(slider))
 				{
 					var sliderX:Number = GetSliderX(slider);
-					if (mouseX > sliderX - SLIDER_WIDTH && mouseX < sliderX + SLIDER_WIDTH)
+					if (mouseX > sliderX - ProgramSlider.SLIDER_SIZE / 2&& mouseX < sliderX + ProgramSlider.SLIDER_SIZE / 2)
 					{
-						if (result == null ||
-							slider.size < result.size)
-							result = slider;
-					}
+						return slider;
+					}					
 				}
 			}
-			return result;
+			return null;
+			
 		}
 		
 		private function GetSliderX(slider:ProgramSlider):Number
 		{
-			var position:Number = 0.0;
+			var position:int = 0;
 			var i:int = -1;
 			do {
 				i++;
 				position += sliders[i].size;
 			} while (sliders[i] != slider && i < sliders.length)
-			return canvasX + position * canvasWidth;
+			return canvasX  + canvasWidth * ((editAreaStart + position) / totalArea);
+		}
+
+		private function GetSliderTop(slider:ProgramSlider):Number
+		{
+			return canvasY + slider.GetGrabPosition() - ProgramSlider.SLIDER_SIZE;
 		}
 		
-		private function GetSliderY(slider:ProgramSlider):Number
+		private function GetSliderBottom(slider:ProgramSlider):Number
 		{
-			return canvasY;
+			return canvasY + canvasHeight;
 		}
 		
 		private function TotalSliderSize():Number

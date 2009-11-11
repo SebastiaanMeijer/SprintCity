@@ -24,6 +24,12 @@
 		private var editor:ProgramEditor;
 		private var currentProgram:Program;
 		
+		private var barCenterTransformArea:AreaBarDrawer;
+		private var barCurrentArea:AreaBarDrawer;
+		private var barCurrentTransformArea:AreaBarDrawer;
+		private var barFutureArea:AreaBarDrawer;
+		private var barFutureTransformArea:AreaBarDrawer;
+		
 		public function ProgramState(parent:SprintStad) 
 		{
 			this.parent = parent;
@@ -33,31 +39,33 @@
 		{
 			// draw stuff
 			var view:MovieClip = parent.program_movie;
-
+			
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
-
+			
 			// background
 			view.sheet.addChild(station.imageData);
-
+			
 			// graphs
-			AreaBarDrawer.DrawBar(view.transform_graph,
+			barCenterTransformArea.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-				
+			
 			// left info
-			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
+			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
 			// update editor
 			editor.SetStation(station);
 		}
 		
-		private function DrawStationInfo(station:StationInstance, clip:MovieClip, title:String)
+		private function DrawStationInfo(station:StationInstance, 
+			clip:MovieClip, area_bar:AreaBarDrawer, transform_area_bar:AreaBarDrawer, 
+			title:String)
 		{
 			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
 			
@@ -81,7 +89,7 @@
 			top[2].stationType.imageData.height = 100;
 			clip.station_type_3_image.addChild(top[2].stationType.imageData);
 			
-			AreaBarDrawer.DrawBar(clip.area_bar,
+			area_bar.DrawBar(
 				station.area_cultivated_home,
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
@@ -93,7 +101,7 @@
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
-			AreaBarDrawer.DrawBar(clip.transform_area_bar, 
+			transform_area_bar.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
@@ -120,17 +128,16 @@
 			var vars:URLVariables = new URLVariables();
 			vars.session = parent.session;
 			vars.data = parent.currentStation.program.GetXmlString();
-			Debug.out("Send: " + vars.session + " data: " + vars.data);
 			request.data = vars;
 			loader.load(request);
 		}
 		
 		private function OnEditorChange():void
 		{
-			var program:Program = CreateProgram();
+			CreateProgram();
 			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, program);
-			DrawStationInfo(stationInstance, parent.program_movie.future_info, "TOEKOMST");
+				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, parent.currentStation.program);
+			DrawStationInfo(stationInstance, parent.program_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
@@ -138,22 +145,19 @@
 			var program:Program = parent.currentStation.program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
-				switch (slider.type.type)
+				switch (slider.GetSliderType())
 				{
-					case "home":
-					case "average_home":
-						program.type_home = slider.type;
-						program.area_home = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_HOME:
+						program.type_home = slider.GetType();
+						program.area_home = Math.round(slider.size);
 						break;
-					case "work":
-					case "average_work":
-						program.type_work = slider.type;
-						program.area_work = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_WORK:
+						program.type_work = slider.GetType();
+						program.area_work = Math.round(slider.size);
 						break;
-					case "leisure":
-					case "average_leisure":
-						program.type_leisure = slider.type;
-						program.area_leisure = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_LEISURE:
+						program.type_leisure = slider.GetType();
+						program.area_leisure = Math.round(slider.size);
 						break;
 				}
 			}
@@ -193,12 +197,16 @@
 			view.cancel_button.buttonMode = true;
 			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
 			
+			// init bar graphs
+			barCenterTransformArea = new AreaBarDrawer(view.transform_graph);
+			barCurrentArea = new AreaBarDrawer(view.current_info.area_bar);
+			barCurrentTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
+			barFutureArea = new AreaBarDrawer(view.future_info.area_bar);
+			barFutureTransformArea = new AreaBarDrawer(view.future_info.transform_area_bar);
+			
 			// draw editor
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_home")[0]));
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_work")[0]));
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_leisure")[0]));
 			
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}

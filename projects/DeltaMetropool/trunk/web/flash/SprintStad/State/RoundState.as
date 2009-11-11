@@ -41,13 +41,14 @@
 			view.sheet.addChild(station.imageData);
 			
 			// graphs
+			/*
 			AreaBarDrawer.DrawBar(view.transform_graph,
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			
+			*/
 			// left info
 			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
 
@@ -79,24 +80,28 @@
 			top[2].stationType.imageData.height = 100;
 			clip.station_type_3_image.addChild(top[2].stationType.imageData);
 			
+			/*
 			AreaBarDrawer.DrawBar(clip.area_bar,
 				station.area_cultivated_home,
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
 				station.area_undeveloped_rural);
+			*/
 			clip.area.text = "(" + Math.round(
 				station.area_cultivated_home +
 				station.area_cultivated_work +
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
+			/*
 			AreaBarDrawer.DrawBar(clip.transform_area_bar, 
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
+			*/
 			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
@@ -182,25 +187,22 @@
 		
 		private function CreateProgram():Program
 		{
-			var program:Program = new Program();
+			var program:Program = parent.currentStation.GetRound(0).program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
-				switch (slider.type.type)
+				switch (slider.GetSliderType())
 				{
-					case "home":
-					case "average_home":
-						program.type_home = slider.type;
-						program.area_home = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_HOME:
+						program.type_home = slider.GetType();
+						program.area_home = Math.round(slider.size);
 						break;
-					case "work":
-					case "average_work":
-						program.type_work = slider.type;
-						program.area_work = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_WORK:
+						program.type_work = slider.GetType();
+						program.area_work = Math.round(slider.size);
 						break;
-					case "leisure":
-					case "average_leisure":
-						program.type_leisure = slider.type;
-						program.area_leisure = Math.round(slider.size * editor.totalArea);
+					case ProgramSlider.TYPE_LEISURE:
+						program.type_leisure = slider.GetType();
+						program.area_leisure = Math.round(slider.size);
 						break;
 				}
 			}
@@ -298,9 +300,9 @@
 			// draw editor
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_home")[0]));
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_work")[0]));
-			editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_leisure")[0]));
+			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_home")[0]));
+			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_work")[0]));
+			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_leisure")[0]));
 			
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}

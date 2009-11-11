@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Types 
 {
 	import flash.display.Loader;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -16,6 +17,7 @@
 		public var image:String = "";
 		public var imageData:Sprite = new Sprite();
 		public var density:Number = 0;
+		public var colorClip:MovieClip = new Placeholder();
 		
 		private var loader:Loader = null;
 		
@@ -45,6 +47,9 @@
 		public function OnLoadComplete(event:Event):void 
 		{
 			imageData.addChild(this.loader);
+			colorClip.graphics.beginFill(parseInt("0x" + color, 16));
+			colorClip.graphics.drawRect(0, 0, 100, 100);
+			colorClip.graphics.endFill();
 		}
 
 		function OnLoadError(e:IOErrorEvent):void 

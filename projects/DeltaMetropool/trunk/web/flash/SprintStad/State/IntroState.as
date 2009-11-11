@@ -26,34 +26,40 @@
 			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
 		}
 		
-		public function OnLoadingDone(data:int)
+		public function OnStageOneLoadingDone(data:int)
 		{
 			Debug.out(this + " I know " + data);
 			loadCount++;
-			if (loadCount == 6)
-			{
-				parent.currentStation = 
-					Data.Get().GetStations().GetStation(
-						Data.Get().GetStations().GetStationCount() - 1);
-				parent.currentStation = 
-					Data.Get().GetStations().GetNextStationOfTeam(
-						parent.currentStation, 
-						Data.Get().GetTeams().GetOwnTeam());
-				parent.intro_movie.buttonMode = true;
-				parent.intro_movie.addEventListener(MouseEvent.CLICK, OnContinueEvent);
-			}
+			// stage two loading
+			if (loadCount >= 5)
+				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+		}
+		
+		public function OnLoadingDone(data:int)
+		{
+			Debug.out(this + " I know " + data);
+
+			parent.currentStation = 
+				Data.Get().GetStations().GetStation(
+					Data.Get().GetStations().GetStationCount() - 1);
+			parent.currentStation = 
+				Data.Get().GetStations().GetNextStationOfTeam(
+					parent.currentStation, 
+					Data.Get().GetTeams().GetOwnTeam());
+			parent.intro_movie.buttonMode = true;
+			parent.intro_movie.addEventListener(MouseEvent.CLICK, OnContinueEvent);
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
 		
 		public function Activate():void 
 		{
-			DataLoader.Get().AddJob(DataLoader.DATA_TEAMS, OnLoadingDone);
-			DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
-			DataLoader.Get().AddJob(DataLoader.DATA_TYPES, OnLoadingDone);
-			DataLoader.Get().AddJob(DataLoader.DATA_STATION_TYPES, OnLoadingDone);
-			DataLoader.Get().AddJob(DataLoader.DATA_CONSTANTS, OnLoadingDone);
-			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+			// stage one loading
+			DataLoader.Get().AddJob(DataLoader.DATA_TEAMS, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_TYPES, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_STATION_TYPES, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_CONSTANTS, OnStageOneLoadingDone);
 		}
 		
 		public function Deactivate():void

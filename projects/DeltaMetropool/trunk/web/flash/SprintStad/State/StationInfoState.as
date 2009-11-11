@@ -93,24 +93,28 @@
 			top[2].stationType.imageData.height = 100;
 			view.current_info.station_type_3_image.addChild(top[2].stationType.imageData);
 			
+			/*
 			AreaBarDrawer.DrawBar(view.current_info.area_bar,
 				station.area_cultivated_home,
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
 				station.area_undeveloped_rural);
+				*/
 			view.current_info.area.text = "(" + (
 				station.area_cultivated_home +
 				station.area_cultivated_work +
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
+				/*
 			AreaBarDrawer.DrawBar(view.current_info.transform_area_bar, 
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
+				*/
 			view.current_info.transform_area.text = "(" + ( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
