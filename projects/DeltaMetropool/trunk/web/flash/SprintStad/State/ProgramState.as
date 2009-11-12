@@ -11,6 +11,7 @@
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Program.Program;
+	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.StationInstance;
 	import SprintStad.Data.Types.Types;
@@ -22,7 +23,7 @@
 	{		
 		private var parent:SprintStad = null;
 		private var editor:ProgramEditor;
-		private var currentProgram:Program;
+		private var oldProgram:Program;
 		
 		private var barCenterTransformArea:AreaBarDrawer;
 		private var barCurrentArea:AreaBarDrawer;
@@ -173,6 +174,7 @@
 		
 		private function OnCancelButton(event:MouseEvent):void
 		{
+			parent.currentStation.program = oldProgram;
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
@@ -180,7 +182,6 @@
 		{
 			var view:MovieClip = parent.program_movie;
 			DrawUI(parent.currentStation);
-			
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);
 		}
@@ -192,6 +193,7 @@
 			var view:MovieClip = parent.program_movie;
 			parent.addChild(SprintStad.LOADER);
 			
+			// init buttons
 			view.ok_button.buttonMode = true;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
 			view.cancel_button.buttonMode = true;
@@ -208,6 +210,10 @@
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
 			
+			// create a copy of the current program
+			oldProgram = parent.currentStation.program.Copy();
+			
+			// display loading screen
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		
