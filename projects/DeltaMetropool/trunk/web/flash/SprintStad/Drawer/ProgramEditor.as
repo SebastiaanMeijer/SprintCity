@@ -26,7 +26,8 @@
 		private var activeSlider:ProgramSlider = null;
 		private var startMouseX:Number = 0;
 		private var startSliderSize:Number = 0;
-				
+		private var unavailabeArea:MovieClip = new UnavailableArea();
+		
 		private var station:Station;
 		private var currentRound:int = 0;		
 		private var programHistory:Array;
@@ -69,9 +70,7 @@
 			else if (type.type == "leisure" || type.type == "average_leisure")
 				slider = sliders[ProgramSlider.TYPE_LEISURE];
 			
-			clip.removeChild(slider.GetType().colorClip);
 			slider.SetType(type);
-			clip.addChild(slider.GetType().colorClip);
 		}
 		
 		private function Init():void
@@ -101,8 +100,8 @@
 				// if in a game round
 				// - find out what transform are was left out in previous rounds
 				// - calc the starting point of the new transform area
-				var round:Round;
-				for (var i:int = 0; i < this.currentRound; i++)
+				var round:Round = station.GetRound(0);
+				for (var i:int = 0; i < this.currentRound - 1; i++)
 				{
 					round = station.GetRound(i);
 					availableArea += round.new_transform_area;
@@ -116,7 +115,9 @@
 						programHistory[round.program.type_leisure.id - 1] += round.program.area_leisure;
 					}
 				}
-				availableArea += station.GetRound(this.currentRound).new_transform_area;
+				availableArea += station.GetRound(this.currentRound - 1).new_transform_area;
+				
+				round = station.GetRound(this.currentRound - 1);
 				// set sliders
 				sliders.push(new ProgramSlider(round.program.type_home, round.program.area_home));
 				sliders.push(new ProgramSlider(round.program.type_work, round.program.area_work));
@@ -124,12 +125,15 @@
 			}
 			// add type bars
 			for (var i:int = 0; i < types.GetTypeCount(); i++)
-				clip.addChild(types.GetType(0).colorClip);
+				clip.addChild(types.GetType(i).colorClip);
 			
 			// add area bars
 			clip.addChild(sliders[ProgramSlider.TYPE_HOME].barClip);
 			clip.addChild(sliders[ProgramSlider.TYPE_WORK].barClip);
 			clip.addChild(sliders[ProgramSlider.TYPE_LEISURE].barClip);
+			
+			// add unavailabe area bar
+			clip.addChild(unavailabeArea);
 			
 			// add slider clips
 			clip.parent.addChild(sliders[ProgramSlider.TYPE_HOME].GetClip());
@@ -144,14 +148,19 @@
 			
 			for (var i:int = 0; i < types.GetTypeCount(); i++)
 			{
-				var clip:MovieClip = types.GetType(i).colorClip;
-				clip.x = (x / totalArea) * 100;
-				clip.y = 0;
-				clip.width = (programHistory[i] / totalArea) * 100;
-				clip.height = 100;
+				var colorClip:MovieClip = types.GetType(i).colorClip;
+				colorClip.x = (x / totalArea) * 100;
+				colorClip.y = 0;
+				colorClip.width = (programHistory[i] / totalArea) * 100;
+				colorClip.height = 100;
 				x += programHistory[i];
 			}
-
+			
+			unavailabeArea.x = ((editAreaStart + availableArea) / totalArea) * 100;
+			unavailabeArea.y = 0;
+			unavailabeArea.width = Math.max(0, 100.0 - unavailabeArea.x);
+			unavailabeArea.height = 100;
+			
 			for each (var slider:ProgramSlider in sliders)
 			{
 				slider.barClip.x = (x / totalArea) * 100;

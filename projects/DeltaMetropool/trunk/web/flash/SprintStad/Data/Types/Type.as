@@ -6,6 +6,7 @@
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
+	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	public class Type
 	{
@@ -23,7 +24,6 @@
 		
 		public function Type() 
 		{
-			
 		}
 		
 		public function PostConstruct():void
@@ -42,14 +42,15 @@
 			{
 				ErrorDisplay.Get().DisplayError("error loading Type.image: " + image);
 			}
+			colorClip.graphics.clear();
+			colorClip.graphics.beginFill(parseInt("0x" + color, 16));
+			colorClip.graphics.drawRect(0, 0, 100, 100);
+			colorClip.graphics.endFill();
  		}
 		
 		public function OnLoadComplete(event:Event):void 
 		{
 			imageData.addChild(this.loader);
-			colorClip.graphics.beginFill(parseInt("0x" + color, 16));
-			colorClip.graphics.drawRect(0, 0, 100, 100);
-			colorClip.graphics.endFill();
 		}
 
 		function OnLoadError(e:IOErrorEvent):void 

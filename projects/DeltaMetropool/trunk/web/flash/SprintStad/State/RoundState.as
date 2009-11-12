@@ -4,11 +4,15 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Program.Program;
+	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.StationInstance;
 	import SprintStad.Data.Types.Type;
@@ -21,6 +25,13 @@
 	{		
 		private var parent:SprintStad = null;
 		private var editor:ProgramEditor;
+		private var oldProgram:Program;
+		
+		private var barCenterTransformArea:AreaBarDrawer;
+		private var barCurrentArea:AreaBarDrawer;
+		private var barCurrentTransformArea:AreaBarDrawer;
+		private var barFutureArea:AreaBarDrawer;
+		private var barFutureTransformArea:AreaBarDrawer;
 		
 		public function RoundState(parent:SprintStad) 
 		{
@@ -41,22 +52,23 @@
 			view.sheet.addChild(station.imageData);
 			
 			// graphs
-			/*
-			AreaBarDrawer.DrawBar(view.transform_graph,
+			barCenterTransformArea.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			*/
+				
 			// left info
-			DrawStationInfo(StationInstance.Create(station), view.current_info, "HUIDIG");
-
+			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
+			
 			// update editor
 			editor.SetStation(station);
 		}
 		
-		private function DrawStationInfo(station:StationInstance, clip:MovieClip, title:String)
+		private function DrawStationInfo(station:StationInstance, 
+			clip:MovieClip, area_bar:AreaBarDrawer, transform_area_bar:AreaBarDrawer, 
+			title:String)
 		{
 			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
 			
@@ -80,28 +92,24 @@
 			top[2].stationType.imageData.height = 100;
 			clip.station_type_3_image.addChild(top[2].stationType.imageData);
 			
-			/*
-			AreaBarDrawer.DrawBar(clip.area_bar,
+			area_bar.DrawBar(
 				station.area_cultivated_home,
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
 				station.area_undeveloped_rural);
-			*/
 			clip.area.text = "(" + Math.round(
 				station.area_cultivated_home +
 				station.area_cultivated_work +
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
-			/*
-			AreaBarDrawer.DrawBar(clip.transform_area_bar, 
+			transform_area_bar.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			*/
 			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
@@ -114,6 +122,17 @@
 			clip.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
 			clip.amount_houses.text = Math.round(station.count_home_total);
 			clip.bvo_work.text = Math.round(station.count_work_total);
+		}
+		
+		private function UploadXML():void 
+		{
+			var loader:URLLoader = new URLLoader();
+			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
+			var vars:URLVariables = new URLVariables();
+			vars.session = parent.session;
+			vars.data = GetCurrentRound().program.GetXmlString();
+			request.data = vars;
+			loader.load(request);
 		}
 		
 		private function InitWindows():void
@@ -164,6 +183,11 @@
 			}
 		}
 		
+		private function GetCurrentRound():Round
+		{
+			return parent.currentStation.GetRound(Data.Get().current_round_id - 1);
+		}
+		
 		private function OnTypeButtonClicked(e:Event):void
 		{
 			var clip:DisplayObject = DisplayObject(e.target);
@@ -172,8 +196,10 @@
 			
 			if (clip != null)
 			{
-
-				Debug.out("    id = " + clip["type_id"]);
+				var type:Type = Data.Get().GetTypes().GetTypeById(clip["type_id"]);
+				GetCurrentRound().program.SetType(type);
+				editor.ChangeSliderType(type);
+				//Debug.out("    id = " + clip["type_id"]);
 			}
 		}
 		
@@ -182,12 +208,12 @@
 			var program:Program = CreateProgram();
 			var stationInstance:StationInstance = 
 				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, program);
-			DrawStationInfo(stationInstance, parent.round_movie.future_info, "TOEKOMST");
+			DrawStationInfo(stationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
 		{
-			var program:Program = parent.currentStation.GetRound(0).program;
+			var program:Program = GetCurrentRound().program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
 				switch (slider.GetSliderType())
@@ -211,18 +237,14 @@
 		
 		private function OnOkButton(event:MouseEvent):void
 		{
-			Debug.out(parent);
-			Debug.out(parent.currentStation);
-			Debug.out(Data.Get().current_round_id);
-			Debug.out(parent.currentStation.GetRound(Data.Get().current_round_id));
-			Debug.out(parent.currentStation.GetRound(Data.Get().current_round_id).program);
-			parent.currentStation.GetRound(Data.Get().current_round_id).program = CreateProgram();
-			
+			GetCurrentRound().program = CreateProgram();
+			UploadXML();
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnCancelButton(event:MouseEvent):void
 		{
+			GetCurrentRound().program = oldProgram;
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
@@ -250,26 +272,10 @@
 			view.leisure_window.visible = true;
 		}
 		
-		public function NextStationEvent(e:Event):void
-		{
-			parent.currentStation = Data.Get().GetStations().GetNextStationOfTeam(
-				parent.currentStation, Data.Get().GetTeams().GetOwnTeam());
-			DrawUI(parent.currentStation);
-		}
-		
-		public function PreviousStationEvent(e:Event):void
-		{
-			parent.currentStation = Data.Get().GetStations().GetPreviousStationOfTeam(
-				parent.currentStation, Data.Get().GetTeams().GetOwnTeam());
-			DrawUI(parent.currentStation);
-		}
-		
 		public function OnLoadingDone(data:int):void
 		{
 			var view:MovieClip = parent.round_movie;
 			DrawUI(parent.currentStation);
-			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
-			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
 			//remove loading screen
 			parent.removeChild(SprintStad.LOADER);
 		}
@@ -297,13 +303,21 @@
 			view.leisure_window.visible = false;
 			InitWindows();
 			
+			// init bar graphs
+			barCenterTransformArea = new AreaBarDrawer(view.transform_graph);
+			barCurrentArea = new AreaBarDrawer(view.current_info.area_bar);
+			barCurrentTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
+			barFutureArea = new AreaBarDrawer(view.future_info.area_bar);
+			barFutureTransformArea = new AreaBarDrawer(view.future_info.transform_area_bar);
+			
 			// draw editor
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
-			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_home")[0]));
-			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_work")[0]));
-			//editor.AddSlider(new ProgramSlider(types.GetTypesOfCategory("average_leisure")[0]));
 			
+			// create a copy of the current program
+			oldProgram = GetCurrentRound().program.Copy();
+			
+			// display loading screen
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		

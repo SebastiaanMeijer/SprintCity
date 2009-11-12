@@ -133,6 +133,7 @@
 			var round:Round = new Round();
 			var roundXml:XML = null;
 			var index:int = 0;
+
 			roundXml = xmlData.round[index];
 			while (roundXml != null)
 			{
@@ -140,7 +141,7 @@
 				{
 					if (xml.name() == "program")
 					{
-						round.program.ParseXML(roundXml.program[0]);
+						round.program.ParseXML(xml);
 					}
 					else
 					{

@@ -26,6 +26,16 @@
 			return area_home + area_work + area_leisure;
 		}
 		
+		public function SetType(type:Type):void
+		{
+			if (type.type == "home" || type.type == "average_home")
+				type_home = type;
+			else if (type.type == "work" || type.type == "average_work")
+				type_work = type;
+			else if (type.type == "leisure" || type.type == "average_leisure")
+				type_leisure = type;
+		}
+		
 		public function ParseXML(xmlData:XML):void
 		{
 			var types:Types = Data.Get().GetTypes();
@@ -53,6 +63,19 @@
 			xmlString += "</program>";
 			
 			return xmlString;
+		}
+		
+		public function Copy():Program
+		{
+			var copy:Program = new Program();
+			copy.program_id = this.program_id;
+			copy.type_home = this.type_home;
+			copy.type_work = this.type_work;
+			copy.type_leisure = this.type_leisure;
+			copy.area_home = this.area_home;
+			copy.area_work = this.area_work;
+			copy.area_leisure = this.area_leisure;
+			return copy;
 		}
 	}
 }
