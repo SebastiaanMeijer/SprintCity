@@ -1,6 +1,8 @@
 ﻿package SprintStad.Data.StationTypes 
 {
+	import flash.display.BitmapData;
 	import flash.display.Loader;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -12,7 +14,7 @@
 		public var name:String = "";
 		public var description:String = "";
 		public var image:String = "";
-		public var imageData:Sprite = new Sprite();
+		public var imageData:BitmapData;
 		public var POVN:Number = 0;
 		public var PWN:Number = 0;
 		public var IWD:Number = 0;
@@ -42,7 +44,8 @@
 		
 		public function OnLoadComplete(event:Event):void 
 		{
-			imageData.addChild(this.loader);
+			imageData = new BitmapData(this.loader.width, this.loader.height);
+			imageData.draw(this.loader);
 		}
 
 		function OnLoadError(e:IOErrorEvent):void 
