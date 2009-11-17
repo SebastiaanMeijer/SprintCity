@@ -1,8 +1,12 @@
 ﻿package SprintStad.State 
 {
+	import flash.display.Bitmap;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -22,6 +26,7 @@
 	public class ProgramState implements IState
 	{		
 		private var parent:SprintStad = null;
+		private var loadCount:int = 0;
 		private var editor:ProgramEditor;
 		private var oldProgram:Program;
 		
@@ -40,15 +45,12 @@
 		{
 			// draw stuff
 			var view:MovieClip = parent.program_movie;
-			
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
-			
 			// background
 			view.sheet.addChild(station.imageData);
-			
 			// graphs
 			barCenterTransformArea.DrawBar(
 				station.transform_area_cultivated_home, 
@@ -56,10 +58,10 @@
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-			
 			// left info
 			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
-			
+			// right info
+			OnEditorChange();
 			// update editor
 			editor.SetStation(station);
 		}
@@ -69,26 +71,30 @@
 			title:String)
 		{
 			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
+			var bitmap:Bitmap;
 			
 			clip.title.text = title;
 			
 			clip.station_type_1_percent.text = top[0].similarity + "%";
 			clip.station_type_1_name.text = top[0].stationType.name;
-			top[0].stationType.imageData.width = 100;
-			top[0].stationType.imageData.height = 100;
-			clip.station_type_1_image.addChild(top[0].stationType.imageData);
+			bitmap = new Bitmap(top[0].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_1_image.addChild(bitmap);
 			
 			clip.station_type_2_percent.text = top[1].similarity + "%";
 			clip.station_type_2_name.text = top[1].stationType.name;
-			top[1].stationType.imageData.width = 100;
-			top[1].stationType.imageData.height = 100;
-			clip.station_type_2_image.addChild(top[1].stationType.imageData);
-			
+			bitmap = new Bitmap(top[1].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_2_image.addChild(bitmap);
+
 			clip.station_type_3_percent.text = top[2].similarity + "%";
 			clip.station_type_3_name.text = top[2].stationType.name;
-			top[2].stationType.imageData.width = 100;
-			top[2].stationType.imageData.height = 100;
-			clip.station_type_3_image.addChild(top[2].stationType.imageData);
+			bitmap = new Bitmap(top[2].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_3_image.addChild(bitmap);
 			
 			area_bar.DrawBar(
 				station.area_cultivated_home,
@@ -180,10 +186,14 @@
 		
 		public function OnLoadingDone(data:int):void
 		{
-			var view:MovieClip = parent.program_movie;
-			DrawUI(parent.currentStation);
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
+			loadCount++;
+			if (loadCount >= 2)
+			{
+				loadCount = 0;
+				DrawUI(parent.currentStation);
+				//remove loading screen
+				parent.removeChild(SprintStad.LOADER);
+			}
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
@@ -192,28 +202,24 @@
 		{
 			var view:MovieClip = parent.program_movie;
 			parent.addChild(SprintStad.LOADER);
-			
 			// init buttons
 			view.ok_button.buttonMode = true;
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
 			view.cancel_button.buttonMode = true;
 			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
-			
 			// init bar graphs
 			barCenterTransformArea = new AreaBarDrawer(view.transform_graph);
 			barCurrentArea = new AreaBarDrawer(view.current_info.area_bar);
 			barCurrentTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
 			barFutureArea = new AreaBarDrawer(view.future_info.area_bar);
 			barFutureTransformArea = new AreaBarDrawer(view.future_info.transform_area_bar);
-			
 			// draw editor
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
-			
 			// create a copy of the current program
 			oldProgram = parent.currentStation.program.Copy();
-			
 			// display loading screen
+			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		

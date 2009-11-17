@@ -4,6 +4,7 @@
 	public class Round
 	{		
 		public var id:int = 0;
+		public var round_info_id:int = 0;
 		public var number:int = 0;
 		public var name:String = "";
 		public var description:String = "";

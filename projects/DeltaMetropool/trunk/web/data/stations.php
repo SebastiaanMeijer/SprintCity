@@ -25,7 +25,7 @@
 		);
 		
 		$round_fields = array(
-			'id', 'number', 'name', 'description', 'new_transform_area', 'POVN', 'PWN'
+			'id', 'round_info_id', 'number', 'name', 'description', 'new_transform_area', 'POVN', 'PWN'
 		);
 		
 		$program_fields = array(
@@ -107,6 +107,7 @@
 		$query = "
 			SELECT Round.id, Round.new_transform_area, Round.POVN, Round.PWN, 
 				RoundInfo.number, RoundInfo.name, RoundInfo.description, 
+				RoundInfo.id AS round_info_id, 
 				Program.id AS program_id, 
 				Program.area_home, Program.area_work, Program.area_leisure, 
 				Program.type_home, Program.type_work, Program.type_leisure 

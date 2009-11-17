@@ -76,17 +76,18 @@
 		private function Init():void
 		{
 			var types:Types = Data.Get().GetTypes();
+			var i:int = 0;
 			
 			currentRound = Data.Get().current_round_id;
 			sliders = new Array();
 			
 			// create a history to be drawn in front of the slider edit area
 			programHistory = new Array();
-			for (var i:int = 0; i < types.GetTypeCount(); i++)
+			for (i = 0; i < types.GetTypeCount(); i++)
 				programHistory.push(0);
 			// total area is always the same
 			SetTotalArea(station.GetTotalTransformArea());
-			if (currentRound == 0)
+			if (currentRound == 1)
 			{
 				// if at masterplan phase all the transform area is available
 				availableArea = station.GetTotalTransformArea();
@@ -100,10 +101,10 @@
 				// if in a game round
 				// - find out what transform are was left out in previous rounds
 				// - calc the starting point of the new transform area
-				var round:Round = station.GetRound(0);
-				for (var i:int = 0; i < this.currentRound - 1; i++)
+				var round:Round = station.GetRoundById(1);	// needed when the for loop is skipped
+				for (i = 2; i < this.currentRound; i++)
 				{
-					round = station.GetRound(i);
+					round = station.GetRoundById(i);
 					availableArea += round.new_transform_area;
 					if (round.program != null)
 					{
@@ -115,16 +116,16 @@
 						programHistory[round.program.type_leisure.id - 1] += round.program.area_leisure;
 					}
 				}
-				availableArea += station.GetRound(this.currentRound - 1).new_transform_area;
+				availableArea += station.GetRoundById(this.currentRound).new_transform_area;
 				
-				round = station.GetRound(this.currentRound - 1);
+				round = station.GetRoundById(this.currentRound);
 				// set sliders
 				sliders.push(new ProgramSlider(round.program.type_home, round.program.area_home));
 				sliders.push(new ProgramSlider(round.program.type_work, round.program.area_work));
 				sliders.push(new ProgramSlider(round.program.type_leisure, round.program.area_leisure));
 			}
 			// add type bars
-			for (var i:int = 0; i < types.GetTypeCount(); i++)
+			for (i = 0; i < types.GetTypeCount(); i++)
 				clip.addChild(types.GetType(i).colorClip);
 			
 			// add area bars

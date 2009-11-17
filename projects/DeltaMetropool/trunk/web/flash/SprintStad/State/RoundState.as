@@ -1,5 +1,6 @@
 ﻿package SprintStad.State 
 {
+	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.events.Event;
@@ -24,8 +25,10 @@
 	public class RoundState implements IState
 	{		
 		private var parent:SprintStad = null;
+		private var loadCount:int = 0;
 		private var editor:ProgramEditor;
 		private var oldProgram:Program;
+		private var stationInstance:StationInstance;
 		
 		private var barCenterTransformArea:AreaBarDrawer;
 		private var barCurrentArea:AreaBarDrawer;
@@ -58,12 +61,16 @@
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
-				
-			// left info
-			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
 			// update editor
 			editor.SetStation(station);
+			
+			// left info
+			stationInstance = StationInstance.Create(station);
+			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
+			
+			// right info
+			OnEditorChange();
 		}
 		
 		private function DrawStationInfo(station:StationInstance, 
@@ -71,26 +78,30 @@
 			title:String)
 		{
 			var top:Array = StationTypeCalculator.GetStationTypeTop(station);
+			var bitmap:Bitmap;
 			
 			clip.title.text = title;
 			
 			clip.station_type_1_percent.text = top[0].similarity + "%";
 			clip.station_type_1_name.text = top[0].stationType.name;
-			top[0].stationType.imageData.width = 100;
-			top[0].stationType.imageData.height = 100;
-			clip.station_type_1_image.addChild(top[0].stationType.imageData);
+			bitmap = new Bitmap(top[0].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_1_image.addChild(bitmap);
 			
 			clip.station_type_2_percent.text = top[1].similarity + "%";
 			clip.station_type_2_name.text = top[1].stationType.name;
-			top[1].stationType.imageData.width = 100;
-			top[1].stationType.imageData.height = 100;
-			clip.station_type_2_image.addChild(top[1].stationType.imageData);
+			bitmap = new Bitmap(top[1].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_2_image.addChild(bitmap);
 			
 			clip.station_type_3_percent.text = top[2].similarity + "%";
 			clip.station_type_3_name.text = top[2].stationType.name;
-			top[2].stationType.imageData.width = 100;
-			top[2].stationType.imageData.height = 100;
-			clip.station_type_3_image.addChild(top[2].stationType.imageData);
+			bitmap = new Bitmap(top[2].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			clip.station_type_3_image.addChild(bitmap);
 			
 			area_bar.DrawBar(
 				station.area_cultivated_home,
@@ -143,13 +154,16 @@
 			var cat_types:Array;
 			var i:int = 0;
 			var clip:MovieClip;
+			var bitmap:Bitmap;
+			
 			cat_types = types.GetTypesOfCategory("home");
 			for (i = 0; i < cat_types.length; i++)
 			{
 				clip = view.home_window.getChildByName("type_" + (i + 1));
-				cat_types[i].imageData.width = 100;
-				cat_types[i].imageData.height = 100;
-				clip.type_image.addChild(cat_types[i].imageData);
+				bitmap = new Bitmap(cat_types[i].imageData);
+				bitmap.width = 100;
+				bitmap.height = 100;
+				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
@@ -160,9 +174,10 @@
 			for (i = 0; i < cat_types.length; i++)
 			{
 				clip = view.work_window.getChildByName("type_" + (i + 1));
-				cat_types[i].imageData.width = 100;
-				cat_types[i].imageData.height = 100;
-				clip.type_image.addChild(cat_types[i].imageData);
+				bitmap = new Bitmap(cat_types[i].imageData);
+				bitmap.width = 100;
+				bitmap.height = 100;
+				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
@@ -173,9 +188,10 @@
 			for (i = 0; i < cat_types.length; i++)
 			{
 				clip = view.leisure_window.getChildByName("type_" + (i + 1));
-				cat_types[i].imageData.width = 100;
-				cat_types[i].imageData.height = 100;
-				clip.type_image.addChild(cat_types[i].imageData);
+				bitmap = new Bitmap(cat_types[i].imageData);
+				bitmap.width = 100;
+				bitmap.height = 100;
+				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
@@ -185,7 +201,7 @@
 		
 		private function GetCurrentRound():Round
 		{
-			return parent.currentStation.GetRound(Data.Get().current_round_id - 1);
+			return parent.currentStation.GetRoundById(Data.Get().current_round_id);
 		}
 		
 		private function OnTypeButtonClicked(e:Event):void
@@ -206,9 +222,10 @@
 		private function OnEditorChange():void
 		{
 			var program:Program = CreateProgram();
-			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, program);
-			DrawStationInfo(stationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
+			var tempStationInstance:StationInstance = stationInstance.Copy();
+			tempStationInstance.ApplyStaticRoundInfo(parent.currentStation.GetRoundById(Data.Get().current_round_id));
+			tempStationInstance.ApplyProgram(program);
+			DrawStationInfo(tempStationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
@@ -274,10 +291,15 @@
 		
 		public function OnLoadingDone(data:int):void
 		{
-			var view:MovieClip = parent.round_movie;
-			DrawUI(parent.currentStation);
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
+			loadCount++;
+			if (loadCount >= 2)
+			{
+				loadCount = 0;
+				DrawUI(parent.currentStation);
+				
+				//remove loading screen
+				parent.removeChild(SprintStad.LOADER);
+			}
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
@@ -319,6 +341,7 @@
 			
 			// display loading screen
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 		}
 		
 		public function Deactivate():void

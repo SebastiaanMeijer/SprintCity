@@ -9,6 +9,7 @@
 	import flash.ui.Mouse;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
 	import SprintStad.Debug.Debug;
@@ -18,10 +19,28 @@
 		private var parent:SprintStad = null;
 		private var selection:StationSelection = new StationSelection();
 		private var stationIndex:int = 0;
+		private var loadCount:int = 0;
 		
 		public function OverviewState(parent:SprintStad) 
 		{
 			this.parent = parent;
+		}
+		
+		private function Init():void
+		{
+			var view:MovieClip = parent.overview_movie;
+			var stations:Stations = Data.Get().GetStations();
+			for (var i:int = 0; i < stations.GetStationCount(); i++)
+			{
+				var station:Station = stations.GetStation(i);
+				var movie:MovieClip = GetStationMovieClip(station);
+				
+				var colorTransform:ColorTransform = new ColorTransform();
+				colorTransform.color = parseInt("0x" + station.owner.color, 16);
+				movie.outline.transform.colorTransform = colorTransform;				
+				station.RefreshAreaBar();
+				movie.graph.addChild(station.areaBar.GetClip());
+			}
 		}
 		
 		private function SelectStation(station:Station):void
@@ -52,6 +71,11 @@
 		{
 			var movie_name:String = station.name.replace(" ", "_");
 			return MovieClip(parent.overview_movie.getChildByName(movie_name));
+		}
+		
+		private function GetCurrentRound():Round
+		{
+			return parent.currentStation.GetRoundById(Data.Get().current_round_id);
 		}
 		
 		private function OnValuesButton(event:MouseEvent):void
@@ -97,7 +121,7 @@
 		
 		public function OnCurrentRoundKnown(data:int):void
 		{
-			if (Data.Get().current_round_id == 0)
+			if (Data.Get().current_round_id == 1)
 				parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
 			else
 				parent.gotoAndPlay(SprintStad.FRAME_ROUND);
@@ -106,18 +130,14 @@
 		public function OnLoadingDone(data:int):void
 		{
 			Debug.out(this + " I know " + data);
-			var view:MovieClip = parent.overview_movie;
-			var stations:Stations = Data.Get().GetStations();
-			for (var i:int = 0; i < stations.GetStationCount(); i++)
+			loadCount++;
+			if (loadCount >= 2)
 			{
-				var station:Station = stations.GetStation(i);
-				var movie:MovieClip = GetStationMovieClip(station);
+				loadCount = 0;
+				Init();
 				
-				var colorTransform:ColorTransform = new ColorTransform();
-				colorTransform.color = parseInt("0x" + station.owner.color, 16);
-				movie.outline.transform.colorTransform = colorTransform;				
-				station.RefreshAreaBar();
-				movie.graph.addChild(station.areaBar.GetClip());
+				//remove loading screen
+				parent.removeChild(SprintStad.LOADER);
 			}
 		}
 			
@@ -131,7 +151,10 @@
 				var view:MovieClip = parent.overview_movie;
 				var station:Station;
 				
+				parent.addChild(SprintStad.LOADER);
+				
 				//LoadStations();
+				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 				
 				// buttons

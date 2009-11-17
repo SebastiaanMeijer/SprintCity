@@ -114,7 +114,7 @@ function NewGame()
 			foreach ($rounds as $round_key => $round_value)
 			{
 				// rounds program
-				$query = "INSERT INTO `Program` () VALUES ();";
+				$query = "INSERT INTO `Program` (type_home, type_work, type_leisure) VALUES (3, 8, 12);";
 				$db->query($query);
 				$program_id = Program::getMaxId();
 				
@@ -156,30 +156,18 @@ function BackStepGame($vars)
 	$db = Database::getDatabase();
 	$rounds = RoundInfo::GetRounds();
 	$game = new Game($vars[1]);
+	$temp_key = 1;
 	
-	$temp_key = -1;
-	if ($game->current_round_id == 1)
-		$temp_key = "NULL";
-	else if ($game->current_round_id != "")
+	// find id of previous round
+	foreach ($rounds as $key => $value)
 	{
-		foreach ($rounds as $key => $value)
-		{
-			if ($game->current_round_id == $key)
-				break;
-			$temp_key = $key;
-		}
+		if ($game->current_round_id == $key)
+			break;
+		$temp_key = $key;
 	}
 	
-	if ($temp_key == "NULL")
-	{
-		$query = "
-			UPDATE `game` 
-			SET `current_round_id` = NULL
-			WHERE `id` = :game_id;";
-		$args = array('game_id' => $game->id);
-		$db->query($query, $args);
-	}
-	else if ($temp_key > -1)
+	// set new round
+	if ($game->current_round_id != $temp_key)
 	{
 		$query = "
 			UPDATE `game` 
@@ -197,26 +185,22 @@ function NextStepGame($vars)
 	$db = Database::getDatabase();
 	$rounds = RoundInfo::GetRounds();
 	$game = new Game($vars[1]);
-
 	$temp_key = -1;
-	if ($game->current_round_id == "")
-		$temp_key = 1;
-	else
+	
+	// find id of next round
+	foreach ($rounds as $key => $value)
 	{
-		foreach ($rounds as $key => $value)
+		if ($temp_key > -1)
 		{
-			// dirty code starts here
-			if ($temp_key > -1)
-			{
-				$temp_key = $key;
-				break;
-			}
-			if ($game->current_round_id == $key)
-				$temp_key = $key;
+			$temp_key = $key;
+			break;
 		}
+		if ($game->current_round_id == $key)
+			$temp_key = $key;
 	}
 	
-	if ($temp_key > -1)
+	// set new round
+	if ($game->current_round_id != $temp_key)
 	{
 		$query = "
 			UPDATE `game` 

@@ -1,5 +1,7 @@
 ﻿package SprintStad.Data.Types 
 {
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -16,7 +18,7 @@
 		public var description:String = "";
 		public var color:String = "0x000000";
 		public var image:String = "";
-		public var imageData:Sprite = new Sprite();
+		public var imageData:BitmapData;
 		public var density:Number = 0;
 		public var colorClip:MovieClip = new Placeholder();
 		
@@ -50,7 +52,8 @@
 		
 		public function OnLoadComplete(event:Event):void 
 		{
-			imageData.addChild(this.loader);
+			imageData = new BitmapData(this.loader.width, this.loader.height);
+			imageData.draw(this.loader);
 		}
 
 		function OnLoadError(e:IOErrorEvent):void 
