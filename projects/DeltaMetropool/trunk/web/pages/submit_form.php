@@ -114,20 +114,20 @@ function NewGame()
 			foreach ($rounds as $round_key => $round_value)
 			{
 				// rounds program
-				$query = "INSERT INTO `Program` (type_home, type_work, type_leisure) VALUES (3, 8, 12);";
+				$query = "INSERT INTO `Program` (type_home, type_work, type_leisure) VALUES (3, 7, 12);";
 				$db->query($query);
 				$program_id = Program::getMaxId();
 				
 				// round instance
 				$query = "
 					INSERT INTO `RoundInstance` 
-						(`round_id`, `station_instance_id`, `program_id`, `starttime`)
+						(`round_id`, `station_instance_id`, `plan_program_id`, `starttime`)
 					VALUES 
-						(:round_id, :station_instance_id, :program_id, :starttime);";
+						(:round_id, :station_instance_id, :plan_program_id, :starttime);";
 				$args = array(
 					'round_id' => $round_key, 
 					'station_instance_id' => $station_instance_id, 
-					'program_id' => $program_id, 
+					'plan_program_id' => $program_id, 
 					'starttime' => date( 'Y-m-d H:i:s'));
 				$db->query($query, $args);
 			}
@@ -182,9 +182,86 @@ function BackStepGame($vars)
 
 function NextStepGame($vars)
 {
+	CalculateFinalPrograms($vars[1]);
+	SetNextRound($vars[1]);
+}
+
+function CalculateFinalPrograms($game_id)
+{
+	// get a lot of info
+	$db = Database::getDatabase();
+	$query = "
+		SELECT *, RoundInstance.id AS round_instance_id 
+		FROM Game 
+		INNER JOIN RoundInfo ON Game.current_round_id = RoundInfo.id 
+		INNER JOIN Round ON RoundInfo.id = Round.round_info_id 
+		INNER JOIN RoundInstance ON Round.id = RoundInstance.round_id 
+		INNER JOIN Program ON RoundInstance.plan_program_id = Program.id
+		WHERE Game.id = :game_id;";
+	$args = array('game_id' => $game_id);
+	$result = $db->query($query, $args);
+	
+	// set final program
+	while ($row = mysql_fetch_array($result))
+	{
+		if ($row['exec_program_id'] == "")
+		{
+			// create new program
+			$query = "
+				INSERT INTO `Program` 
+					(`area_home`, `area_work`, `area_leisure`, `type_home`, `type_work`, `type_leisure`) 
+				VALUES 
+					(:area_home, :area_work, :area_leisure, :type_home, :type_work, :type_leisure);";
+			$args = array(
+				'area_home' => $row['area_home'], 
+				'area_work' => $row['area_work'], 
+				'area_leisure' => $row['area_leisure'], 
+				'type_home' => $row['type_home'], 
+				'type_work' => $row['type_work'], 
+				'type_leisure' => $row['type_leisure']);
+			$db->query($query, $args);
+			
+			// hook the program up to the round instance
+			$query = "
+				UPDATE `RoundInstance` 
+				SET `exec_program_id` = :exec_program_id
+				WHERE `id` = :id;";
+			$args = array(
+				'id' => $row['round_instance_id'], 
+				'exec_program_id' => $db->insertId());
+			$db->query($query, $args);
+		}
+		else
+		{
+			// the program already exists, update it
+			$query = "
+				UPDATE `Program` 
+				SET 
+					`area_home` = :area_home, 
+					`area_work` = :area_work, 
+					`area_leisure` = :area_leisure, 
+					`type_home` = :type_home, 
+					`type_work` = :type_work, 
+					`type_leisure` = :type_leisure 
+				WHERE `id` = :id;";
+			$args = array(
+				'id' => $row['exec_program_id'], 
+				'area_home' => $row['area_home'], 
+				'area_work' => $row['area_work'], 
+				'area_leisure' => $row['area_leisure'], 
+				'type_home' => $row['type_home'], 
+				'type_work' => $row['type_work'], 
+				'type_leisure' => $row['type_leisure']);
+			$db->query($query, $args);
+		}
+	}
+}
+
+function SetNextRound($game_id)
+{
 	$db = Database::getDatabase();
 	$rounds = RoundInfo::GetRounds();
-	$game = new Game($vars[1]);
+	$game = new Game($game_id);
 	$temp_key = -1;
 	
 	// find id of next round

@@ -1,5 +1,6 @@
 ﻿package SprintStad.Data.Station 
 {
+	import SprintStad.Data.Data;
 	import SprintStad.Data.IDataCollection;
 	import SprintStad.Data.Team.Team;
 	import SprintStad.Debug.Debug;
@@ -55,51 +56,52 @@
 			return null;
 		}
 		
+		public function GetStationIndex(station:Station):int
+		{
+			return stations.indexOf(station);
+		}
+		
 		public function GetStationCount():int
 		{
 			return stations.length;
 		}
 		
-		public function GetNextStationOfTeam(currentStation:Station, team:Team):Station
+		public function GetNextStationOfTeam(currentStationIndex:int, team:Team):int
 		{
-			var index:int = stations.indexOf(currentStation);
-			var station:Station = currentStation;
+			var currentStation:Station = GetStation(currentStationIndex);
+			var index:int = currentStationIndex;
 			do
 			{
 				index = (index + 1) % stations.length;
-				station = stations[index];
-				if (station.team_id == currentStation.team_id)
-					return station;
+				if (stations[index].team_id == currentStation.team_id)
+					return index;
 			}
-			while (station != currentStation)
-			return currentStation;
+			while (index != currentStationIndex)
+			return currentStationIndex;
 		}
 		
-		public function GetPreviousStationOfTeam(currentStation:Station, team:Team):Station
+		public function GetPreviousStationOfTeam(currentStationIndex:int, team:Team):int
 		{
-			var index:int = stations.indexOf(currentStation);
-			var station:Station = currentStation;
+			var currentStation:Station = GetStation(currentStationIndex);
+			var index:int = currentStationIndex;
 			do
 			{
 				index = (stations.length + index - 1) % stations.length;
-				station = stations[index];
-				if (station.team_id == currentStation.team_id)
-					return station;
+				if (stations[index].team_id == currentStation.team_id)
+					return index;
 			}
-			while (station != currentStation)
-			return currentStation;
+			while (index != currentStationIndex)
+			return currentStationIndex;
 		}
 		
-		public function GetNextStation(currentStation:Station):Station
+		public function GetNextStation(currentStationIndex:int):int
 		{
-			var index:int = stations.indexOf(currentStation);
-			return stations[(index + 1) % stations.length];
+			return (currentStationIndex + 1) % stations.length;
 		}
 		
-		public function GetPreviousStation(currentStation:Station):Station
+		public function GetPreviousStation(currentStationIndex:int):int
 		{
-			var index:int = stations.indexOf(currentStation);
-			return stations[(stations.length + index - 1) % stations.length];
+			return (stations.length + currentStationIndex - 1) % stations.length;
 		}
 		
 		public function Clear():void

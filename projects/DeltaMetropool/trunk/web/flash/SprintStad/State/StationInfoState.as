@@ -1,6 +1,7 @@
 ﻿package SprintStad.State 
 {
 	import fl.controls.TextArea;
+	import flash.display.Bitmap;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -27,6 +28,8 @@
 	public class StationInfoState implements IState
 	{
 		private var parent:SprintStad = null;
+		private var barTotalArea:AreaBarDrawer;
+		private var barTransformArea:AreaBarDrawer;
 		
 		public function StationInfoState(parent:SprintStad) 
 		{
@@ -35,14 +38,14 @@
 		
 		public function NextStationEvent(e:Event):void
 		{
-			parent.currentStation = Data.Get().GetStations().GetNextStation(parent.currentStation);
-			DrawUI(parent.currentStation);
+			parent.currentStationIndex = Data.Get().GetStations().GetNextStation(parent.currentStationIndex);
+			DrawUI(parent.GetCurrentStation());
 		}
 		
 		public function PreviousStationEvent(e:Event):void
 		{
-			parent.currentStation = Data.Get().GetStations().GetPreviousStation(parent.currentStation);
-			DrawUI(parent.currentStation);
+			parent.currentStationIndex = Data.Get().GetStations().GetPreviousStation(parent.currentStationIndex);
+			DrawUI(parent.GetCurrentStation());
 		}
 		
 		private function DrawUI(station:Station):void
@@ -74,47 +77,47 @@
 			//left info
 			view.current_info.title.text = "";
 			var top:Array = StationTypeCalculator.GetStationTypeTop(stationInstance);
+			var bitmap:Bitmap;
 			
 			view.current_info.station_type_1_percent.text = top[0].similarity + "%";
 			view.current_info.station_type_1_name.text = top[0].stationType.name;
-			top[0].stationType.imageData.width = 100;
-			top[0].stationType.imageData.height = 100;
-			view.current_info.station_type_1_image.addChild(top[0].stationType.imageData);
+			bitmap = new Bitmap(top[0].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			view.current_info.station_type_1_image.addChild(bitmap);		
 			
 			view.current_info.station_type_2_percent.text = top[1].similarity + "%";
 			view.current_info.station_type_2_name.text = top[1].stationType.name;
-			top[1].stationType.imageData.width = 100;
-			top[1].stationType.imageData.height = 100;
-			view.current_info.station_type_2_image.addChild(top[1].stationType.imageData);
+			bitmap = new Bitmap(top[1].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			view.current_info.station_type_2_image.addChild(bitmap);
 			
 			view.current_info.station_type_3_percent.text = top[2].similarity + "%";
 			view.current_info.station_type_3_name.text = top[2].stationType.name;
-			top[2].stationType.imageData.width = 100;
-			top[2].stationType.imageData.height = 100;
-			view.current_info.station_type_3_image.addChild(top[2].stationType.imageData);
+			bitmap = new Bitmap(top[2].stationType.imageData);
+			bitmap.width = 100;
+			bitmap.height = 100;
+			view.current_info.station_type_3_image.addChild(bitmap);			
 			
-			/*
-			AreaBarDrawer.DrawBar(view.current_info.area_bar,
+			barTotalArea.DrawBar(
 				station.area_cultivated_home,
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
-				station.area_undeveloped_rural);
-				*/
+				station.area_undeveloped_rural);			
 			view.current_info.area.text = "(" + (
 				station.area_cultivated_home +
 				station.area_cultivated_work +
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
-				station.area_undeveloped_rural) + " ha.)";
-				/*
-			AreaBarDrawer.DrawBar(view.current_info.transform_area_bar, 
+				station.area_undeveloped_rural) + " ha.)";			
+			barTransformArea.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed);
-				*/
+				station.transform_area_undeveloped_mixed);			
 			view.current_info.transform_area.text = "(" + ( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
@@ -137,7 +140,7 @@
 		public function OnLoadingDone(data:int)
 		{
 			var view:MovieClip = parent.station_info_movie;
-			DrawUI(parent.currentStation);
+			DrawUI(parent.GetCurrentStation());
 			
 			view.previous_station_button.buttonMode = true;
 			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
@@ -154,8 +157,14 @@
 		{
 			var view:MovieClip = parent.station_info_movie;
 			parent.addChild(SprintStad.LOADER);
+			
 			view.cancel_button.buttonMode = true;
 			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
+			
+			// init bar graphs
+			barTotalArea = new AreaBarDrawer(view.current_info.area_bar);
+			barTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
+			
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		

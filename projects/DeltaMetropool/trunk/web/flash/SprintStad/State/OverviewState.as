@@ -43,11 +43,12 @@
 			}
 		}
 		
-		private function SelectStation(station:Station):void
+		private function SelectStation(stationIndex:int):void
 		{
 			var view:MovieClip = parent.overview_movie;
+			var station:Station = Data.Get().GetStations().GetStation(stationIndex);
 			var stationMovie:MovieClip = MovieClip(view.getChildByName(station.name.replace(" ", "_")));
-			parent.currentStation = station;
+			parent.currentStationIndex = stationIndex;
 			selection.x = stationMovie.x;
 			selection.y = stationMovie.y;
 			view.board.name_field.text = station.name;
@@ -75,7 +76,7 @@
 		
 		private function GetCurrentRound():Round
 		{
-			return parent.currentStation.GetRoundById(Data.Get().current_round_id);
+			return parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id);
 		}
 		
 		private function OnValuesButton(event:MouseEvent):void
@@ -110,7 +111,7 @@
 					}
 				}
 				if (station != null)
-					SelectStation(station);			
+					SelectStation(Data.Get().GetStations().GetStationIndex(station));			
 			}
 			catch (e:Error) 
 			{
@@ -181,7 +182,7 @@
 				selection.y = 500;
 				selection.width = 42;
 				selection.height = 42;
-				SelectStation(parent.currentStation);
+				SelectStation(parent.currentStationIndex);
 			}
 			catch (e:Error)
 			{

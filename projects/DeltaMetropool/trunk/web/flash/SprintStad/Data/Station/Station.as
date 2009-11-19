@@ -141,9 +141,15 @@
 			{
 				for each (var xml:XML in roundXml.children())
 				{
-					if (xml.name() == "program")
+					if (xml.name() == "plan_program")
 					{
-						round.program.ParseXML(xml);
+						round.plan_program = new Program();
+						round.plan_program.ParseXML(xml);
+					}
+					else if (xml.name() == "exec_program")
+					{
+						round.exec_program = new Program();
+						round.exec_program.ParseXML(xml);
 					}
 					else
 					{
@@ -154,6 +160,17 @@
 				round = new Round();
 				index++;
 				roundXml = xmlData.round[index];
+			}
+		}
+		
+		public function PrintRounds():void
+		{
+			Debug.out("----" + name + "----");
+			for each (var round:Round in rounds)
+			{
+				Debug.out(round.round_info_id + " " + round.name);
+				Debug.out("   " + round.plan_program);
+				Debug.out("   " + round.exec_program);
 			}
 		}
 	}

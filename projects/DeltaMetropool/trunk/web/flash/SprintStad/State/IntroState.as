@@ -39,12 +39,10 @@
 		{
 			Debug.out(this + " I know " + data);
 
-			parent.currentStation = 
-				Data.Get().GetStations().GetStation(
-					Data.Get().GetStations().GetStationCount() - 1);
-			parent.currentStation = 
+			parent.currentStationIndex = Data.Get().GetStations().GetStationCount() - 1;
+			parent.currentStationIndex = 
 				Data.Get().GetStations().GetNextStationOfTeam(
-					parent.currentStation, 
+					parent.currentStationIndex, 
 					Data.Get().GetTeams().GetOwnTeam());
 			parent.intro_movie.buttonMode = true;
 			parent.intro_movie.addEventListener(MouseEvent.CLICK, OnContinueEvent);

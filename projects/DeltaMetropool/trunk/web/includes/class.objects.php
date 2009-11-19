@@ -244,7 +244,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'program_id', 'starttime'), $id);
+			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'plan_program_id', 'exec_program_id', 'starttime'), $id);
 		}
 		
 		public static function getCommittedRounds($game_id, $round_id)
@@ -263,7 +263,7 @@
 				ON TeamInstance.id=StationInstance.team_instance_id
 				WHERE TeamInstance.game_id=" . $game_id . "
 				AND RoundInstance.round_id" . $round_id_condition . "
-				AND RoundInstance.program_id IS NOT NULL");
+				AND RoundInstance.plan_program_id IS NOT NULL");
 		}
 	}
 	
@@ -313,7 +313,7 @@
 					INNER JOIN RoundInstance
 					ON StationInstance.id = RoundInstance.station_instance_id
 					INNER JOIN Program 
-					ON RoundInstance.program_id = Program.id 
+					ON RoundInstance.plan_program_id = Program.id 
 					WHERE ClientSession.id = :session_id AND 
 					Program.id = :id;", 
 					array('session_id' => $session_id, 'id' => $id));

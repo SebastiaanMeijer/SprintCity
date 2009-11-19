@@ -62,12 +62,28 @@
 				{
 					echo "\t\t\t\t" . '<' . $round_field . '>' . $round_row[$round_field] . '</' . $round_field . '>' . "\n";
 				}
-				echo "\t\t\t\t" . '<program>' . "\n";
-				foreach ($program_fields as $program_field)
+				if ($round_row['plan_program_id'] != "")
 				{
-					echo "\t\t\t\t\t" . '<' . $program_field . '>' . $round_row[$program_field] . '</' . $program_field . '>' . "\n";
+					$program_result = getProgram($round_row['plan_program_id']);
+					$program_row = mysql_fetch_array($program_result);
+					echo "\t\t\t\t" . '<plan_program>' . "\n";
+					foreach ($program_fields as $program_field)
+					{
+						echo "\t\t\t\t\t" . '<' . $program_field . '>' . $program_row[$program_field] . '</' . $program_field . '>' . "\n";
+					}
+					echo "\t\t\t\t" . '</plan_program>' . "\n";
 				}
-				echo "\t\t\t\t" . '</program>' . "\n";
+				if ($round_row['exec_program_id'] != "")
+				{
+					$program_result = getProgram($round_row['exec_program_id']);
+					$program_row = mysql_fetch_array($program_result);
+					echo "\t\t\t\t" . '<exec_program>' . "\n";
+					foreach ($program_fields as $program_field)
+					{
+						echo "\t\t\t\t\t" . '<' . $program_field . '>' . $program_row[$program_field] . '</' . $program_field . '>' . "\n";
+					}
+					echo "\t\t\t\t" . '</exec_program>' . "\n";
+				}
 				echo "\t\t\t" . '</round>' . "\n";
 			}			
 			echo "\t\t" . '</rounds>' . "\n";
@@ -108,9 +124,7 @@
 			SELECT Round.id, Round.new_transform_area, Round.POVN, Round.PWN, 
 				RoundInfo.number, RoundInfo.name, RoundInfo.description, 
 				RoundInfo.id AS round_info_id, 
-				Program.id AS program_id, 
-				Program.area_home, Program.area_work, Program.area_leisure, 
-				Program.type_home, Program.type_work, Program.type_leisure 
+				RoundInstance.plan_program_id, RoundInstance.exec_program_id
 			FROM StationInstance 
 			INNER JOIN RoundInstance 
 			ON StationInstance.id = RoundInstance.station_instance_id 
@@ -118,11 +132,20 @@
 			ON RoundInstance.round_id = Round.id 
 			INNER JOIN RoundInfo 
 			ON Round.round_info_id = RoundInfo.id 
-			INNER JOIN Program
-			ON RoundInstance.program_id = Program.id 
 			WHERE RoundInstance.station_instance_id = :station_instance_id
 			ORDER BY RoundInfo.number";
 		$args = array('station_instance_id' => $station_instance_id);
+		return $db->query($query, $args);
+	}
+	
+	function getProgram($program_id)
+	{
+		$db = Database::getDatabase();
+		$query = "
+			SELECT *, id AS program_id
+			FROM Program 
+			WHERE id = :program_id";
+		$args = array('program_id' => $program_id);
 		return $db->query($query, $args);
 	}
 ?>

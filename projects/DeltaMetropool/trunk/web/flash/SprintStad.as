@@ -1,5 +1,6 @@
 ﻿package{
 	import flash.display.MovieClip;
+	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
@@ -30,7 +31,7 @@
 		public static const FRAME_OVERVIEW:int = 51;
 		
 		private var currentState:IState = null;
-		public var currentStation:Station = null;
+		public var currentStationIndex:int = 0;
 		private var states:Array = new Array();
 		
 		public function SprintStad()
@@ -68,6 +69,11 @@
 		public function GetState(state:int):IState
 		{
 			return states[state];
+		}
+		
+		public function GetCurrentStation():Station
+		{
+			return Data.Get().GetStations().GetStation(currentStationIndex);
 		}
 	}
 }
