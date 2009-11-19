@@ -134,7 +134,7 @@
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
 			var vars:URLVariables = new URLVariables();
 			vars.session = parent.session;
-			vars.data = parent.currentStation.program.GetXmlString();
+			vars.data = parent.GetCurrentStation().program.GetXmlString();
 			request.data = vars;
 			loader.load(request);
 		}
@@ -143,13 +143,13 @@
 		{
 			CreateProgram();
 			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(parent.currentStation, parent.currentStation.program);
+				StationStatsCalculator.GetStationAfterProgram(parent.GetCurrentStation(), parent.GetCurrentStation().program);
 			DrawStationInfo(stationInstance, parent.program_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
 		{
-			var program:Program = parent.currentStation.program;
+			var program:Program = parent.GetCurrentStation().program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
 				switch (slider.GetSliderType())
@@ -173,14 +173,14 @@
 		
 		private function OnOkButton(event:MouseEvent):void
 		{
-			parent.currentStation.program = CreateProgram();
+			parent.GetCurrentStation().program = CreateProgram();
 			UploadXML();
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnCancelButton(event:MouseEvent):void
 		{
-			parent.currentStation.program = oldProgram;
+			parent.GetCurrentStation().program = oldProgram;
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
@@ -190,7 +190,7 @@
 			if (loadCount >= 2)
 			{
 				loadCount = 0;
-				DrawUI(parent.currentStation);
+				DrawUI(parent.GetCurrentStation());
 				//remove loading screen
 				parent.removeChild(SprintStad.LOADER);
 			}
@@ -217,7 +217,7 @@
 			var types:Types = Data.Get().GetTypes();
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
 			// create a copy of the current program
-			oldProgram = parent.currentStation.program.Copy();
+			oldProgram = parent.GetCurrentStation().program.Copy();
 			// display loading screen
 			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);

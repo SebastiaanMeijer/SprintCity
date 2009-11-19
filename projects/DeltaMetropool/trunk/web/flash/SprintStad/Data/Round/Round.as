@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Round 
 {
 	import SprintStad.Data.Program.Program;
+	import SprintStad.Debug.Debug;
 	public class Round
 	{		
 		public var id:int = 0;
@@ -13,10 +14,11 @@
 		public var PWN:Number = 0;
 		
 		// game data
-		public var program:Program = new Program();
+		public var plan_program:Program;
+		public var exec_program:Program;
 		
 		public function Round() 
-		{			
-		}		
+		{
+		}
 	}
 }

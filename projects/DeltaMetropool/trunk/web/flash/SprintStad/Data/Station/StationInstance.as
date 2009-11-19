@@ -90,7 +90,7 @@
 		public function ApplyRound(round:Round):void
 		{
 			this.round = round;
-			ApplyProgram(round.program);
+			ApplyProgram(round.exec_program);
 			this.round = null;
 		}
 		

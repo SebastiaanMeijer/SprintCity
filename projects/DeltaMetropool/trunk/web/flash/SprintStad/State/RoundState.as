@@ -54,18 +54,19 @@
 			// background
 			view.sheet.addChild(station.imageData);
 			
-			// graphs
+			// graph masterplan
 			barCenterTransformArea.DrawBar(
-				station.transform_area_cultivated_home, 
-				station.transform_area_cultivated_work, 
-				station.transform_area_cultivated_mixed, 
-				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed);
+				station.program.area_home, 
+				station.program.area_work, 
+				station.program.area_leisure, 
+				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
+				0);
 			
 			// update editor
 			editor.SetStation(station);
 			
 			// left info
+			//station.PrintRounds();
 			stationInstance = StationInstance.Create(station);
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
@@ -141,7 +142,7 @@
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
 			var vars:URLVariables = new URLVariables();
 			vars.session = parent.session;
-			vars.data = GetCurrentRound().program.GetXmlString();
+			vars.data = GetCurrentRound().plan_program.GetXmlString();
 			request.data = vars;
 			loader.load(request);
 		}
@@ -201,7 +202,7 @@
 		
 		private function GetCurrentRound():Round
 		{
-			return parent.currentStation.GetRoundById(Data.Get().current_round_id);
+			return parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id);
 		}
 		
 		private function OnTypeButtonClicked(e:Event):void
@@ -213,9 +214,8 @@
 			if (clip != null)
 			{
 				var type:Type = Data.Get().GetTypes().GetTypeById(clip["type_id"]);
-				GetCurrentRound().program.SetType(type);
+				GetCurrentRound().plan_program.SetType(type);
 				editor.ChangeSliderType(type);
-				//Debug.out("    id = " + clip["type_id"]);
 			}
 		}
 		
@@ -223,14 +223,14 @@
 		{
 			var program:Program = CreateProgram();
 			var tempStationInstance:StationInstance = stationInstance.Copy();
-			tempStationInstance.ApplyStaticRoundInfo(parent.currentStation.GetRoundById(Data.Get().current_round_id));
+			tempStationInstance.ApplyStaticRoundInfo(parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id));
 			tempStationInstance.ApplyProgram(program);
 			DrawStationInfo(tempStationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
 		private function CreateProgram():Program
 		{
-			var program:Program = GetCurrentRound().program;
+			var program:Program = GetCurrentRound().plan_program;
 			for each (var slider:ProgramSlider in editor.sliders)
 			{
 				switch (slider.GetSliderType())
@@ -254,14 +254,14 @@
 		
 		private function OnOkButton(event:MouseEvent):void
 		{
-			GetCurrentRound().program = CreateProgram();
+			GetCurrentRound().plan_program = CreateProgram();
 			UploadXML();
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		private function OnCancelButton(event:MouseEvent):void
 		{
-			GetCurrentRound().program = oldProgram;
+			GetCurrentRound().plan_program = oldProgram;
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
@@ -295,8 +295,7 @@
 			if (loadCount >= 2)
 			{
 				loadCount = 0;
-				DrawUI(parent.currentStation);
-				
+				DrawUI(parent.GetCurrentStation());				
 				//remove loading screen
 				parent.removeChild(SprintStad.LOADER);
 			}
@@ -337,7 +336,7 @@
 			editor = new ProgramEditor(view.program_graph, OnEditorChange);
 			
 			// create a copy of the current program
-			oldProgram = GetCurrentRound().program.Copy();
+			oldProgram = GetCurrentRound().plan_program.Copy();
 			
 			// display loading screen
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);

@@ -6,7 +6,7 @@
 	import SprintStad.Debug.Debug;
 	public class Program
 	{
-		public var program_id:uint = 0;
+		public var id:uint = 0;
 		
 		public var type_home:Type = null;
 		public var type_work:Type = null;
@@ -39,7 +39,7 @@
 		public function ParseXML(xmlData:XML):void
 		{
 			var types:Types = Data.Get().GetTypes();
-			program_id = xmlData.program_id;
+			id = xmlData.program_id;
 			type_home = types.GetTypeById(xmlData.type_home);
 			type_work = types.GetTypeById(xmlData.type_work);
 			type_leisure = types.GetTypeById(xmlData.type_leisure);
@@ -53,7 +53,7 @@
 			var xmlString:String = "";
 			
 			xmlString += "<program>";
-			xmlString += "<program_id>" + program_id + "</program_id>";
+			xmlString += "<program_id>" + id + "</program_id>";
 			xmlString += "<type_home>" + type_home.id + "</type_home>";
 			xmlString += "<type_work>" + type_work.id + "</type_work>";
 			xmlString += "<type_leisure>" + type_leisure.id + "</type_leisure>";
@@ -68,7 +68,7 @@
 		public function Copy():Program
 		{
 			var copy:Program = new Program();
-			copy.program_id = this.program_id;
+			copy.id = this.id;
 			copy.type_home = this.type_home;
 			copy.type_work = this.type_work;
 			copy.type_leisure = this.type_leisure;
