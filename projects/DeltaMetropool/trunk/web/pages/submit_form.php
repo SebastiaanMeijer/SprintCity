@@ -23,7 +23,8 @@ switch( $vars[0] )
 		break;
 	case "game_step_next":
 		NextStepGame($vars);
-		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		//header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		echo '</br></br><a href="../admin.php?view=games&page=' . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1) . '">Continue</a>';
 		break;
 	case "game_toggle_active":
 		ToggleGame($vars);
@@ -188,8 +189,18 @@ function NextStepGame($vars)
 
 function CalculateFinalPrograms($game_id)
 {
-	// get a lot of info
+	/*
+	 * Procedure:
+	 * 1. Just copy all plan programs to the exec(final) programs
+	 * 2. Add all demand area (D) of all types of all rounds until and including the current round
+	 * 3. Add all exec (final) program area (P) of all types of all rounds until and including the current round
+	 * 4. D - P = Shortage of area
+	 * 5. If the shortage is lower than 0 reduce the station exec programs areas according to their area type.
+	 */
+	
 	$db = Database::getDatabase();
+	
+	// set exec programs of current round based on the plan programs
 	$query = "
 		SELECT *, RoundInstance.id AS round_instance_id 
 		FROM Game 
@@ -201,7 +212,6 @@ function CalculateFinalPrograms($game_id)
 	$args = array('game_id' => $game_id);
 	$result = $db->query($query, $args);
 	
-	// set final program
 	while ($row = mysql_fetch_array($result))
 	{
 		if ($row['exec_program_id'] == "")
@@ -254,6 +264,212 @@ function CalculateFinalPrograms($game_id)
 				'type_leisure' => $row['type_leisure']);
 			$db->query($query, $args);
 		}
+	}
+	
+	$types = array();
+	
+	// retrieve a list of types with the total amount of acres demanded for that type 
+	// throughout all previous and current rounds. 
+	$query = "
+		SELECT Types.id AS id, SUM(Demand.amount) AS total_area 
+		FROM Types 
+		INNER JOIN Demand ON Types.id = Demand.type_id 
+		INNER JOIN RoundInfo ON Demand.round_info_id = RoundInfo.id 
+		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id 
+		WHERE Game.id = :game_id 
+		GROUP BY Types.id;";
+	$args = array('game_id' => $game_id);
+	$result = $db->query($query, $args);
+	
+	while ($row = mysql_fetch_array($result))
+	{
+		$types[$row['id']] = $row['total_area'];
+	}
+	
+	// retrieve a list of types with the total amount of acres assigned to that type 
+	// in the previous rounds' exec programs with more than zero acres. 
+	$query = "
+		SELECT 
+			Types.id AS id, 
+			Types.type AS type, Types.density as density, 
+			SUM(Program.area_home) AS area_home, 
+			SUM(Program.area_work) AS area_work, 
+			SUM(Program.area_leisure) AS area_leisure 
+		FROM Types 
+		INNER JOIN Program ON 
+			Types.id = Program.type_home OR 
+			Types.id = Program.type_work OR 
+			Types.id = Program.type_leisure 
+		INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
+		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id 
+		WHERE Game.id = :game_id 
+		GROUP BY Types.id 
+		HAVING 
+			Types.type = 'home' AND SUM(Program.area_home) > 0 OR 
+			Types.type = 'work' AND SUM(Program.area_work) > 0 OR 
+			Types.type = 'leisure' AND SUM(Program.area_leisure) > 0;";
+	$args = array('game_id' => $game_id);
+	$result = $db->query($query, $args);
+	
+	while ($row = mysql_fetch_array($result))
+	{
+		switch($row['type'])
+		{
+			case 'home':
+				$types[$row['id']] -= $row['area_home'];
+				if ($row['area_home'] < 0)
+					ReduceHomeTypes($game_id, $row['density'], -$types[$row['id']]);
+				break;
+			case 'work':
+				$types[$row['id']] -= $row['area_work'];
+				if ($row['area_work'] < 0)
+					ReduceWorkTypes($game_id, $row['density'], -$types[$row['id']]);
+				break;
+			case 'leisure':
+				$total_area_type = $types[$row['id']];
+				$types[$row['id']] -= $row['area_leisure'];
+				if ($row['area_leisure'] < 0)
+					ReduceLeisureTypes($game_id, $row['density'], -$types[$row['id']], $total_area_type);
+				break;
+			default:
+		}
+	}
+}
+
+// reduce home type in the last rounds's exec programs 
+function ReduceHomeTypes($game_id, $type_density, $reduce_area)
+{
+	// get a list of programs of the current round of all stations, 
+	// in the order of stations that fit the least to the most with the given type density
+	$db = Database::getDatabase();
+	$query = "
+		SELECT Program.id AS id, Program.area_home AS area
+		FROM Station
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+		INNER JOIN Game ON TeamInstance.game_id = Game.id
+		INNER JOIN Round ON RoundInstance.round_id = Round.id
+		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
+		ORDER BY ABS(Station.count_home_total / Station.area_cultivated_home - :density) DESC;";
+	$args = array(
+		'game_id' => $game_id, 
+		'density' => $type_density);
+	$result = $db->query($query, $args);
+	while ($row = mysql_fetch_array($result))
+	{
+		$reduce_with = min($reduce_area, $row['area']);
+		$updateQuery = "
+			UPDATE `Program` 
+			SET `area_home` = :area, 
+			WHERE `id` = :id;";
+		$updateArgs = array(
+			'id' => $row['id'], 
+			'area' => $reduce_with);
+		$db->query($updateQuery, $updateArgs);
+		$reduce_area -= $reduce_with;
+		if ($reduce_area <= 0)
+			break;
+	}
+}
+
+// reduce work type in the last rounds's exec programs 
+function ReduceWorkTypes($game_id, $type_density, $reduce_area)
+{
+	// get a list of programs of the current round of all stations, 
+	// in the order of stations that fit the least to the most with the given type density
+	$db = Database::getDatabase();
+	$query = "
+		SELECT Program.id AS id, Program.area_work AS area
+		FROM Station
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+		INNER JOIN Game ON TeamInstance.game_id = Game.id
+		INNER JOIN Round ON RoundInstance.round_id = Round.id
+		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
+		ORDER BY ABS(Station.count_work_total / Station.area_cultivated_work - :density) DESC;";
+	$args = array(
+		'game_id' => $game_id, 
+		'density' => $type_density);
+	$result = $db->query($query, $args);
+	while ($row = mysql_fetch_array($result))
+	{
+		$reduce_with = min($reduce_area, $row['area']);
+		$updateQuery = "
+			UPDATE `Program` 
+			SET `area_work` = :area, 
+			WHERE `id` = :id;";
+		$updateArgs = array(
+			'id' => $row['id'], 
+			'area' => $reduce_with);
+		$db->query($updateQuery, $updateArgs);
+		$reduce_area -= $reduce_with;
+		if ($reduce_area <= 0)
+			break;
+	}
+}
+
+// reduce leisure type in the last rounds's exec programs 
+function ReduceLeisureTypes($game_id, $type_density, $reduce_area, $total_area)
+{
+	// get a list of programs of the current round of all stations, 
+	// in the order of stations that have the most part in the excess area use
+	$db = Database::getDatabase();
+	$query = "
+		SELECT Program.id AS id, Program.area_leisure AS area, CEILING((Program.area_leisure / :total_area) * 10) AS fraction
+		FROM Station
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+		INNER JOIN Game ON TeamInstance.game_id = Game.id
+		INNER JOIN Round ON RoundInstance.round_id = Round.id
+		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
+		ORDER BY (Program.area_leisure / :total_area) DESC;";
+	$args = array(
+		'game_id' => $game_id, 
+		'total_area' => $total_area);
+	$result = $db->query($query, $args);
+	
+	// gather info in an array
+	$programs = array();
+	$index = 0;
+	while ($row = mysql_fetch_array($result))
+	{
+		if ($programs[$index]['fraction'] > 0)
+		{
+			$programs[$index]['id'] = $row['id'];
+			$programs[$index]['area'] = $row['area'];
+			$programs[$index]['fraction'] = $row['fraction'];
+			$index++;
+		}
+	}
+	
+	// keep removing area until the area reduction is satisfied
+	$index = 0;
+	while ($reduce_area > 0)
+	{
+		$reduce_with = min($programs[$index]['area'], $programs[$index]['fraction']);
+		$programs[$index]['area'] -= $reduce_with;
+		$reduce_area -= $reduce_with;
+		$index = ($index + 1) % count($programs);
+	}
+	// commit new areas
+	foreach ($programs as $key => $value)
+	{
+		$query = "
+			UPDATE `Program` 
+			SET `area_leisure` = :area, 
+			WHERE `id` = :id;";
+		$args = array(
+			'id' => $value['id'], 
+			'area' => $value['area']);
+		$db->query($query, $args);
 	}
 }
 
