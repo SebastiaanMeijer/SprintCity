@@ -23,8 +23,8 @@ switch( $vars[0] )
 		break;
 	case "game_step_next":
 		NextStepGame($vars);
-		//header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
-		echo '</br></br><a href="../admin.php?view=games&page=' . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1) . '">Continue</a>';
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		//echo '</br></br><a href="../admin.php?view=games&page=' . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1) . '">Continue</a>';
 		break;
 	case "game_toggle_active":
 		ToggleGame($vars);
@@ -319,19 +319,19 @@ function CalculateFinalPrograms($game_id)
 		{
 			case 'home':
 				$types[$row['id']] -= $row['area_home'];
-				if ($row['area_home'] < 0)
+				if ($types[$row['id']] < 0)
 					ReduceHomeTypes($game_id, $row['density'], -$types[$row['id']]);
 				break;
 			case 'work':
 				$types[$row['id']] -= $row['area_work'];
-				if ($row['area_work'] < 0)
+				if ($types[$row['id']] < 0)
 					ReduceWorkTypes($game_id, $row['density'], -$types[$row['id']]);
 				break;
 			case 'leisure':
 				$total_area_type = $types[$row['id']];
 				$types[$row['id']] -= $row['area_leisure'];
-				if ($row['area_leisure'] < 0)
-					ReduceLeisureTypes($game_id, $row['density'], -$types[$row['id']], $total_area_type);
+				if ($types[$row['id']] < 0)
+					ReduceLeisureTypes($game_id, $row['density'], -$types[$row['id']], $row['area_leisure']);
 				break;
 			default:
 		}
@@ -364,11 +364,11 @@ function ReduceHomeTypes($game_id, $type_density, $reduce_area)
 		$reduce_with = min($reduce_area, $row['area']);
 		$updateQuery = "
 			UPDATE `Program` 
-			SET `area_home` = :area, 
+			SET `area_home` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
 			'id' => $row['id'], 
-			'area' => $reduce_with);
+			'area' => $row['area'] - $reduce_with);
 		$db->query($updateQuery, $updateArgs);
 		$reduce_area -= $reduce_with;
 		if ($reduce_area <= 0)
@@ -402,11 +402,11 @@ function ReduceWorkTypes($game_id, $type_density, $reduce_area)
 		$reduce_with = min($reduce_area, $row['area']);
 		$updateQuery = "
 			UPDATE `Program` 
-			SET `area_work` = :area, 
+			SET `area_work` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
 			'id' => $row['id'], 
-			'area' => $reduce_with);
+			'area' => $row['area'] - $reduce_with);
 		$db->query($updateQuery, $updateArgs);
 		$reduce_area -= $reduce_with;
 		if ($reduce_area <= 0)
@@ -421,7 +421,8 @@ function ReduceLeisureTypes($game_id, $type_density, $reduce_area, $total_area)
 	// in the order of stations that have the most part in the excess area use
 	$db = Database::getDatabase();
 	$query = "
-		SELECT Program.id AS id, Program.area_leisure AS area, CEILING((Program.area_leisure / :total_area) * 10) AS fraction
+		SELECT Program.id AS id, Program.area_leisure AS area, 
+			ROUND((Program.area_leisure / :total_area) * :reduce_area) AS reduce_area
 		FROM Station
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
@@ -433,7 +434,8 @@ function ReduceLeisureTypes($game_id, $type_density, $reduce_area, $total_area)
 		ORDER BY (Program.area_leisure / :total_area) DESC;";
 	$args = array(
 		'game_id' => $game_id, 
-		'total_area' => $total_area);
+		'total_area' => $total_area,
+		'reduce_area' => $reduce_area);
 	$result = $db->query($query, $args);
 	
 	// gather info in an array
@@ -441,34 +443,22 @@ function ReduceLeisureTypes($game_id, $type_density, $reduce_area, $total_area)
 	$index = 0;
 	while ($row = mysql_fetch_array($result))
 	{
-		if ($programs[$index]['fraction'] > 0)
-		{
-			$programs[$index]['id'] = $row['id'];
-			$programs[$index]['area'] = $row['area'];
-			$programs[$index]['fraction'] = $row['fraction'];
-			$index++;
-		}
+		$programs[$index]['id'] = $row['id'];
+		$programs[$index]['area'] = $row['area'];
+		$programs[$index]['reduce_area'] = $row['reduce_area'];
+		$index++;
 	}
-	
-	// keep removing area until the area reduction is satisfied
-	$index = 0;
-	while ($reduce_area > 0)
-	{
-		$reduce_with = min($programs[$index]['area'], $programs[$index]['fraction']);
-		$programs[$index]['area'] -= $reduce_with;
-		$reduce_area -= $reduce_with;
-		$index = ($index + 1) % count($programs);
-	}
+
 	// commit new areas
 	foreach ($programs as $key => $value)
 	{
 		$query = "
 			UPDATE `Program` 
-			SET `area_leisure` = :area, 
+			SET `area_leisure` = :area 
 			WHERE `id` = :id;";
 		$args = array(
 			'id' => $value['id'], 
-			'area' => $value['area']);
+			'area' => $value['area'] - min($value['area'], $value['reduce_area']));
 		$db->query($query, $args);
 	}
 }
