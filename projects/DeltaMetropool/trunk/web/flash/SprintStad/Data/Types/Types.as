@@ -1,5 +1,7 @@
 ﻿package SprintStad.Data.Types 
 {
+	import SprintStad.Data.Data;
+	import SprintStad.Data.Demand.Demand;
 	import SprintStad.Data.IDataCollection;
 	import SprintStad.Debug.Debug;
 	public class Types implements IDataCollection
@@ -62,27 +64,29 @@
 		{
 			Clear();
 			
-			var xmlList:XMLList = xmlData.type.children();
 			var type:Type = new Type();
-			var xml:XML = null;
-			var firstTag:String = "";
+			var typeXml:XML = null;
+			var index = 0;
+			typeXml = xmlData.type[index];
 			
-			for each (xml in xmlList) 
+			while (typeXml != null)
 			{
-				var tag:String = xml.name();
-				
-				if (xml.name() == firstTag)
+				for each (var xml:XML in typeXml.children()) 
 				{
-					AddType(type);
-					type = new Type();
+					if (xml.name() == "demands")
+					{
+						type.ParseXML(xml);
+					}
+					else
+					{
+						type[xml.name()] = xml;
+					}
 				}
-				
-				if (firstTag == "")
-					firstTag = xml.name();
-					
-				type[xml.name()] = xml;
+				AddType(type);
+				type = new Type();
+				index++;
+				typeXml = xmlData.type[index];
 			}
-			AddType(type);
 		}
 	}
 }

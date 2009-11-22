@@ -1,7 +1,7 @@
 <?php
-	require_once './includes/master.inc.php';
+	require_once '../includes/master.inc.php';
 	
-	if(!$Auth->loggedIn()) redirect('login.php');
+	if(!$Auth->loggedIn()) redirect('../login.php');
 	
 	$class = new Loop('odd', 'even');
 	$teams = Team::getTeams(0, Team::rowCount());

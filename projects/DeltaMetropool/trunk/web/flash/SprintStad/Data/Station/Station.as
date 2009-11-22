@@ -46,7 +46,7 @@
 		public var count_work_total:int = 0;
 		public var count_work_transform:int = 0;
 		
-		private var rounds:Array = new Array();
+		public var rounds:Array = new Array();
 		
 		private var loader:Loader = null;
 		
