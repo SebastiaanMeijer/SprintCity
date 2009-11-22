@@ -6,12 +6,15 @@
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
+	import flash.text.TextField;
 	import flash.ui.Mouse;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
+	import SprintStad.Data.Types.Type;
+	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Drawer.AreaBarDrawer;
 	public class OverviewState  implements IState
@@ -21,6 +24,10 @@
 		private var stationIndex:int = 0;
 		private var loadCount:int = 0;
 		
+		private var barInitial:AreaBarDrawer;
+		private var barMasterplan:AreaBarDrawer;
+		private var barReality:AreaBarDrawer;
+		
 		public function OverviewState(parent:SprintStad) 
 		{
 			this.parent = parent;
@@ -29,8 +36,10 @@
 		private function Init():void
 		{
 			var view:MovieClip = parent.overview_movie;
+			var i:int = 0;
+			// fill station circles
 			var stations:Stations = Data.Get().GetStations();
-			for (var i:int = 0; i < stations.GetStationCount(); i++)
+			for (i = 0; i < stations.GetStationCount(); i++)
 			{
 				var station:Station = stations.GetStation(i);
 				var movie:MovieClip = GetStationMovieClip(station);
@@ -41,6 +50,18 @@
 				station.RefreshAreaBar();
 				movie.graph.addChild(station.areaBar.GetClip());
 			}
+			// fill in the demand windows
+			var types:Types = Data.Get().GetTypes();
+			for (i = 0; i < types.GetTypeCount(); i++)
+			{
+				var type:Type = types.GetType(i);
+				if (type.id < 15)
+				{
+					TextField(view.getChildByName("type_" + type.id)).text = type.GetDemandUntilNow() + " ha";
+				}
+			}
+			// select first station
+			SelectStation(parent.currentStationIndex);
 		}
 		
 		private function SelectStation(stationIndex:int):void
@@ -66,6 +87,19 @@
 				view.program_button.buttonMode = false;
 				view.program_button.removeEventListener(MouseEvent.CLICK, OnProgramButton);
 			}
+			// refresh bars
+			barInitial.DrawBar(
+				station.transform_area_cultivated_home, 
+				station.transform_area_cultivated_work, 
+				station.transform_area_cultivated_mixed, 
+				station.transform_area_undeveloped_urban,
+				station.transform_area_undeveloped_mixed);
+			barMasterplan.DrawBar(
+				station.program.area_home, 
+				station.program.area_work, 
+				station.program.area_leisure, 
+				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
+				0);
 		}
 		
 		private function GetStationMovieClip(station:Station):MovieClip
@@ -166,6 +200,11 @@
 				view.values_button.buttonMode = true;
 				view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
 				
+				// bar graphs
+				barInitial = new AreaBarDrawer(view.graph_initial);
+				barMasterplan = new AreaBarDrawer(view.graph_masterplan);
+				barReality = new AreaBarDrawer(view.graph_reality);
+				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();
 				for (var i:int = 0; i < stations.GetStationCount(); i++)
@@ -178,11 +217,10 @@
 				
 				// initial selection
 				parent.overview_movie.addChild(selection);
-				selection.x = 500;
-				selection.y = 500;
+				selection.x = -500;
+				selection.y = -500;
 				selection.width = 42;
 				selection.height = 42;
-				SelectStation(parent.currentStationIndex);
 			}
 			catch (e:Error)
 			{

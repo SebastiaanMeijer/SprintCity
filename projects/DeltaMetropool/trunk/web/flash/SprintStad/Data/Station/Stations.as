@@ -6,7 +6,7 @@
 	import SprintStad.Debug.Debug;
 	public class Stations implements IDataCollection
 	{	
-		private var stations:Array = new Array();	
+		public var stations:Array = new Array();
 		
 		public var MaxPOVN:Number = 0;
 		public var MaxPWN:Number = 0;
