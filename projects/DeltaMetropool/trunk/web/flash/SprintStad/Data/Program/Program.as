@@ -21,6 +21,15 @@
 			
 		}
 		
+		public static function Default():Program
+		{
+			var program:Program = new Program();
+			program.type_home = Data.Get().GetTypes().GetTypesOfCategory("average_home")[0];
+			program.type_work = Data.Get().GetTypes().GetTypesOfCategory("average_work")[0];
+			program.type_leisure = Data.Get().GetTypes().GetTypesOfCategory("average_leisure")[0];
+			return program;
+		}
+		
 		public function TotalArea():int
 		{
 			return area_home + area_work + area_leisure;

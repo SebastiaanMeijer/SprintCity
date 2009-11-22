@@ -156,11 +156,11 @@
 			IWD = (count_home_total * constants.average_citizens_per_home +
 				count_work_total * constants.average_workers_per_bvo) / 
 				(area_cultivated_home + area_cultivated_work);
-			Debug.out("IWD: " + IWD);
+			//Debug.out("IWD: " + IWD);
 			var citizens:Number = count_home_total * constants.average_citizens_per_home;
 			var workers:Number = count_work_total * constants.average_workers_per_bvo;
 			MNG = Math.min(citizens * 5, workers) / Math.max(citizens * 5, workers) * 100;
-			Debug.out("MNG: " + MNG);
+			//Debug.out("MNG: " + MNG);
 		}
 		
 		private function GetHomeDensity(program:Program):Number
