@@ -68,6 +68,7 @@
 			// left info
 			//station.PrintRounds();
 			stationInstance = StationInstance.Create(station);
+			stationInstance.ApplyProgram(Program.Default());
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
 			// right info

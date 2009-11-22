@@ -1,5 +1,5 @@
 <?php
-	require_once '../includes/master.inc.php';
+	require_once '/includes/master.inc.php';
 
 	if(!$Auth->loggedIn()) redirect('../login.php');
 	
