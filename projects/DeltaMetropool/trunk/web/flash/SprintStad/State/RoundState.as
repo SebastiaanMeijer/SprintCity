@@ -16,6 +16,7 @@
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.StationInstance;
+	import SprintStad.Data.StationTypes.StationType;
 	import SprintStad.Data.Types.Type;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
@@ -35,6 +36,9 @@
 		private var barCurrentTransformArea:AreaBarDrawer;
 		private var barFutureArea:AreaBarDrawer;
 		private var barFutureTransformArea:AreaBarDrawer;
+		
+		private var popup:StationTypePopup = null;
+		private var popupImage:Bitmap = new Bitmap();
 		
 		public function RoundState(parent:SprintStad) 
 		{
@@ -90,6 +94,9 @@
 			bitmap.width = 100;
 			bitmap.height = 100;
 			clip.station_type_1_image.addChild(bitmap);
+			clip.station_type_1_image.stationType = top[0].stationType;
+			clip.station_type_1_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			clip.station_type_1_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			clip.station_type_2_percent.text = top[1].similarity + "%";
 			clip.station_type_2_name.text = top[1].stationType.name;
@@ -97,6 +104,9 @@
 			bitmap.width = 100;
 			bitmap.height = 100;
 			clip.station_type_2_image.addChild(bitmap);
+			clip.station_type_2_image.stationType = top[1].stationType;
+			clip.station_type_2_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			clip.station_type_2_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			clip.station_type_3_percent.text = top[2].similarity + "%";
 			clip.station_type_3_name.text = top[2].stationType.name;
@@ -104,6 +114,9 @@
 			bitmap.width = 100;
 			bitmap.height = 100;
 			clip.station_type_3_image.addChild(bitmap);
+			clip.station_type_3_image.stationType = top[2].stationType;
+			clip.station_type_3_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			clip.station_type_3_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			area_bar.DrawBar(
 				station.area_cultivated_home,
@@ -204,6 +217,33 @@
 		private function GetCurrentRound():Round
 		{
 			return parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id);
+		}
+		
+		private function MouseOverType(event:MouseEvent):void
+		{
+			ShowPopup(event.target.stationType);
+		}
+		
+		private function MouseOutType(event:MouseEvent):void
+		{
+			HidePopup();
+		}
+		
+		private function ShowPopup(type:StationType):void
+		{
+			popup.title.text = type.name;
+			popup.description.text = type.description;
+			popupImage = new Bitmap(type.imageData);
+			popupImage.width = 100;
+			popupImage.height = 100;
+			popup.image.addChild(popupImage);
+			popup.visible = true;
+		}
+		
+		private function HidePopup()
+		{
+			popup.image.removeChild(popupImage);
+			popup.visible = false;
 		}
 		
 		private function OnTypeButtonClicked(e:Event):void
@@ -312,6 +352,14 @@
 			view.ok_button.addEventListener(MouseEvent.CLICK, OnOkButton);
 			view.cancel_button.buttonMode = true;
 			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
+			
+			// init station type poput menu
+			popup = new StationTypePopup();
+			popup.image.addChild(popupImage);
+			popup.x = 287;
+			popup.y = 120;
+			popup.visible = false;
+			view.addChild(popup);
 			
 			view.home_button.buttonMode = true;
 			view.home_button.addEventListener(MouseEvent.CLICK, OnHomeButton);

@@ -31,6 +31,9 @@
 		private var barTotalArea:AreaBarDrawer;
 		private var barTransformArea:AreaBarDrawer;
 		
+		private var popup:StationTypePopup = null;
+		private var popupImage:Bitmap = new Bitmap();
+		
 		public function StationInfoState(parent:SprintStad) 
 		{
 			this.parent = parent;
@@ -84,7 +87,10 @@
 			bitmap = new Bitmap(top[0].stationType.imageData);
 			bitmap.width = 100;
 			bitmap.height = 100;
-			view.current_info.station_type_1_image.addChild(bitmap);		
+			view.current_info.station_type_1_image.addChild(bitmap);
+			view.current_info.station_type_1_image.stationType = top[0].stationType;
+			view.current_info.station_type_1_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			view.current_info.station_type_1_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			view.current_info.station_type_2_percent.text = top[1].similarity + "%";
 			view.current_info.station_type_2_name.text = top[1].stationType.name;
@@ -92,13 +98,19 @@
 			bitmap.width = 100;
 			bitmap.height = 100;
 			view.current_info.station_type_2_image.addChild(bitmap);
+			view.current_info.station_type_2_image.stationType = top[1].stationType;
+			view.current_info.station_type_2_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			view.current_info.station_type_2_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			view.current_info.station_type_3_percent.text = top[2].similarity + "%";
 			view.current_info.station_type_3_name.text = top[2].stationType.name;
 			bitmap = new Bitmap(top[2].stationType.imageData);
 			bitmap.width = 100;
 			bitmap.height = 100;
-			view.current_info.station_type_3_image.addChild(bitmap);			
+			view.current_info.station_type_3_image.addChild(bitmap);
+			view.current_info.station_type_3_image.stationType = top[2].stationType;
+			view.current_info.station_type_3_image.addEventListener(MouseEvent.MOUSE_OVER, MouseOverType);
+			view.current_info.station_type_3_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			barTotalArea.DrawBar(
 				station.area_cultivated_home,
@@ -132,6 +144,33 @@
 			view.current_info.bvo_work.text = station.count_work_total;
 		}
 		
+		private function MouseOverType(event:MouseEvent):void
+		{
+			ShowPopup(event.target.stationType);
+		}
+		
+		private function MouseOutType(event:MouseEvent):void
+		{
+			HidePopup();
+		}
+		
+		private function ShowPopup(type:StationType):void
+		{
+			popup.title.text = type.name;
+			popup.description.text = type.description;
+			popupImage = new Bitmap(type.imageData);
+			popupImage.width = 100;
+			popupImage.height = 100;
+			popup.image.addChild(popupImage);
+			popup.visible = true;
+		}
+		
+		private function HidePopup()
+		{
+			popup.image.removeChild(popupImage);
+			popup.visible = false;
+		}
+		
 		private function OnCancelButton(event:MouseEvent):void
 		{
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
@@ -160,6 +199,14 @@
 			
 			view.cancel_button.buttonMode = true;
 			view.cancel_button.addEventListener(MouseEvent.CLICK, OnCancelButton);
+			
+			// init station type poput menu
+			popup = new StationTypePopup();
+			popup.image.addChild(popupImage);
+			popup.x = 287;
+			popup.y = 120;
+			popup.visible = false;
+			view.addChild(popup);
 			
 			// init bar graphs
 			barTotalArea = new AreaBarDrawer(view.current_info.area_bar);
