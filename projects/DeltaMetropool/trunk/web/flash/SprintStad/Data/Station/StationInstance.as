@@ -35,6 +35,31 @@
 			
 		}
 		
+		public static function CreateInitial(station:Station):StationInstance
+		{
+			var result:StationInstance = new StationInstance();
+			result.station = station;
+			result.POVN = station.POVN;
+			result.PWN = station.PWN;
+			result.IWD = station.IWD;
+			result.MNG = station.MNG;
+			result.area_cultivated_home = station.area_cultivated_home;
+			result.area_cultivated_work = station.area_cultivated_work;
+			result.area_cultivated_mixed = station.area_cultivated_mixed;
+			result.area_undeveloped_urban = station.area_undeveloped_urban;
+			result.area_undeveloped_rural = station.area_undeveloped_rural;
+			result.transform_area_cultivated_home = station.transform_area_cultivated_home;
+			result.transform_area_cultivated_work = station.transform_area_cultivated_work;
+			result.transform_area_cultivated_mixed = station.transform_area_cultivated_mixed;
+			result.transform_area_undeveloped_urban = station.transform_area_undeveloped_urban;
+			result.transform_area_undeveloped_mixed = station.transform_area_undeveloped_mixed;
+			result.count_home_total = station.count_home_total;
+			result.count_home_transform = station.count_home_transform;
+			result.count_work_total = station.count_work_total;
+			result.count_work_transform = station.count_work_transform;
+			return result;
+		}
+		
 		public static function Create(station:Station):StationInstance
 		{
 			var result:StationInstance = new StationInstance();
@@ -58,7 +83,11 @@
 			result.count_work_total = station.count_work_total;
 			result.count_work_transform = station.count_work_transform;
 			for (var i:int = 2; i < Data.Get().current_round_id; i++)
-				result.ApplyRound(station.GetRoundById(i));
+			{
+				var round:Round = station.GetRoundById(i)
+				if (round != null)
+					result.ApplyRound(station.GetRoundById(i));
+			}
 			return result;
 		}
 		
