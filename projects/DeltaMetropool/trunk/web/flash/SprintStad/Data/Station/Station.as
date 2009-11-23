@@ -93,6 +93,11 @@
 			return rounds.length;
 		}
 		
+		public function IsLastRound(round_id:int):Boolean
+		{
+			return round_id - 1 == rounds[rounds.length - 1].round_info_id;
+		}
+		
 		public function GetTotalTransformArea():int
 		{
 			return transform_area_cultivated_home + 

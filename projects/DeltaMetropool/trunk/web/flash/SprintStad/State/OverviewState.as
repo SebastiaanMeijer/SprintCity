@@ -75,6 +75,7 @@
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
+			// set program button
 			if (station.owner.is_player)
 			{
 				view.program_button.visible = true;
@@ -86,6 +87,20 @@
 				view.program_button.visible = false;
 				view.program_button.buttonMode = false;
 				view.program_button.removeEventListener(MouseEvent.CLICK, OnProgramButton);
+			}
+			// set result button
+			if (station.IsLastRound(Data.Get().current_round_id))
+			{
+				view.program_button.visible = false;
+				view.result_button.visible = true;
+				view.result_button.buttonMode = true;
+				view.result_button.addEventListener(MouseEvent.CLICK, OnResultButton);
+			}
+			else
+			{
+				view.result_button.visible = false;
+				view.result_button.buttonMode = false;
+				view.result_button.removeEventListener(MouseEvent.CLICK, OnResultButton);
 			}
 			// refresh bars
 			barInitial.DrawBar(
@@ -119,6 +134,11 @@
 		}
 		
 		private function OnProgramButton(event:MouseEvent):void
+		{
+			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnCurrentRoundKnown);
+		}
+		
+		private function OnResultButton(event:MouseEvent):void
 		{
 			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnCurrentRoundKnown);
 		}
@@ -158,6 +178,8 @@
 		{
 			if (Data.Get().current_round_id == 1)
 				parent.gotoAndPlay(SprintStad.FRAME_PROGRAM);
+			else if (parent.GetCurrentStation().IsLastRound(Data.Get().current_round_id))
+				parent.gotoAndPlay(SprintStad.FRAME_RESULT);
 			else
 				parent.gotoAndPlay(SprintStad.FRAME_ROUND);
 		}

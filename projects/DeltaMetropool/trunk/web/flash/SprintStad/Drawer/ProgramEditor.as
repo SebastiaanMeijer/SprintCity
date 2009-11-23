@@ -105,41 +105,51 @@
 				for (i = 2; i < this.currentRound; i++)
 				{
 					round = station.GetRoundById(i);
-					availableArea += round.new_transform_area;
-					if (round.exec_program != null)
+					if (round != null)
 					{
-						var filledArea = round.exec_program.area_home + round.exec_program.area_work + round.exec_program.area_leisure;
-						availableArea -= filledArea;
-						editAreaStart += filledArea;
-						programHistory[round.exec_program.type_home.id - 1] += round.exec_program.area_home;
-						programHistory[round.exec_program.type_work.id - 1] += round.exec_program.area_work;
-						programHistory[round.exec_program.type_leisure.id - 1] += round.exec_program.area_leisure;
+						availableArea += round.new_transform_area;
+						if (round.exec_program != null)
+						{
+							var filledArea = round.exec_program.area_home + round.exec_program.area_work + round.exec_program.area_leisure;
+							availableArea -= filledArea;
+							editAreaStart += filledArea;
+							programHistory[round.exec_program.type_home.id - 1] += round.exec_program.area_home;
+							programHistory[round.exec_program.type_work.id - 1] += round.exec_program.area_work;
+							programHistory[round.exec_program.type_leisure.id - 1] += round.exec_program.area_leisure;
+						}
 					}
 				}
-				availableArea += station.GetRoundById(this.currentRound).new_transform_area;
-				
 				round = station.GetRoundById(this.currentRound);
-				// set sliders
-				sliders.push(new ProgramSlider(round.plan_program.type_home, round.plan_program.area_home));
-				sliders.push(new ProgramSlider(round.plan_program.type_work, round.plan_program.area_work));
-				sliders.push(new ProgramSlider(round.plan_program.type_leisure, round.plan_program.area_leisure));
+				
+				if (round != null)
+				{
+					availableArea += round.new_transform_area;
+					// set sliders
+					sliders.push(new ProgramSlider(round.plan_program.type_home, round.plan_program.area_home));
+					sliders.push(new ProgramSlider(round.plan_program.type_work, round.plan_program.area_work));
+					sliders.push(new ProgramSlider(round.plan_program.type_leisure, round.plan_program.area_leisure));
+				}
 			}
+			
 			// add type bars
 			for (i = 0; i < types.GetTypeCount(); i++)
 				clip.addChild(types.GetType(i).colorClip);
 			
-			// add area bars
-			clip.addChild(sliders[ProgramSlider.TYPE_HOME].barClip);
-			clip.addChild(sliders[ProgramSlider.TYPE_WORK].barClip);
-			clip.addChild(sliders[ProgramSlider.TYPE_LEISURE].barClip);
-			
 			// add unavailabe area bar
-			clip.addChild(unavailabeArea);
+			clip.addChild(unavailabeArea);			
 			
-			// add slider clips
-			clip.parent.addChild(sliders[ProgramSlider.TYPE_HOME].GetClip());
-			clip.parent.addChild(sliders[ProgramSlider.TYPE_WORK].GetClip());
-			clip.parent.addChild(sliders[ProgramSlider.TYPE_LEISURE].GetClip());
+			if (sliders.length == 3)
+			{
+				// add area bars
+				clip.addChild(sliders[ProgramSlider.TYPE_HOME].barClip);
+				clip.addChild(sliders[ProgramSlider.TYPE_WORK].barClip);
+				clip.addChild(sliders[ProgramSlider.TYPE_LEISURE].barClip);
+							
+				// add slider clips
+				clip.parent.addChild(sliders[ProgramSlider.TYPE_HOME].GetClip());
+				clip.parent.addChild(sliders[ProgramSlider.TYPE_WORK].GetClip());
+				clip.parent.addChild(sliders[ProgramSlider.TYPE_LEISURE].GetClip());
+			}
 		}
 		
 		public function Draw():void
