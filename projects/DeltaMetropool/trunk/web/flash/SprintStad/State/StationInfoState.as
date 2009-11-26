@@ -162,13 +162,13 @@
 			popupImage.width = 100;
 			popupImage.height = 100;
 			popup.image.addChild(popupImage);
-			popup.visible = true;
+			parent.addChild(popup);
 		}
 		
 		private function HidePopup()
 		{
 			popup.image.removeChild(popupImage);
-			popup.visible = false;
+			parent.removeChild(popup);
 		}
 		
 		private function OnCancelButton(event:MouseEvent):void
@@ -205,8 +205,6 @@
 			popup.image.addChild(popupImage);
 			popup.x = 287;
 			popup.y = 120;
-			popup.visible = false;
-			view.addChild(popup);
 			
 			// init bar graphs
 			barTotalArea = new AreaBarDrawer(view.current_info.area_bar);

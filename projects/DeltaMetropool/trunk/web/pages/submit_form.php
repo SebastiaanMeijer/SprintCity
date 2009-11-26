@@ -24,7 +24,6 @@ switch( $vars[0] )
 	case "game_step_next":
 		NextStepGame($vars);
 		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
-		//echo '</br></br><a href="../admin.php?view=games&page=' . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1) . '">Continue</a>';
 		break;
 	case "game_toggle_active":
 		ToggleGame($vars);
@@ -320,18 +319,17 @@ function CalculateFinalPrograms($game_id)
 			case 'home':
 				$types[$row['id']] -= $row['area_home'];
 				if ($types[$row['id']] < 0)
-					ReduceHomeTypes($game_id, $row['density'], -$types[$row['id']]);
+					ReduceHomeTypes($game_id, $row['id'], -$types[$row['id']]);
 				break;
 			case 'work':
 				$types[$row['id']] -= $row['area_work'];
 				if ($types[$row['id']] < 0)
-					ReduceWorkTypes($game_id, $row['density'], -$types[$row['id']]);
+					ReduceWorkTypes($game_id, $row['id'], -$types[$row['id']]);
 				break;
 			case 'leisure':
-				$total_area_type = $types[$row['id']];
 				$types[$row['id']] -= $row['area_leisure'];
 				if ($types[$row['id']] < 0)
-					ReduceLeisureTypes($game_id, $row['density'], -$types[$row['id']], $row['area_leisure']);
+					ReduceLeisureTypes($game_id, $row['id'], -$types[$row['id']]);
 				break;
 			default:
 		}
@@ -339,127 +337,200 @@ function CalculateFinalPrograms($game_id)
 }
 
 // reduce home type in the last rounds's exec programs 
-function ReduceHomeTypes($game_id, $type_density, $reduce_area)
+function ReduceHomeTypes($game_id, $type, $reduce_area)
 {
-	// get a list of programs of the current round of all stations, 
-	// in the order of stations that fit the least to the most with the given type density
 	$db = Database::getDatabase();
 	$query = "
-		SELECT Program.id AS id, Program.area_home AS area
-		FROM Station
-		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
-		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
-		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-		INNER JOIN Game ON TeamInstance.game_id = Game.id
-		INNER JOIN Round ON RoundInstance.round_id = Round.id
-		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
-		ORDER BY ABS(Station.count_home_total / Station.area_cultivated_home - :density) DESC;";
+		SELECT 
+			Program.id AS id, 
+			Program.area_home AS area, 
+			ABS(Station.count_home_total / Station.area_cultivated_home - Types.density) AS density_delta, 
+			ABS(Round.POVN - Types.POVN) AS povn_delta 
+		FROM Station 
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id 
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		INNER JOIN Game ON TeamInstance.game_id = Game.id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN Types ON Program.type_home = Types.id 
+		WHERE 
+			Game.id = :game_id AND 
+			Program.type_home = :type AND 
+			Program.area_home > 0 AND 
+			Round.round_info_id = Game.current_round_id;";
 	$args = array(
 		'game_id' => $game_id, 
-		'density' => $type_density);
+		'type' => $type);
 	$result = $db->query($query, $args);
+	
+	$data = array();
+	$index = 0;
+	$total_density_delta = 0;
+	$total_povn_delta = 0;
+	$total_area = 0;
 	while ($row = mysql_fetch_array($result))
 	{
-		$reduce_with = min($reduce_area, $row['area']);
+		$data[$index]['id'] = $row['id'];
+		$data[$index]['area'] = $row['area'];
+		$data[$index]['density_delta'] = $row['density_delta'];
+		$data[$index]['povn_delta'] = $row['povn_delta'];
+		$total_area += $row['area'];
+		$total_density_delta += $row['density_delta'];
+		$total_povn_delta += $row['povn_delta'];
+		$index++;
+	}
+	
+	foreach ($data as $key => $value)
+	{
+		$density_fraction = $total_density_delta != 0 ?  1 - $value['density_delta'] / $total_density_delta : 1;
+		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
+		$final_value = round(($density_fraction + $povn_fraction) * 0.5 * ($total_area - $reduce_area));
+		$final_value = min($final_value, $value['area']);
+		$reduce_area -= $value['area'] - $final_value;
+		$total_area -= $value['area'];
+		$total_density_delta -= $value['density_delta'];
+		$total_povn_delta -= $value['povn_delta'];
 		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_home` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
-			'id' => $row['id'], 
-			'area' => $row['area'] - $reduce_with);
+			'id' => $value['id'], 
+			'area' => $final_value);
 		$db->query($updateQuery, $updateArgs);
-		$reduce_area -= $reduce_with;
 		if ($reduce_area <= 0)
 			break;
 	}
 }
 
 // reduce work type in the last rounds's exec programs 
-function ReduceWorkTypes($game_id, $type_density, $reduce_area)
+function ReduceWorkTypes($game_id, $type, $reduce_area)
 {
-	// get a list of programs of the current round of all stations, 
-	// in the order of stations that fit the least to the most with the given type density
 	$db = Database::getDatabase();
 	$query = "
-		SELECT Program.id AS id, Program.area_work AS area
-		FROM Station
-		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
-		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
-		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-		INNER JOIN Game ON TeamInstance.game_id = Game.id
-		INNER JOIN Round ON RoundInstance.round_id = Round.id
-		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
-		ORDER BY ABS(Station.count_work_total / Station.area_cultivated_work - :density) DESC;";
+		SELECT 
+			Program.id AS id, 
+			Program.area_work AS area, 
+			ABS(Station.count_work_total / Station.area_cultivated_work - Types.density) AS density_delta, 
+			ABS(Round.POVN - Types.POVN) AS povn_delta 
+		FROM Station 
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id 
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		INNER JOIN Game ON TeamInstance.game_id = Game.id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN Types ON Program.type_home = Types.id 
+		WHERE 
+			Game.id = :game_id AND 
+			Program.type_work = :type AND 
+			Program.area_work > 0 AND 
+			Round.round_info_id = Game.current_round_id;";
 	$args = array(
 		'game_id' => $game_id, 
-		'density' => $type_density);
+		'type' => $type);
 	$result = $db->query($query, $args);
+	
+	$data = array();
+	$index = 0;
+	$total_density_delta = 0;
+	$total_povn_delta = 0;
+	$total_area = 0;
 	while ($row = mysql_fetch_array($result))
 	{
-		$reduce_with = min($reduce_area, $row['area']);
+		$data[$index]['id'] = $row['id'];
+		$data[$index]['area'] = $row['area'];
+		$data[$index]['density_delta'] = $row['density_delta'];
+		$data[$index]['povn_delta'] = $row['povn_delta'];
+		$total_area += $row['area'];
+		$total_density_delta += $row['density_delta'];
+		$total_povn_delta += $row['povn_delta'];
+		$index++;
+	}
+	
+	foreach ($data as $key => $value)
+	{
+		$density_fraction = $total_density_delta != 0 ?  1 - $value['density_delta'] / $total_density_delta : 1;
+		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
+		$final_value = round(($density_fraction + $povn_fraction) * 0.5 * ($total_area - $reduce_area));
+		$final_value = min($final_value, $value['area']);
+		$reduce_area -= $value['area'] - $final_value;
+		$total_area -= $value['area'];
+		$total_density_delta -= $value['density_delta'];
+		$total_povn_delta -= $value['povn_delta'];
 		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_work` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
-			'id' => $row['id'], 
-			'area' => $row['area'] - $reduce_with);
+			'id' => $value['id'], 
+			'area' => $final_value);
 		$db->query($updateQuery, $updateArgs);
-		$reduce_area -= $reduce_with;
 		if ($reduce_area <= 0)
 			break;
 	}
 }
 
 // reduce leisure type in the last rounds's exec programs 
-function ReduceLeisureTypes($game_id, $type_density, $reduce_area, $total_area)
+function ReduceLeisureTypes($game_id, $type, $reduce_area)
 {
-	// get a list of programs of the current round of all stations, 
-	// in the order of stations that have the most part in the excess area use
 	$db = Database::getDatabase();
 	$query = "
-		SELECT Program.id AS id, Program.area_leisure AS area, 
-			ROUND((Program.area_leisure / :total_area) * :reduce_area) AS reduce_area
-		FROM Station
-		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
-		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
-		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-		INNER JOIN Game ON TeamInstance.game_id = Game.id
-		INNER JOIN Round ON RoundInstance.round_id = Round.id
-		WHERE Game.id = :game_id AND Round.round_info_id = Game.current_round_id
-		ORDER BY (Program.area_leisure / :total_area) DESC;";
+		SELECT 
+			Program.id AS id, 
+			Program.area_leisure AS area,
+			ABS(Round.POVN - Types.POVN) AS povn_delta 
+		FROM Station 
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
+		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
+		INNER JOIN Program ON RoundInstance.exec_program_id = Program.id 
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		INNER JOIN Game ON TeamInstance.game_id = Game.id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN Types ON Program.type_home = Types.id 
+		WHERE 
+			Game.id = :game_id AND 
+			Program.type_leisure = :type AND 
+			Program.area_leisure > 0 AND 
+			Round.round_info_id = Game.current_round_id;";
 	$args = array(
 		'game_id' => $game_id, 
-		'total_area' => $total_area,
-		'reduce_area' => $reduce_area);
+		'type' => $type);
 	$result = $db->query($query, $args);
 	
-	// gather info in an array
-	$programs = array();
+	$data = array();
 	$index = 0;
+	$total_povn_delta = 0;
+	$total_area = 0;
 	while ($row = mysql_fetch_array($result))
 	{
-		$programs[$index]['id'] = $row['id'];
-		$programs[$index]['area'] = $row['area'];
-		$programs[$index]['reduce_area'] = $row['reduce_area'];
+		$data[$index]['id'] = $row['id'];
+		$data[$index]['area'] = $row['area'];
+		$data[$index]['povn_delta'] = $row['povn_delta'];
+		$total_area += $row['area'];
+		$total_povn_delta += $row['povn_delta'];
 		$index++;
 	}
-
-	// commit new areas
-	foreach ($programs as $key => $value)
+	
+	foreach ($data as $key => $value)
 	{
-		$query = "
+		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
+		$final_value = round($povn_fraction * ($total_area - $reduce_area));
+		$final_value = min($final_value, $value['area']);
+		$reduce_area -= $value['area'] - $final_value;
+		$total_area -= $value['area'];
+		$total_povn_delta -= $value['povn_delta'];
+		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_leisure` = :area 
 			WHERE `id` = :id;";
-		$args = array(
+		$updateArgs = array(
 			'id' => $value['id'], 
-			'area' => $value['area'] - min($value['area'], $value['reduce_area']));
-		$db->query($query, $args);
+			'area' => $final_value);
+		$db->query($updateQuery, $updateArgs);
+		if ($reduce_area <= 0)
+			break;
 	}
 }
 
