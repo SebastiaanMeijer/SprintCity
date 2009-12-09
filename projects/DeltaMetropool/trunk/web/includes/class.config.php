@@ -50,8 +50,9 @@
             elseif('shell' == $i_am_here)
                 $this->shell();
             else
-                die('<h1>Where am I?</h1> <p>You need to setup your server names in <code>class.config.php</code></p>
-                     <p><code>$_SERVER[\'HTTP_HOST\']</code> reported <code>' . $_SERVER['HTTP_HOST'] . '</code></p>');
+				$this->production();
+            //    die('<h1>Where am I?</h1> <p>You need to setup your server names in <code>class.config.php</code></p>
+            //         <p><code>$_SERVER[\'HTTP_HOST\']</code> reported <code>' . $_SERVER['HTTP_HOST'] . '</code></p>');
         }
 
         /**
@@ -91,9 +92,9 @@
 
             define('WEB_ROOT', '');
 
-            $this->dbHost       = '';
-            $this->dbName       = '';
-            $this->dbUsername   = '';
+            $this->dbHost       = 'localhost';
+            $this->dbName       = 'sprintstad';
+            $this->dbUsername   = 'root';
             $this->dbPassword   = '';
             $this->dbDieOnError = false;
         }
