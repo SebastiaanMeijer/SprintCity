@@ -35,11 +35,44 @@
 		
 		private function Init():void
 		{
-			var view:MovieClip = parent.overview_movie;
-			var i:int = 0;
-			// fill station circles
 			var stations:Stations = Data.Get().GetStations();
-			for (i = 0; i < stations.GetStationCount(); i++)
+
+			FillStationCircles(stations);
+			
+			// fill in the demand windows
+			FillDemandWindows();
+			
+			// select first station
+			SelectStation(parent.currentStationIndex);
+			
+			// change the planned/assign bar titles
+			ChangePlannedBarTitles();
+			
+			// Draw the bars per station
+			DrawStationBars(stations);
+		}
+			
+		private function SelectStation(stationIndex:int):void
+		{
+			var view:MovieClip = parent.overview_movie;
+			var station:Station = Data.Get().GetStations().GetStation(stationIndex);
+			var stationMovie:MovieClip = MovieClip(view.getChildByName(station.name.replace(" ", "_")));
+			
+			parent.currentStationIndex = stationIndex;
+			selection.x = stationMovie.x;
+			selection.y = stationMovie.y;
+			
+			view.board.name_field.text = station.name;
+			view.board.region_field.text = station.region;
+			view.board.town_field.text = station.town;
+			
+			SetButtons(station);
+			RefreshBars(station);
+		}
+		
+		private function FillStationCircles(stations:Stations):void
+		{
+			for (var i:int = 0; i < stations.GetStationCount(); i++)
 			{
 				var station:Station = stations.GetStation(i);
 				var movie:MovieClip = GetStationMovieClip(station);
@@ -50,9 +83,16 @@
 				station.RefreshAreaBar();
 				movie.graph.addChild(station.areaBar.GetClip());
 			}
-			// fill in the demand windows
+		}
+		
+		
+		private function FillDemandWindows():void
+		{
+			var view:MovieClip = parent.overview_movie;
+			
 			var types:Types = Data.Get().GetTypes();
-			for (i = 0; i < types.GetTypeCount(); i++)
+			
+			for (var i:int = 0; i < types.GetTypeCount(); i++)
 			{
 				var type:Type = types.GetType(i);
 				if (type.id < 15)
@@ -60,21 +100,12 @@
 					TextField(view.getChildByName("type_" + type.id)).text = type.GetDemandUntilNow() + " ha";
 				}
 			}
-			// select first station
-			SelectStation(parent.currentStationIndex);
 		}
 		
-		private function SelectStation(stationIndex:int):void
+		private function SetButtons(station:Station):void
 		{
 			var view:MovieClip = parent.overview_movie;
-			var station:Station = Data.Get().GetStations().GetStation(stationIndex);
-			var stationMovie:MovieClip = MovieClip(view.getChildByName(station.name.replace(" ", "_")));
-			parent.currentStationIndex = stationIndex;
-			selection.x = stationMovie.x;
-			selection.y = stationMovie.y;
-			view.board.name_field.text = station.name;
-			view.board.region_field.text = station.region;
-			view.board.town_field.text = station.town;
+			
 			// set program button
 			if (station.owner.is_player)
 			{
@@ -88,6 +119,7 @@
 				view.program_button.buttonMode = false;
 				view.program_button.removeEventListener(MouseEvent.CLICK, OnProgramButton);
 			}
+			
 			// set result button
 			if (station.IsLastRound(Data.Get().current_round_id))
 			{
@@ -102,13 +134,17 @@
 				view.result_button.buttonMode = false;
 				view.result_button.removeEventListener(MouseEvent.CLICK, OnResultButton);
 			}
-			// refresh bars
+		}
+		
+		private function RefreshBars(station:Station):void
+		{
 			barInitial.DrawBar(
 				station.transform_area_cultivated_home, 
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_mixed);
+			
 			barMasterplan.DrawBar(
 				station.program.area_home, 
 				station.program.area_work, 
@@ -117,10 +153,61 @@
 				0);
 		}
 		
+		private function ChangePlannedBarTitles():void
+		{
+			Debug.out("Changing Planned/Assigned Bar titles...");
+			var parent:MovieClip = parent.overview_movie;
+			
+			var period:String = "";
+			var roundID:int = Data.Get().current_round_id;
+			Debug.out("We're in round: "+ roundID +" ....!!!");
+			switch (roundID)
+			{
+				case 1:
+					period = "masterplan";
+					break;
+				case 2:
+					period = "2010 - 2014";
+					break;
+				case 3:
+					period = "2014 - 2018";
+					break;
+				case 4:
+					period = "2018 - 2022";
+					break;
+				case 5:
+					period = "2022 - 2026";
+					break;
+				case 6:
+					period = "2026 - 2030";
+					break;
+				default:
+					Debug.out("Changing Planned/Assigned Bar titles failed");
+			}			
+				TextField(parent.plannedPeriod).text = period;
+				TextField(parent.assignedPeriod).text = period;
+				
+		}
+		
+		private function DrawStationBars(stations:Stations):void
+		{
+			// todo
+		}
+		
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
 			var movie_name:String = station.name.replace(" ", "_");
 			return MovieClip(parent.overview_movie.getChildByName(movie_name));
+		}
+		
+		private function GetPreviousRound():Round
+		{
+			var roundID:int = Data.Get().current_round_id;
+			
+			if (roundID == 1)
+				return null;
+			else
+				return parent.GetCurrentStation().GetRoundById(roundID);
 		}
 		
 		private function GetCurrentRound():Round
@@ -192,9 +279,9 @@
 			{
 				loadCount = 0;
 				Init();
-				
 				//remove loading screen
 				parent.removeChild(SprintStad.LOADER);
+				Debug.out("removed loadscreen removed" );
 			}
 		}
 			
@@ -211,6 +298,7 @@
 				parent.addChild(SprintStad.LOADER);
 				
 				//LoadStations();
+				Debug.out("Load the stations");
 				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 				
