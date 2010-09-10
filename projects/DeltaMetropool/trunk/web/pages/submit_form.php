@@ -156,28 +156,56 @@ function BackStepGame($vars)
 	$db = Database::getDatabase();
 	$rounds = RoundInfo::GetRounds();
 	$game = new Game($vars[1]);
-	$temp_key = 1;
+	$previous_round = 1;
 	
 	// find id of previous round
 	foreach ($rounds as $key => $value)
 	{
 		if ($game->current_round_id == $key)
 			break;
-		$temp_key = $key;
+		$previous_round = $key;
 	}
 	
+	// reset exec programs previous round
+	ResetExecPrograms($game->id, $previous_round);
+	
 	// set new round
-	if ($game->current_round_id != $temp_key)
+	if ($game->current_round_id != $previous_round)
 	{
 		$query = "
 			UPDATE `game` 
 			SET `current_round_id` = :round_id
 			WHERE `id` = :game_id;";
 		$args = array(
-			'round_id' => $temp_key, 
+			'round_id' => $previous_round, 
 			'game_id' => $game->id);
 		$db->query($query, $args);
 	}
+}
+
+// sets all area fields of exec programs of a certain round to zero
+function ResetExecPrograms($game_id, $round_id)
+{
+	$db = Database::getDatabase();
+	$query = "
+		UPDATE Program 
+		INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
+		INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		SET 
+			Program.area_home = :area_home, 
+			Program.area_work = :area_work, 
+			Program.area_leisure = :area_leisure 
+		WHERE TeamInstance.game_id = :game_id AND RoundInfo.id = :round_id;";
+	$args = array(
+		'game_id' => $game_id, 
+		'round_id' => $round_id, 
+		'area_home' => 0, 
+		'area_work' => 0, 
+		'area_leisure' => 0);
+	$db->query($query, $args);
 }
 
 function NextStepGame($vars)
@@ -201,7 +229,8 @@ function CalculateFinalPrograms($game_id)
 	
 	// set exec programs of current round based on the plan programs
 	$query = "
-		SELECT *, RoundInstance.id AS round_instance_id 
+		SELECT RoundInstance.id AS round_instance_id, exec_program_id, 
+			area_home, area_work, area_leisure, type_home, type_work, type_leisure
 		FROM Game 
 		INNER JOIN RoundInfo ON Game.current_round_id = RoundInfo.id 
 		INNER JOIN Round ON RoundInfo.id = Round.round_info_id 
@@ -265,80 +294,130 @@ function CalculateFinalPrograms($game_id)
 		}
 	}
 	
-	$types = array();
-	
-	// retrieve a list of types with the total amount of acres demanded for that type 
-	// throughout all previous and current rounds. 
+	// get total demand until current round
+	$demand = array();
 	$query = "
-		SELECT Types.id AS id, SUM(Demand.amount) AS total_area 
-		FROM Types 
-		INNER JOIN Demand ON Types.id = Demand.type_id 
+		SELECT Demand.type_id AS type, SUM(Demand.amount) AS demand
+		FROM Demand 
 		INNER JOIN RoundInfo ON Demand.round_info_id = RoundInfo.id 
 		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id 
 		WHERE Game.id = :game_id 
-		GROUP BY Types.id;";
+		GROUP BY Demand.type_id;";
 	$args = array('game_id' => $game_id);
 	$result = $db->query($query, $args);
-	
 	while ($row = mysql_fetch_array($result))
-	{
-		$types[$row['id']] = $row['total_area'];
-	}
+		$demand[$row['type']] = $row['demand'];
 	
-	// retrieve a list of types with the total amount of acres assigned to that type 
-	// in the previous rounds' exec programs with more than zero acres. 
+	// get total executed program area per type
+	$area_used = array();
 	$query = "
-		SELECT 
-			Types.id AS id, 
-			Types.type AS type, Types.density as density, 
-			SUM(Program.area_home) AS area_home, 
-			SUM(Program.area_work) AS area_work, 
-			SUM(Program.area_leisure) AS area_leisure 
-		FROM Types 
-		INNER JOIN Program ON 
-			Types.id = Program.type_home OR 
-			Types.id = Program.type_work OR 
-			Types.id = Program.type_leisure 
+		SELECT Types.id, Types.type, 
+			IF(Program.type_home = Types.id, SUM(Program.area_home), 0) AS area_home, 
+			IF(Program.type_work = Types.id, SUM(Program.area_work), 0) AS area_work, 
+			IF(Program.type_leisure = Types.id, SUM(Program.area_leisure), 0) AS area_leisure 
+		FROM Types, Program 
 		INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
-		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id 
-		WHERE Game.id = :game_id 
-		GROUP BY Types.id 
-		HAVING 
-			Types.type = 'home' AND SUM(Program.area_home) > 0 OR 
-			Types.type = 'work' AND SUM(Program.area_work) > 0 OR 
-			Types.type = 'leisure' AND SUM(Program.area_leisure) > 0;";
+		INNER JOIN Game ON RoundInfo.id < Game.current_round_id 
+		WHERE Game.id = :game_id
+		GROUP BY Types.id;";
 	$args = array('game_id' => $game_id);
 	$result = $db->query($query, $args);
-	
 	while ($row = mysql_fetch_array($result))
 	{
 		switch($row['type'])
 		{
 			case 'home':
-				$types[$row['id']] -= $row['area_home'];
-				if ($types[$row['id']] < 0)
-					ReduceHomeTypes($game_id, $row['id'], -$types[$row['id']]);
+				$area_used[$row['id']] = $row['area_home'];
 				break;
 			case 'work':
-				$types[$row['id']] -= $row['area_work'];
-				if ($types[$row['id']] < 0)
-					ReduceWorkTypes($game_id, $row['id'], -$types[$row['id']]);
+				$area_used[$row['id']] = $row['area_work'];
 				break;
 			case 'leisure':
-				$types[$row['id']] -= $row['area_leisure'];
-				if ($types[$row['id']] < 0)
-					ReduceLeisureTypes($game_id, $row['id'], -$types[$row['id']]);
+				$area_used[$row['id']] = $row['area_leisure'];
 				break;
 			default:
 		}
 	}
+			
+	// get plans per type for this round
+	$area_planned = array();
+	$type_id = array();
+	$query = "
+		SELECT Types.id, Types.type, 
+			SUM(Program.area_home) AS area_home, 
+			SUM(Program.area_work) AS area_work, 
+			SUM(Program.area_leisure) AS area_leisure
+		FROM Program
+		INNER JOIN Types ON
+			Types.id = Program.type_home OR 
+			Types.id = Program.type_work OR 
+			Types.id = Program.type_leisure
+		INNER JOIN RoundInstance ON Program.id = RoundInstance.plan_program_id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
+		INNER JOIN Game ON RoundInfo.id = Game.current_round_id 
+		WHERE Game.id = :game_id
+		GROUP BY Types.id;";
+	$args = array('game_id' => $game_id);
+	$result = $db->query($query, $args);
+	while ($row = mysql_fetch_array($result))
+	{
+		$type_id[$row['id']] = $row['type'];
+		switch($row['type'])
+		{
+			case 'home':
+				$area_planned[$row['id']] = $row['area_home'];
+				break;
+			case 'work':
+				$area_planned[$row['id']] = $row['area_work'];
+				break;
+			case 'leisure':
+				$area_planned[$row['id']] = $row['area_leisure'];
+				break;
+			default:
+		}
+	}
+
+/*
+	echo '<br><br>';
+	var_dump($area_planned);
+	echo '<br><br>';
+	var_dump($area_used);
+	echo '<br><br>';
+	var_dump($demand);
+	echo '<br><br>';
+	*/
+	// determine for each type if too much area has been allocated
+	// redistribute the available area over the stations if necessary
+	foreach ($area_planned as $type => $area)
+	{
+		$area_used_value = isset($area_used[$type]) ? $area_used[$type] : 0;
+		if ($area_used_value + $area_planned[$type] > $demand[$type])
+		{
+			switch($type_id[$type])
+			{
+				case 'home':
+					RedistributeAreaOfHomeType($game_id, $type, $demand[$type] - $area_used_value);
+					break;
+				case 'work':
+					RedistributeAreaOfWorkType($game_id, $type, $demand[$type] - $area_used_value);
+					break;
+				case 'leisure':
+					RedistributeAreaOfLeisureType($game_id, $type, $demand[$type] - $area_used_value);
+					break;
+				default:
+			}
+		}
+	}
 }
 
-// reduce home type in the last rounds's exec programs 
-function ReduceHomeTypes($game_id, $type, $reduce_area)
+// redistribute the available home type area over the programs requiring it
+// $game_id: duh. $type: home type id. $distribute_area: the area in acres to distribute over the programs 
+function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 {
+	// get information needed for area distribution
 	$db = Database::getDatabase();
 	$query = "
 		SELECT 
@@ -364,56 +443,40 @@ function ReduceHomeTypes($game_id, $type, $reduce_area)
 		'type' => $type);
 	$result = $db->query($query, $args);
 	
-	$data = array();
-	$index = 0;
-	$total_density_delta = 0;
-	$total_povn_delta = 0;
-	$total_area = 0;
-	while ($row = mysql_fetch_array($result))
-	{
-		$data[$index]['id'] = $row['id'];
-		$data[$index]['area'] = $row['area'];
-		$data[$index]['density_delta'] = $row['density_delta'];
-		$data[$index]['povn_delta'] = $row['povn_delta'];
-		$total_area += $row['area'];
-		$total_density_delta += $row['density_delta'];
-		$total_povn_delta += $row['povn_delta'];
-		$index++;
-	}
+	// structure the data
+	$data = StructureRedistributeData($result);
 	
+	// distribute the available area based on the structured data
+	$data = DistributeArea($data, $distribute_area);
+	var_dump($data);
+	echo '<br><br>';
+	
+	// commit the redistributed data in the programs
 	foreach ($data as $key => $value)
 	{
-		$density_fraction = $total_density_delta != 0 ?  1 - $value['density_delta'] / $total_density_delta : 1;
-		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
-		$final_value = round(($density_fraction + $povn_fraction) * 0.5 * ($total_area - $reduce_area));
-		$final_value = min($final_value, $value['area']);
-		$reduce_area -= $value['area'] - $final_value;
-		$total_area -= $value['area'];
-		$total_density_delta -= $value['density_delta'];
-		$total_povn_delta -= $value['povn_delta'];
 		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_home` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
 			'id' => $value['id'], 
-			'area' => $final_value);
+			'area' => $value['def_area']);
 		$db->query($updateQuery, $updateArgs);
-		if ($reduce_area <= 0)
-			break;
 	}
 }
 
-// reduce work type in the last rounds's exec programs 
-function ReduceWorkTypes($game_id, $type, $reduce_area)
+// redistribute the available work type area over the programs requiring it
+// $game_id: duh. $type: work type id. $distribute_area: the area in acres to distribute over the programs 
+function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 {
+	// get information needed for area distribution
 	$db = Database::getDatabase();
 	$query = "
 		SELECT 
 			Program.id AS id, 
 			Program.area_work AS area, 
 			ABS(Station.count_work_total / Station.area_cultivated_work - Types.density) AS density_delta, 
-			ABS(Round.POVN - Types.POVN) AS povn_delta 
+			ABS(Round.POVN - Types.POVN) AS povn_delta
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -421,7 +484,7 @@ function ReduceWorkTypes($game_id, $type, $reduce_area)
 		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
 		INNER JOIN Game ON TeamInstance.game_id = Game.id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
-		INNER JOIN Types ON Program.type_home = Types.id 
+		INNER JOIN Types ON Program.type_work = Types.id 
 		WHERE 
 			Game.id = :game_id AND 
 			Program.type_work = :type AND 
@@ -432,48 +495,29 @@ function ReduceWorkTypes($game_id, $type, $reduce_area)
 		'type' => $type);
 	$result = $db->query($query, $args);
 	
-	$data = array();
-	$index = 0;
-	$total_density_delta = 0;
-	$total_povn_delta = 0;
-	$total_area = 0;
-	while ($row = mysql_fetch_array($result))
-	{
-		$data[$index]['id'] = $row['id'];
-		$data[$index]['area'] = $row['area'];
-		$data[$index]['density_delta'] = $row['density_delta'];
-		$data[$index]['povn_delta'] = $row['povn_delta'];
-		$total_area += $row['area'];
-		$total_density_delta += $row['density_delta'];
-		$total_povn_delta += $row['povn_delta'];
-		$index++;
-	}
+	// structure the data
+	$data = StructureRedistributeData($result);
+		
+	// distribute the available area based on the structured data
+	$data = DistributeArea($data, $distribute_area);
 	
+	// commit the redistributed data in the programs
 	foreach ($data as $key => $value)
 	{
-		$density_fraction = $total_density_delta != 0 ?  1 - $value['density_delta'] / $total_density_delta : 1;
-		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
-		$final_value = round(($density_fraction + $povn_fraction) * 0.5 * ($total_area - $reduce_area));
-		$final_value = min($final_value, $value['area']);
-		$reduce_area -= $value['area'] - $final_value;
-		$total_area -= $value['area'];
-		$total_density_delta -= $value['density_delta'];
-		$total_povn_delta -= $value['povn_delta'];
 		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_work` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
 			'id' => $value['id'], 
-			'area' => $final_value);
+			'area' => $value['def_area']);
 		$db->query($updateQuery, $updateArgs);
-		if ($reduce_area <= 0)
-			break;
 	}
 }
 
+
 // reduce leisure type in the last rounds's exec programs 
-function ReduceLeisureTypes($game_id, $type, $reduce_area)
+function RedistributeAreaOfLeisureType($game_id, $type, $distribute_area)
 {
 	$db = Database::getDatabase();
 	$query = "
@@ -488,7 +532,7 @@ function ReduceLeisureTypes($game_id, $type, $reduce_area)
 		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
 		INNER JOIN Game ON TeamInstance.game_id = Game.id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
-		INNER JOIN Types ON Program.type_home = Types.id 
+		INNER JOIN Types ON Program.type_leisure = Types.id 
 		WHERE 
 			Game.id = :game_id AND 
 			Program.type_leisure = :type AND 
@@ -499,39 +543,124 @@ function ReduceLeisureTypes($game_id, $type, $reduce_area)
 		'type' => $type);
 	$result = $db->query($query, $args);
 	
-	$data = array();
-	$index = 0;
-	$total_povn_delta = 0;
-	$total_area = 0;
-	while ($row = mysql_fetch_array($result))
-	{
-		$data[$index]['id'] = $row['id'];
-		$data[$index]['area'] = $row['area'];
-		$data[$index]['povn_delta'] = $row['povn_delta'];
-		$total_area += $row['area'];
-		$total_povn_delta += $row['povn_delta'];
-		$index++;
-	}
+	// structure the data
+	$data = StructureRedistributeData($result);
+		
+	// distribute the available area based on the structured data
+	$data = DistributeArea($data, $distribute_area);
 	
+	// commit the redistributed data in the programs
 	foreach ($data as $key => $value)
 	{
-		$povn_fraction = $total_povn_delta != 0 ? 1 - $value['povn_delta'] / $total_povn_delta : 1;
-		$final_value = round($povn_fraction * ($total_area - $reduce_area));
-		$final_value = min($final_value, $value['area']);
-		$reduce_area -= $value['area'] - $final_value;
-		$total_area -= $value['area'];
-		$total_povn_delta -= $value['povn_delta'];
 		$updateQuery = "
 			UPDATE `Program` 
 			SET `area_leisure` = :area 
 			WHERE `id` = :id;";
 		$updateArgs = array(
 			'id' => $value['id'], 
-			'area' => $final_value);
+			'area' => $value['def_area']);
 		$db->query($updateQuery, $updateArgs);
-		if ($reduce_area <= 0)
-			break;
 	}
+}
+
+function StructureRedistributeData($result)
+{
+	// structure the data
+	$data = array();
+	$index = 0;	
+	while ($row = mysql_fetch_array($result))
+	{
+		// program id
+		$data[$index]['id'] = $row['id'];
+		// desired area
+		$data[$index]['area'] = $row['area'];
+		// definitive area assigned to this station
+		$data[$index]['def_area'] = 0;
+		// difference between the typical resident density of the type and 
+		// the resient density of the station who issued this program
+		if (isset($row['density_delta']))
+			$data[$index]['density_delta'] = $row['density_delta'];
+		else
+			$data[$index]['density_delta'] = 0;
+		// difference between the typical povn of the type and
+		// the povn of the station who issued this program
+		$data[$index]['povn_delta'] = $row['povn_delta'];
+		// need more index!
+		$index++;
+	}
+	
+	// invert deltas
+	$count = sizeof($data);
+	for ($i = 0; $i < floor($count / 2); $i++)
+	{
+		$j = $count - $i - 1;
+		// swap vars
+		list($data[$i]['density_delta'], $data[$j]['density_delta']) = array($data[$j]['density_delta'], $data[$i]['density_delta']);
+		list($data[$i]['povn_delta'], $data[$j]['povn_delta']) = array($data[$j]['povn_delta'], $data[$i]['povn_delta']);
+	}
+	
+	return $data;
+}
+
+// tries to distribute the $distribute_area as honoust as possible 
+// over the programs based on the provided density and povn data
+function DistributeArea($data, $distribute_area)
+{
+	$total_density_delta = 0;
+	$total_povn_delta = 0;
+	$remainder = 0;
+	$start_distribute_area = $distribute_area;
+	
+	// no area left to distribute, we're done here.
+	if ($distribute_area == 0)
+		return $data;
+	
+	// calc the total density delta to properly scale over all stations
+	foreach ($data as $index => $row)
+	{
+		// only do this when the station can actually accept more area
+		if ($row['def_area'] < $row['area'])
+		{
+			$total_density_delta += $row['density_delta'];
+			$total_povn_delta += $row['povn_delta'];
+		}
+	}
+	echo '------------------------------'.$distribute_area.'<br>';
+	
+	// distribute!
+	foreach ($data as $index => $row)
+	{
+		echo '+' . $index . '+ ';
+		// only distribute if the station can actually accept more area
+		if ($row['def_area'] < $row['area'])
+		{
+			// calc fraction of total based on density/povn
+			$density_fraction = $total_density_delta != $row['density_delta'] ? $row['density_delta'] / $total_density_delta : 1;
+			$povn_fraction = $total_povn_delta != $row['povn_delta'] ? $row['povn_delta'] / $total_povn_delta : 1;
+			echo $density_fraction . ' + ' . $povn_fraction . ' * 0.5 = ' . (($density_fraction + $povn_fraction) * 0.5) . ', ';
+			// calc what this fraction means in terms of area
+			$piece_of_the_pie = round(($density_fraction + $povn_fraction) * 0.5 * $distribute_area);
+			echo $piece_of_the_pie . ', ';
+			// make sure not more area is given than requested in the program
+			$final_value = min($piece_of_the_pie, $row['area'] - $row['def_area']);
+			echo $final_value . ' ^ ' . $row['area'];
+			$data[$index]['def_area'] += $final_value;
+			// if more was given, store how much of area is left
+			$remainder += $piece_of_the_pie - $final_value;
+			
+			// exclude the current program from having a part in further calculations in this loop.
+			$distribute_area -= $piece_of_the_pie;
+		}
+		echo '<br>';
+	}
+	
+	echo $distribute_area + $remainder;
+		
+	// stop if the area can't be devided honoustly
+	if ($start_distribute_area == ($distribute_area + $remainder))
+		return $data;
+	// keep iterating until no area remains, 
+	return DistributeArea($data, $distribute_area + $remainder);
 }
 
 function SetNextRound($game_id)
