@@ -380,15 +380,6 @@ function CalculateFinalPrograms($game_id)
 		}
 	}
 
-/*
-	echo '<br><br>';
-	var_dump($area_planned);
-	echo '<br><br>';
-	var_dump($area_used);
-	echo '<br><br>';
-	var_dump($demand);
-	echo '<br><br>';
-	*/
 	// determine for each type if too much area has been allocated
 	// redistribute the available area over the stations if necessary
 	foreach ($area_planned as $type => $area)
@@ -448,8 +439,6 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 	
 	// distribute the available area based on the structured data
 	$data = DistributeArea($data, $distribute_area);
-	var_dump($data);
-	echo '<br><br>';
 	
 	// commit the redistributed data in the programs
 	foreach ($data as $key => $value)
@@ -625,25 +614,20 @@ function DistributeArea($data, $distribute_area)
 			$total_povn_delta += $row['povn_delta'];
 		}
 	}
-	echo '------------------------------'.$distribute_area.'<br>';
 	
 	// distribute!
 	foreach ($data as $index => $row)
 	{
-		echo '+' . $index . '+ ';
 		// only distribute if the station can actually accept more area
 		if ($row['def_area'] < $row['area'])
 		{
 			// calc fraction of total based on density/povn
 			$density_fraction = $total_density_delta != $row['density_delta'] ? $row['density_delta'] / $total_density_delta : 1;
 			$povn_fraction = $total_povn_delta != $row['povn_delta'] ? $row['povn_delta'] / $total_povn_delta : 1;
-			echo $density_fraction . ' + ' . $povn_fraction . ' * 0.5 = ' . (($density_fraction + $povn_fraction) * 0.5) . ', ';
 			// calc what this fraction means in terms of area
 			$piece_of_the_pie = round(($density_fraction + $povn_fraction) * 0.5 * $distribute_area);
-			echo $piece_of_the_pie . ', ';
 			// make sure not more area is given than requested in the program
 			$final_value = min($piece_of_the_pie, $row['area'] - $row['def_area']);
-			echo $final_value . ' ^ ' . $row['area'];
 			$data[$index]['def_area'] += $final_value;
 			// if more was given, store how much of area is left
 			$remainder += $piece_of_the_pie - $final_value;
@@ -651,10 +635,7 @@ function DistributeArea($data, $distribute_area)
 			// exclude the current program from having a part in further calculations in this loop.
 			$distribute_area -= $piece_of_the_pie;
 		}
-		echo '<br>';
 	}
-	
-	echo $distribute_area + $remainder;
 		
 	// stop if the area can't be devided honoustly
 	if ($start_distribute_area == ($distribute_area + $remainder))
