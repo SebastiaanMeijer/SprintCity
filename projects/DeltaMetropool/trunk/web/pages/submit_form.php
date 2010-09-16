@@ -319,7 +319,9 @@ function CalculateFinalPrograms($game_id)
 		INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
-		INNER JOIN Game ON RoundInfo.id < Game.current_round_id 
+		INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id 
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		INNER JOIN Game ON RoundInfo.id < Game.current_round_id AND TeamInstance.game_id = Game.id 
 		WHERE Game.id = :game_id
 		GROUP BY Types.id;";
 	$args = array('game_id' => $game_id);
@@ -357,7 +359,9 @@ function CalculateFinalPrograms($game_id)
 		INNER JOIN RoundInstance ON Program.id = RoundInstance.plan_program_id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
-		INNER JOIN Game ON RoundInfo.id = Game.current_round_id 
+		INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id 
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		INNER JOIN Game ON RoundInfo.id = Game.current_round_id AND TeamInstance.game_id = Game.id 
 		WHERE Game.id = :game_id
 		GROUP BY Types.id;";
 	$args = array('game_id' => $game_id);
