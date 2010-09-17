@@ -8,6 +8,7 @@
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.ui.Mouse;
+	import flash.utils.ByteArray;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
 	import SprintStad.Data.Round.Round;
@@ -28,9 +29,16 @@
 		private var barMasterplan:AreaBarDrawer;
 		private var barReality:AreaBarDrawer;
 		
+		// switch between space and mobility modes
+		private static const SPACE_MODE:int = 0;
+		private static const MOBILITY_MODE:int = 1;
+		private static const NONE:int = -1;
+		
+		private var currentMode:int = OverviewState.NONE;
+		
 		public function OverviewState(parent:SprintStad) 
 		{
-			this.parent = parent;
+			this.parent = parent;			
 		}
 		
 		private function Init():void
@@ -50,6 +58,8 @@
 			
 			// Draw the bars per station
 			DrawStationBars(stations);
+			
+			SetMode(OverviewState.SPACE_MODE);
 		}
 			
 		private function SelectStation(stationIndex:int):void
@@ -194,6 +204,89 @@
 			// todo
 		}
 		
+		// SetMode sets the two panels visible or invisible
+		// Displays the right mode button and mode title
+		private function SetMode(mode:int):void
+		{
+			var parent:MovieClip = parent.overview_movie;
+			
+			HideModeElements();
+			
+			Debug.out("setmode");
+			if (mode == OverviewState.SPACE_MODE) // extra check
+			{
+				SetSpaceMode();
+			}
+			else if (mode == OverviewState.MOBILITY_MODE) // extra check
+			{
+				SetMobilityMode();
+			}
+		}
+		
+		private function HideModeElements():void
+		{
+			var parent:MovieClip = parent.overview_movie;
+			
+			MovieClip(parent.space_button).visible = false;
+			MovieClip(parent.mobility_button).visible = false;
+			
+			TextField(parent.mobilityTitle).visible = false;
+			TextField(parent.spaceTitle).visible = false;
+			
+			MovieClip(parent.space_button).removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
+			MovieClip(parent.mobility_button).removeEventListener(MouseEvent.CLICK, OnMobilityButton);
+			
+			Debug.out("Hid mode elements");
+		}
+		
+		private function SetSpaceMode():void
+		{
+			var parent:MovieClip = parent.overview_movie;
+			
+			Debug.out("Now entering Space Mode.")
+			try 
+			{
+				// set button
+				MovieClip(parent.mobility_button).visible = true;
+				
+				// set eventlistener
+				MovieClip(parent.mobility_button).addEventListener(MouseEvent.CLICK, OnMobilityButton);
+				
+				// set title
+				TextField(parent.spaceTitle).visible = true;
+				
+				// set panels
+				Debug.out("...Entered Space Mode");
+			}
+			catch (e:Error)
+			{
+				Debug.out("Error in setting mode");
+			}
+		}
+
+		private function SetMobilityMode():void
+		{
+			var parent:MovieClip = parent.overview_movie;
+			Debug.out("Now entering Mobility mode.")
+			
+			try 
+			{
+				// set button
+				MovieClip(parent.space_button).visible = true;
+				
+				// set eventlistener
+				MovieClip(parent.space_button).addEventListener(MouseEvent.CLICK, OnSpaceButton);
+				
+				// set title
+				TextField(parent.mobilityTitle).visible = true;
+			}
+			catch (e:Error)
+			{
+				Debug.out("Error in setting mode2");
+			}
+		}
+		
+		
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
 			var movie_name:String = station.name.replace(" ", "_");
@@ -233,6 +326,18 @@
 		private function OnInfoButton(event:MouseEvent):void
 		{
 			parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
+		}
+		
+		private function OnMobilityButton(event:MouseEvent):void
+		{
+			Debug.out("Clicked on mobility button!");
+			SetMode(OverviewState.MOBILITY_MODE);
+		}
+		
+		private function OnSpaceButton(event:MouseEvent):void
+		{
+			Debug.out("Clicked on space button!");
+			SetMode(OverviewState.SPACE_MODE);
 		}
 		
 		private function OnStationClick(event:MouseEvent):void
@@ -309,6 +414,11 @@
 				view.info_button.addEventListener(MouseEvent.CLICK, OnInfoButton);
 				view.values_button.buttonMode = true;
 				view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+				view.mobility_button.buttonMode = true;
+				view.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
+				view.space_button.buttonMode = true;
+				view.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
+				Debug.out("Activated buttons");
 				
 				// bar graphs
 				barInitial = new AreaBarDrawer(view.graph_initial);
