@@ -18,10 +18,14 @@
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Drawer.AreaBarDrawer;
+	import SprintStad.Calculators.StationStatsCalculator;
 	public class OverviewState  implements IState
 	{
 		private var parent:SprintStad = null;
-		private var selection:StationSelection = new StationSelection();
+		private var selection:StationSelection = new StationSelection(); // still used?
+		
+		private var selectedStation:Station = null;
+		
 		private var stationIndex:int = 0;
 		private var loadCount:int = 0;
 		
@@ -80,6 +84,8 @@
 			
 			SetButtons(station);
 			RefreshBars(station);
+			
+			selectedStation = station;
 		}
 		
 		private function FillStationCircles(stations:Stations):void
@@ -451,7 +457,6 @@
 			try
 			{
 				var view:MovieClip = parent.overview_movie;
-				//var station:Station = Data.Get().GetStations().GetStation(1);
 				var station:Station;
 				
 				parent.addChild(SprintStad.LOADER);
@@ -482,8 +487,8 @@
 				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 
-				
-				
+				// Load transformArea into panel
+				SetTransformArea();
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();
@@ -507,6 +512,20 @@
 				Debug.out(e.name);
 				Debug.out(e.message);
 			}
+		}
+		
+		private function SetTransformArea()
+		{
+			var station:Station = selectedStation;
+			var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+			
+			// amount Ha last
+				if (station != null)
+				{
+					var transFormArea:Number = StationStatsCalculator.GetTransformArea(station);
+					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
+				}
+
 		}
 		
 		public function Deactivate():void
