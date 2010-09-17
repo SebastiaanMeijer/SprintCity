@@ -196,7 +196,7 @@
 		{
 			Debug.out("Changing Planned/Assigned Bar titles...");
 			
-			var view:MovieClip = parent.overview_movie;
+			var view:MovieClip = parent.overview_movie.spacePanelElements;
 			
 			var period:String = "";
 			var roundID:int = Data.Get().current_round_id;
@@ -271,6 +271,9 @@
 		{
 			var parent:MovieClip = parent.overview_movie;
 			
+			MovieClip(parent.spacePanelElements).visible = false;
+			MovieClip(parent.mobilityPanelElements).visible = false;
+			
 			MovieClip(parent.space_button).visible = false;
 			MovieClip(parent.mobility_button).visible = false;
 			
@@ -279,6 +282,7 @@
 			
 			MovieClip(parent.space_button).removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
 			MovieClip(parent.mobility_button).removeEventListener(MouseEvent.CLICK, OnMobilityButton);
+			
 			
 			Debug.out("Hid mode elements");
 		}
@@ -290,6 +294,9 @@
 			Debug.out("Now entering Space Mode.")
 			try 
 			{
+				// set panel
+				MovieClip(parent.spacePanelElements).visible = true;
+				
 				// set button
 				MovieClip(parent.mobility_button).visible = true;
 				
@@ -315,6 +322,9 @@
 			
 			try 
 			{
+				// set panel
+				MovieClip(parent.mobilityPanelElements).visible = true;
+				
 				// set button
 				MovieClip(parent.space_button).visible = true;
 				
@@ -465,11 +475,12 @@
 				Debug.out("Activated buttons");
 				
 				// bar graphs
-				barInitial = new AreaBarDrawer(view.graph_initial);
-				barMasterplan = new AreaBarDrawer(view.graph_masterplan);
-				barReality = new AreaBarDrawer(view.graph_reality);
-				barPlanned = new AreaBarDrawer(view.graph_planned);
-				barAllocated = new AreaBarDrawer(view.graph_allocated);
+				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+				barInitial = new AreaBarDrawer(spacePanel.graph_initial);
+				barMasterplan = new AreaBarDrawer(spacePanel.graph_masterplan);
+				barReality = new AreaBarDrawer(spacePanel.graph_reality);
+				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
+				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 
 				
 				
