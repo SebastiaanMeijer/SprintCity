@@ -19,6 +19,7 @@
 		
 		public function DrawBar(home:int, work:int, leisure:int, urban:int, rural:int)
 		{
+			bar.visible = true;
 			var areas:Array = new Array(
 				home, work, leisure, urban, rural);
 			var total_area:int = home + work + leisure + urban + rural;
@@ -35,6 +36,7 @@
 				startX += barWidth;
 			}
 		}
+
 		
 		public function GetClip():MovieClip
 		{

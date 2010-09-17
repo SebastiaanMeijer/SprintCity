@@ -28,6 +28,8 @@
 		private var barInitial:AreaBarDrawer;
 		private var barMasterplan:AreaBarDrawer;
 		private var barReality:AreaBarDrawer;
+		private var barPlanned:AreaBarDrawer;
+		private var barAllocated:AreaBarDrawer;
 		
 		// switch between space and mobility modes
 		private static const SPACE_MODE:int = 0;
@@ -98,8 +100,8 @@
 		
 		private function FillDemandWindows():void
 		{
-			var view:MovieClip = parent.overview_movie;
 			
+			var view:MovieClip = parent.overview_movie;
 			var types:Types = Data.Get().GetTypes();
 			
 			for (var i:int = 0; i < types.GetTypeCount(); i++)
@@ -114,8 +116,8 @@
 		
 		private function SetButtons(station:Station):void
 		{
-			var view:MovieClip = parent.overview_movie;
 			
+			var view:MovieClip = parent.overview_movie;
 			// set program button
 			if (station.owner.is_player)
 			{
@@ -161,41 +163,83 @@
 				station.program.area_leisure, 
 				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
 				0);
+			
+			var roundID:int = Data.Get().current_round_id;
+			
+			if (roundID > 2)
+			{
+				var round:Round = station.GetRoundById(roundID - 1);
+				barPlanned.DrawBar(
+					round.plan_program.area_home,
+					round.plan_program.area_work,
+					round.plan_program.area_leisure,
+					station.GetTotalTransformArea() - round.plan_program.area_home - round.plan_program.area_work - round.plan_program.area_leisure,
+					0);
+				
+				barAllocated.DrawBar(
+					round.exec_program.area_home,
+					round.exec_program.area_work,
+					round.exec_program.area_leisure,
+					station.GetTotalTransformArea() - round.exec_program.area_home - round.exec_program.area_leisure - round.exec_program.area_work,
+					0);
+			}
+			else
+			{
+				if(barPlanned != null)
+					barPlanned.GetClip().visible = false;
+				if(barAllocated != null)
+					barAllocated.GetClip().visible = false;
+			}
 		}
 		
 		private function ChangePlannedBarTitles():void
 		{
 			Debug.out("Changing Planned/Assigned Bar titles...");
-			var parent:MovieClip = parent.overview_movie;
+			
+			var view:MovieClip = parent.overview_movie;
 			
 			var period:String = "";
 			var roundID:int = Data.Get().current_round_id;
 			Debug.out("We're in round: "+ roundID +" ....!!!");
+			if (roundID > 2)
+			{
+					view.plannedPeriod.visible = true;
+					view.allocatedPeriod.visible = true;
+			}
+			else
+			{
+					view.plannedPeriod.visible = false;
+					view.allocatedPeriod.visible = false;
+			}
+			
 			switch (roundID)
 			{
 				case 1:
-					period = "masterplan";
+					period = "";
 					break;
 				case 2:
-					period = "2010 - 2014";
+					period = "";
 					break;
 				case 3:
-					period = "2014 - 2018";
+					period = "2010 - 2014";
 					break;
 				case 4:
-					period = "2018 - 2022";
+					period = "2014 - 2018";
 					break;
 				case 5:
-					period = "2022 - 2026";
+					period = "2018 - 2022";
 					break;
 				case 6:
+					period = "2022 - 2026";
+					break;
+				case 7:
 					period = "2026 - 2030";
 					break;
 				default:
 					Debug.out("Changing Planned/Assigned Bar titles failed");
 			}			
-				TextField(parent.plannedPeriod).text = period;
-				TextField(parent.assignedPeriod).text = period;
+			view.plannedPeriod.text = period;
+			view.assignedPeriod.text = period;
 				
 		}
 		
@@ -396,8 +440,8 @@
 		{
 			try
 			{
-				//var station:Station = Data.Get().GetStations().GetStation(1);
 				var view:MovieClip = parent.overview_movie;
+				//var station:Station = Data.Get().GetStations().GetStation(1);
 				var station:Station;
 				
 				parent.addChild(SprintStad.LOADER);
@@ -424,6 +468,11 @@
 				barInitial = new AreaBarDrawer(view.graph_initial);
 				barMasterplan = new AreaBarDrawer(view.graph_masterplan);
 				barReality = new AreaBarDrawer(view.graph_reality);
+				barPlanned = new AreaBarDrawer(view.graph_planned);
+				barAllocated = new AreaBarDrawer(view.graph_allocated);
+
+				
+				
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();
