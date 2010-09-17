@@ -5,6 +5,8 @@
 	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.StationInstance;
+	import SprintStad.Debug.Debug;
+	
 	public class StationStatsCalculator
 	{
 		public function StationStatsCalculator() 
@@ -34,6 +36,16 @@
 				return int(
 					station.count_home_total * constants.average_citizens_per_home * (70 / 1000) + 
 					station.count_work_total * constants.average_workers_per_bvo * (30 / 100));
+		}
+		
+		public static function GetTransformArea(station:Station):Number
+		{
+			return Math.round( 
+				station.transform_area_cultivated_home + 
+				station.transform_area_cultivated_work + 
+				station.transform_area_cultivated_mixed +  
+				station.transform_area_undeveloped_urban +
+				station.transform_area_undeveloped_mixed);
 		}
 
 		
