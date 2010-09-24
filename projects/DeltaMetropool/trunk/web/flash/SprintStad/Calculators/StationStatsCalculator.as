@@ -41,10 +41,11 @@
 		
 		
 		// Returns new allocatable area + unallocated area of previous round
-		public static function GetTransformArea(station:Station):Number
+		public static function GetTransformArea(station:Station):int
 		{	
 			var newAllocatableArea:int; // there is always new allocatable area
 			var previousNewAllocatableArea:int = 0; //default if there is no previous
+			var totalArea:int = 0;
 			var unAllocatedArea:int = 0; //default if there is no previous
 			
 			var previousRound:Round;
@@ -54,22 +55,27 @@
 			var transformArea:Number = new Number( -1.0);
 			
 			// get all the information now
+			newAllocatableArea = 0;
+			if (currentStationRound != null)
+				newAllocatableArea = currentStationRound.new_transform_area;
 			
-			newAllocatableArea = currentStationRound.new_transform_area;
-					
 			if (roundID > 2)
 			{
 				previousRound = station.GetRound(roundID - 1);
-				previousNewAllocatableArea = previousRound.new_transform_area;
-				unAllocatedArea = previousNewAllocatableArea - previousRound.exec_program.TotalArea(); 
+				previousNewAllocatableArea = 0;
+				totalArea = 0;
+				if (previousRound != null)
+				{
+					previousNewAllocatableArea = previousRound.new_transform_area;
+					if (previousRound.exec_program != null)
+						totalArea = previousRound.exec_program.TotalArea();
+				}
+				unAllocatedArea = previousNewAllocatableArea - totalArea; 
 			}
 			
-			transformArea = Number(newAllocatableArea + unAllocatedArea); //makes sense right?
+			transformArea = newAllocatableArea + unAllocatedArea; //makes sense right?
 			
 			return transformArea;
 		}
-
-		
 	}
-
 }
