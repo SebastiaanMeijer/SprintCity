@@ -39,6 +39,16 @@
 			return null;
 		}
 		
+		public function getIndex(type:Type):int
+		{
+			for each (var t:Type in types)
+			{
+				if (type.id == t.id)
+					return types.indexOf(t);
+			}
+			return -1;
+		}
+		
 		public function GetTypeCount():int
 		{
 			return types.length;
