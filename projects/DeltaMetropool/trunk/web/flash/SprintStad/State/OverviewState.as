@@ -188,11 +188,14 @@
 					0,
 					0);
 				
+				int notAllocated = 	(round.plan_program.area_home - round.exec_program.area_home) +
+									(round.plan_program.area_leisure - round.exec_program.area_leisure
+									(round.plan_program.area_work - round.exec_program.area_work);
 				barAllocated.DrawBar(
 					round.exec_program.area_home,
 					round.exec_program.area_work,
 					round.exec_program.area_leisure,
-					0,
+					notAllocated,
 					0);
 			}
 			else
