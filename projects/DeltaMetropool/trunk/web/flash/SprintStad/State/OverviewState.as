@@ -56,15 +56,13 @@
 			
 			// fill in the demand windows
 			FillDemandWindows();
-			
+
 			// select first station
 			SelectStation(parent.currentStationIndex);
-			
+
 			// change the planned/assign bar titles
 			ChangePlannedBarTitles();
 			
-			// Draw the bars per station
-			DrawStationBars(stations);
 			
 			SetMode(OverviewState.SPACE_MODE);
 		}
@@ -82,11 +80,14 @@
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
-			
+
 			SetButtons(station);
+
 			RefreshBars(station);
+
+			SetTransformArea(station);
+
 			
-			selectedStation = station;
 		}
 		
 		private function FillStationCircles(stations:Stations):void
@@ -169,45 +170,45 @@
 				station.program.area_home, 
 				station.program.area_work, 
 				station.program.area_leisure, 
-				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
+				0,
 				0);
 			
 			//TODO OPEN
 			//barReality.DrawBar
 				
 			var roundID:int = Data.Get().current_round_id;
-			
-			if (roundID > 2)
-			{
-				var round:Round = station.GetRoundById(roundID - 1);
-				
-				
+			//
+			//if (roundID > 2)
+			//{
+				//var round:Round = station.GetRoundById(roundID - 1);
+				//
+				//
 				//Draw the planned bar according to the given program
-				barPlanned.DrawBar(
-					round.plan_program.area_home,
-					round.plan_program.area_work,
-					round.plan_program.area_leisure,
-					0,
-					0);
-				
+				//barPlanned.DrawBar(
+					//round.plan_program.area_home,
+					//round.plan_program.area_work,
+					//round.plan_program.area_leisure,
+					//0,
+					//0);
+				//
 				//Decide how much of the planned program hasn't been allocated and draw the corresponding allocated bar
-				var notAllocated:int = 	(round.plan_program.area_home - round.exec_program.area_home) +
-									(round.plan_program.area_leisure - round.exec_program.area_leisure)
-									(round.plan_program.area_work - round.exec_program.area_work);
-				barAllocated.DrawBar(
-					round.exec_program.area_home,
-					round.exec_program.area_work,
-					round.exec_program.area_leisure,
-					notAllocated,
-					0);
-			}
-			else
-			{
-				if(barPlanned != null)
-					barPlanned.GetClip().visible = false;
-				if(barAllocated != null)
-					barAllocated.GetClip().visible = false;
-			}
+				//var notAllocated:int = 	(round.plan_program.area_home - round.exec_program.area_home) +
+									//(round.plan_program.area_leisure - round.exec_program.area_leisure)
+									//(round.plan_program.area_work - round.exec_program.area_work);
+				//barAllocated.DrawBar(
+					//round.exec_program.area_home,
+					//round.exec_program.area_work,
+					//round.exec_program.area_leisure,
+					//notAllocated,
+					//0);
+			//}
+			//else
+			//{
+				//if(barPlanned != null)
+					//barPlanned.GetClip().visible = false;
+				//if(barAllocated != null)
+					//barAllocated.GetClip().visible = false;
+			//}
 		}
 		
 		private function ChangePlannedBarTitles():void
@@ -250,11 +251,7 @@
 			view.allocatedPeriod.text = roundNameStart + " - " + roundNameFinish;
 		}
 		
-		private function DrawStationBars(stations:Stations):void
-		{
-			// todo
-		}
-		
+
 		// SetMode sets the two panels visible or invisible
 		// Displays the right mode button and mode title
 		private function SetMode(mode:int):void
@@ -488,8 +485,6 @@
 				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 
-				// Load transformArea into panel
-				SetTransformArea();
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();
@@ -512,12 +507,17 @@
 			{
 				Debug.out(e.name);
 				Debug.out(e.message);
+				Debug.out(e.getStackTrace());
 			}
 		}
 		
-		private function SetTransformArea()
+		// Should set the number in the textfield to the 
+		// amount of the available transformable area in the current round
+		private function SetTransformArea(station:Station)
 		{
-			var station:Station = selectedStation;
+			try 
+			{
+			
 			var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
 			
 			// amount Ha last
@@ -526,7 +526,13 @@
 					var transFormArea:Number = StationStatsCalculator.GetTransformArea(station);
 					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
 				}
-
+			}
+			catch (e:Error)
+			{
+				
+				Debug.out(e.name);
+				Debug.out(e.getStackTrace());
+			}
 		}
 		
 		public function Deactivate():void
