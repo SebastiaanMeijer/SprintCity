@@ -517,7 +517,7 @@
 			// amount Ha last
 				if (station != null)
 				{
-					var transFormArea:Number = StationStatsCalculator.GetTransformArea(station);
+					var transFormArea:int = StationStatsCalculator.GetTransformArea(station);
 					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
 				}
 			}
