@@ -1,0 +1,1 @@
+<?phprequire_once('GraphImage.php');$graph = new GraphImage();// Initialize all settings$graph->MakeGraph(900,400);// Draw the graph into an image$image = $graph->GetImage();// Makes the php file into a png-image !header('Content-type:image/png');// Output the result and cleanupimagepng($image);imagedestroy($image);?>
