@@ -57,9 +57,11 @@
 			// fill in the demand windows
 			FillDemandWindows();
 			
+
 			// select first station
 			SelectStation(parent.currentStationIndex);
 			
+
 			// change the planned/assign bar titles
 			ChangePlannedBarTitles();
 			
@@ -161,51 +163,60 @@
 				pastStationInstance.area_cultivated_work, 
 				pastStationInstance.area_cultivated_mixed, 
 				pastStationInstance.area_undeveloped_urban,
-				pastStationInstance.area_undeveloped_rural);
+				pastStationInstance.area_undeveloped_rural,
+				0);
 			
 			barMasterplan.DrawBar(
 				station.program.area_home, 
 				station.program.area_work, 
 				station.program.area_leisure, 
 				0,
+				0,
 				0);
 			
-			//TODO OPEN
-			//barReality.DrawBar
-				
+			barReality.drawStationCurrentBar(station, this.GetCurrentRound());
 			var roundID:int = Data.Get().current_round_id;
-			//
-			//if (roundID > 2)
-			//{
-				//var round:Round = station.GetRoundById(roundID - 1);
-				//
-				//
+			if (roundID > 2)
+			{
+				var round:Round = station.GetRoundById(roundID - 1);
+				
+				
 				//Draw the planned bar according to the given program
-				//barPlanned.DrawBar(
-					//round.plan_program.area_home,
-					//round.plan_program.area_work,
-					//round.plan_program.area_leisure,
-					//0,
-					//0);
-				//
-				//Decide how much of the planned program hasn't been allocated and draw the corresponding allocated bar
-				//var notAllocated:int = 	(round.plan_program.area_home - round.exec_program.area_home) +
-									//(round.plan_program.area_leisure - round.exec_program.area_leisure)
-									//(round.plan_program.area_work - round.exec_program.area_work);
-				//barAllocated.DrawBar(
-					//round.exec_program.area_home,
-					//round.exec_program.area_work,
-					//round.exec_program.area_leisure,
-					//notAllocated,
-					//0);
-			//}
-			//else
-			//{
-				//if(barPlanned != null)
-					//barPlanned.GetClip().visible = false;
-				//if(barAllocated != null)
-					//barAllocated.GetClip().visible = false;
-			//}
+				if (round.plan_program != null)
+				{
+					barPlanned.drawPeriodBar(station, round.plan_program);
+					barAllocated.drawPeriodBar(station, round.exec_program);
+					
+					/*barPlanned.DrawBar(
+						round.plan_program.area_home,
+						round.plan_program.area_work,
+						round.plan_program.area_leisure,
+						0,
+						0,
+						station.GetTotalTransformArea() - round.plan_program.area_home - round.plan_program.area_work - round.plan_program.area_leisure);
+					
+					//Decide how much of the planned program hasn't been allocated and draw the corresponding allocated bar
+					barAllocated.DrawBar(
+						round.exec_program.area_home,
+						round.exec_program.area_work,
+						round.exec_program.area_leisure,
+						0,
+						0,
+						station.GetTotalTransformArea() - round.exec_program.area_home - round.exec_program.area_leisure - round.exec_program.area_work);*/
+				}
+				else
+				{
+					barPlanned.DrawBar(0,0,0,0,0,1);
+					barAllocated.DrawBar(0,0,0,0,0,1);
+				}
+			}
+			else
+			{
+				if(barPlanned != null)
+					barPlanned.GetClip().visible = false;
+				if(barAllocated != null)
+					barAllocated.GetClip().visible = false;
+			}
 		}
 		
 		private function ChangePlannedBarTitles():void

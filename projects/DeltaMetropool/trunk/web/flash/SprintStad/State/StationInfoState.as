@@ -117,7 +117,8 @@
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
-				station.area_undeveloped_rural);			
+				station.area_undeveloped_rural,
+				0);			
 			view.current_info.area.text = "(" + (
 				station.area_cultivated_home +
 				station.area_cultivated_work +
@@ -129,7 +130,8 @@
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed);			
+				station.transform_area_undeveloped_mixed,
+				0);			
 			view.current_info.transform_area.text = "(" + ( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 

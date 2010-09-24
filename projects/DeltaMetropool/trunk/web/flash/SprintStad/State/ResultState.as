@@ -64,6 +64,7 @@
 				station.program.area_work, 
 				station.program.area_leisure, 
 				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
+				0,
 				0);
 
 			// update editor
@@ -122,7 +123,8 @@
 				station.area_cultivated_work,
 				station.area_cultivated_mixed, 
 				station.area_undeveloped_urban,
-				station.area_undeveloped_rural);
+				station.area_undeveloped_rural,
+				0);
 			clip.area.text = "(" + Math.round(
 				station.area_cultivated_home +
 				station.area_cultivated_work +
@@ -134,7 +136,8 @@
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed);
+				station.transform_area_undeveloped_mixed,
+				0);
 			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 

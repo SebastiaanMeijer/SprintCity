@@ -65,7 +65,7 @@
 		
 		public function RefreshAreaBar():void
 		{
-			areaBar.DrawBar(area_cultivated_home, area_cultivated_work, area_cultivated_mixed, area_undeveloped_urban, area_undeveloped_rural);
+			areaBar.DrawBar(area_cultivated_home, area_cultivated_work, area_cultivated_mixed, area_undeveloped_urban, area_undeveloped_rural, 0);
 		}
 		
 		public function AddRound(round:Round):void
