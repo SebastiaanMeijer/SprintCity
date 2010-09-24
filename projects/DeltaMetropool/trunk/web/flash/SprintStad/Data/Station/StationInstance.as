@@ -9,7 +9,7 @@
 	public class StationInstance
 	{
 		public var station:Station = null;
-		private var round:Round = null;
+		public var round:Round = null;
 		
 		public var POVN:Number = 0;
 		public var PWN:Number = 0;

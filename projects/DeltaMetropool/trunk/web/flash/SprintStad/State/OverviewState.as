@@ -14,6 +14,7 @@
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
+	import SprintStad.Data.Station.StationInstance;
 	import SprintStad.Data.Types.Type;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
@@ -156,12 +157,13 @@
 		
 		private function RefreshBars(station:Station):void
 		{
+			var pastStationInstance:StationInstance = StationInstance.CreateInitial(station);
 			barInitial.DrawBar(
-				station.transform_area_cultivated_home, 
-				station.transform_area_cultivated_work, 
-				station.transform_area_cultivated_mixed, 
-				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed);
+				pastStationInstance.area_cultivated_home, 
+				pastStationInstance.area_cultivated_work, 
+				pastStationInstance.area_cultivated_mixed, 
+				pastStationInstance.area_undeveloped_urban,
+				pastStationInstance.area_undeveloped_rural);
 			
 			barMasterplan.DrawBar(
 				station.program.area_home, 
@@ -170,23 +172,27 @@
 				station.GetTotalTransformArea() - station.program.area_home - station.program.area_work - station.program.area_leisure,
 				0);
 			
+			//TODO OPEN
+			//barReality.DrawBar
+				
 			var roundID:int = Data.Get().current_round_id;
 			
 			if (roundID > 2)
 			{
 				var round:Round = station.GetRoundById(roundID - 1);
+				
 				barPlanned.DrawBar(
 					round.plan_program.area_home,
 					round.plan_program.area_work,
 					round.plan_program.area_leisure,
-					station.GetTotalTransformArea() - round.plan_program.area_home - round.plan_program.area_work - round.plan_program.area_leisure,
+					0,
 					0);
 				
 				barAllocated.DrawBar(
 					round.exec_program.area_home,
 					round.exec_program.area_work,
 					round.exec_program.area_leisure,
-					station.GetTotalTransformArea() - round.exec_program.area_home - round.exec_program.area_leisure - round.exec_program.area_work,
+					0,
 					0);
 			}
 			else
@@ -210,43 +216,32 @@
 			if (roundID > 2)
 			{
 					view.plannedPeriod.visible = true;
+					view.plannedText.visible = true;
 					view.allocatedPeriod.visible = true;
+					view.allocatedText.visible = true;
+					
 			}
 			else
 			{
 					view.plannedPeriod.visible = false;
+					view.plannedText.visible = false;
 					view.allocatedPeriod.visible = false;
+					view.allocatedText.visible = false;
 			}
 			
-			switch (roundID)
+			//Get the round name belonging to the current round through one of the stations.
+			var roundNameStart:String = "";
+			var roundNameFinish:String = "";
+			for each (var round:Round in Data.Get().GetStations().GetStation(stationIndex).rounds)
 			{
-				case 1:
-					period = "";
-					break;
-				case 2:
-					period = "";
-					break;
-				case 3:
-					period = "2010 - 2014";
-					break;
-				case 4:
-					period = "2014 - 2018";
-					break;
-				case 5:
-					period = "2018 - 2022";
-					break;
-				case 6:
-					period = "2022 - 2026";
-					break;
-				case 7:
-					period = "2026 - 2030";
-					break;
-				default:
-					Debug.out("Changing Planned/Assigned Bar titles failed");
-			}			
-			view.plannedPeriod.text = period;
-			view.assignedPeriod.text = period;
-				
+				if (round.round_info_id == roundID)
+					roundNameFinish = round.name;
+				else if (round.round_info_id == roundID - 1)
+					roundNameStart = round.name;
+			}
+					
+			view.plannedPeriod.text = roundNameStart + " - " + roundNameFinish;
+			view.allocatedPeriod.text = roundNameStart + " - " + roundNameFinish;
 		}
 		
 		private function DrawStationBars(stations:Stations):void
