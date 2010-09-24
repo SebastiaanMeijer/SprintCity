@@ -181,6 +181,8 @@
 			{
 				var round:Round = station.GetRoundById(roundID - 1);
 				
+				
+				//Draw the planned bar according to the given program
 				barPlanned.DrawBar(
 					round.plan_program.area_home,
 					round.plan_program.area_work,
@@ -188,8 +190,9 @@
 					0,
 					0);
 				
-				int notAllocated = 	(round.plan_program.area_home - round.exec_program.area_home) +
-									(round.plan_program.area_leisure - round.exec_program.area_leisure
+				//Decide how much of the planned program hasn't been allocated and draw the corresponding allocated bar
+				var notAllocated:int = 	(round.plan_program.area_home - round.exec_program.area_home) +
+									(round.plan_program.area_leisure - round.exec_program.area_leisure)
 									(round.plan_program.area_work - round.exec_program.area_work);
 				barAllocated.DrawBar(
 					round.exec_program.area_home,
