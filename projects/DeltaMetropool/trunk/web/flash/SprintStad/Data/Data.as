@@ -72,7 +72,6 @@
 		public function ParseXML(xmlData:XML):void
 		{
 			Clear();
-			
 			var xmlList:XMLList = xmlData.children();
 			this.current_round_id = xmlList;
 		}
