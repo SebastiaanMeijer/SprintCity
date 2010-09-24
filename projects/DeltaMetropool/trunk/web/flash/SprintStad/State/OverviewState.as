@@ -45,24 +45,23 @@
 		
 		public function OverviewState(parent:SprintStad) 
 		{
-			this.parent = parent;			
+			this.parent = parent;
 		}
 		
 		private function Init():void
 		{
 			var stations:Stations = Data.Get().GetStations();
-
+			
 			FillStationCircles(stations);
 			
 			// fill in the demand windows
 			FillDemandWindows();
-
+			
 			// select first station
 			SelectStation(parent.currentStationIndex);
-
+			
 			// change the planned/assign bar titles
 			ChangePlannedBarTitles();
-			
 			
 			SetMode(OverviewState.SPACE_MODE);
 		}
@@ -80,14 +79,12 @@
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
 			view.board.town_field.text = station.town;
-
-			SetButtons(station);
-
-			RefreshBars(station);
-
-			SetTransformArea(station);
-
 			
+			SetButtons(station);
+			
+			RefreshBars(station);
+			
+			SetTransformArea(station);
 		}
 		
 		private function FillStationCircles(stations:Stations):void
@@ -222,18 +219,18 @@
 			Debug.out("We're in round: "+ roundID +" ....!!!");
 			if (roundID > 2)
 			{
-					view.plannedPeriod.visible = true;
-					view.plannedText.visible = true;
-					view.allocatedPeriod.visible = true;
-					view.allocatedText.visible = true;
+				view.plannedPeriod.visible = true;
+				view.plannedText.visible = true;
+				view.allocatedPeriod.visible = true;
+				view.allocatedText.visible = true;
 					
 			}
 			else
 			{
-					view.plannedPeriod.visible = false;
-					view.plannedText.visible = false;
-					view.allocatedPeriod.visible = false;
-					view.allocatedText.visible = false;
+				view.plannedPeriod.visible = false;
+				view.plannedText.visible = false;
+				view.allocatedPeriod.visible = false;
+				view.allocatedText.visible = false;
 			}
 			
 			//Get the round name belonging to the current round through one of the stations.
@@ -246,7 +243,6 @@
 				else if (round.round_info_id == roundID - 1)
 					roundNameStart = round.name;
 			}
-					
 			view.plannedPeriod.text = roundNameStart + " - " + roundNameFinish;
 			view.allocatedPeriod.text = roundNameStart + " - " + roundNameFinish;
 		}
@@ -274,19 +270,17 @@
 		private function HideModeElements():void
 		{
 			var parent:MovieClip = parent.overview_movie;
+			parent.spacePanelElements.visible = false;
+			parent.mobilityPanelElements.visible = false;
 			
-			MovieClip(parent.spacePanelElements).visible = false;
-			MovieClip(parent.mobilityPanelElements).visible = false;
+			parent.space_button.visible = false;
+			parent.mobility_button.visible = false;
 			
-			MovieClip(parent.space_button).visible = false;
-			MovieClip(parent.mobility_button).visible = false;
+			parent.spaceTitle.visible = false;
+			parent.mobilityTitle.visible = false;
 			
-			TextField(parent.mobilityTitle).visible = false;
-			TextField(parent.spaceTitle).visible = false;
-			
-			MovieClip(parent.space_button).removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
-			MovieClip(parent.mobility_button).removeEventListener(MouseEvent.CLICK, OnMobilityButton);
-			
+			parent.space_button.removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
+			parent.mobility_button.removeEventListener(MouseEvent.CLICK, OnMobilityButton);
 			
 			Debug.out("Hid mode elements");
 		}
@@ -299,16 +293,16 @@
 			try 
 			{
 				// set panel
-				MovieClip(parent.spacePanelElements).visible = true;
+				parent.spacePanelElements.visible = true;
 				
 				// set button
-				MovieClip(parent.mobility_button).visible = true;
+				parent.mobility_button.visible = true;
 				
 				// set eventlistener
-				MovieClip(parent.mobility_button).addEventListener(MouseEvent.CLICK, OnMobilityButton);
+				parent.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
 				
 				// set title
-				TextField(parent.spaceTitle).visible = true;
+				parent.spaceTitle.visible = true;
 				
 				// set panels
 				Debug.out("...Entered Space Mode");
@@ -327,16 +321,16 @@
 			try 
 			{
 				// set panel
-				MovieClip(parent.mobilityPanelElements).visible = true;
+				parent.mobilityPanelElements.visible = true;
 				
 				// set button
-				MovieClip(parent.space_button).visible = true;
+				parent.space_button.visible = true;
 				
 				// set eventlistener
-				MovieClip(parent.space_button).addEventListener(MouseEvent.CLICK, OnSpaceButton);
+				parent.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
 				
 				// set title
-				TextField(parent.mobilityTitle).visible = true;
+				parent.mobilityTitle.visible = true;
 			}
 			catch (e:Error)
 			{
@@ -537,7 +531,7 @@
 		
 		public function Deactivate():void
 		{
-
+		
 		}
 	}
 }
