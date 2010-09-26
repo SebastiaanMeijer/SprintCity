@@ -18,11 +18,21 @@ class GraphImage
 	private $markersArray;
 	private $markerLength;
 	private $divisionCount;
-
+	private static $H_OFFSET = 10;
+	private static $V_OFFSET = 15;
+	
 	// axis information
 	private $beginYear = 2010;
 	private $axisInfoArray;
 	
+	// --- GRAPH --
+	private $inputArray1;
+	private $inputArray1Min;
+	private $inputArray1Max;
+	
+	private $inputArray2;
+	private $inputArray2Min;
+	private $inputArray2Max;
 	
 	// colors
 	private $backgroundColor;
@@ -32,15 +42,15 @@ class GraphImage
 	
 	private $residentsColor;
 	private $workersColor;
+	
+	// fonts
+	private static $FONT = 'verdana.ttf';
+	private static $FONT_SIZE = 10;
 
 	
-	public function __construct()
+	public function __construct($width, $height)
 	{
-	}
-	
-	public function MakeGraph($width, $height)
-	{
-		$this->image = imagecreate($width, $height);
+			$this->image = imagecreate($width, $height);
 		
 		$this->SetSize($width, $height); 		
 		$this->SetColors();  // change colors here
@@ -50,12 +60,8 @@ class GraphImage
 		$this->SetMarkers($this->divisionCount); 
 		$this->SetMarkerLength(10);
 		$this->SetAxisInformation();
-	
-		$this->DrawStuff();
-		$this->DrawGraphLines();
 	}
-	
-	
+		
 	// set-methods
 	public function SetSize($width, $height)
 	{
@@ -69,7 +75,7 @@ class GraphImage
 		$this->backgroundColor = imagecolorallocatealpha($this->image, 0, 0, 0 , 127); //transparant
 		$this->borderColor = imagecolorallocate($this->image, 0, 0, 0);
 		$this->lineColor = imagecolorallocatealpha($this->image, 100, 100, 100, 20); //grayish
-		$this->textColor = imagecolorallocate($this->image, 100, 100, 100);
+		$this->textColor = imagecolorallocate($this->image, 0, 0, 0);
 		$this->residentsColor = imagecolorallocate($this->image, 230, 172, 173); 
 		$this->workersColor = imagecolorallocate($this->image, 201, 165, 196);
 	}
@@ -98,7 +104,6 @@ class GraphImage
 		for($i = 0; $i < $divisionCount + 1 ; $i++) //+1 because we need 6 lines
 		{
 			$this->markersArray[$i] = $this->sidePadding + $i*$divisionWidth;
-			//echo " - ".$i ." :". $arr[$i];
 		}
 	}
 	
@@ -119,21 +124,136 @@ class GraphImage
 		}
 	}
 	
+	public function SetInputArray($inputArray)
+	{
+		if($this->inputArray1 == NULL)
+		{
+			$this->inputArray1 = $inputArray;
+			$this->inputArray1Min = min($inputArray);
+			$this->inputArray1Max = max($inputArray);
+		}
+		elseif ($this->inputArray2 == NULL)
+		{
+			$this->inputArray2 = $inputArray;
+			$this->inputArray2Min = min($inputArray);
+			$this->inputArray2Max = max($inputArray);
+		}
+		else
+			echo 'ERROR: max is two inputs';
+	}
+	
 	private function DrawStuff()
 	{
 		$this->DrawBackground();
-		$this->DrawBorder();
-		// $this->DrawTestLine();
-		
+		$this->DrawBorder();		
 		$this->DrawAxis();
 		$this->DrawMarkers();
 		$this->DrawAxisInformation();
-		
-		// $this->DrawTestText();
 	}
 	
-	private function DrawGraphLines()
+	// PRE: inputArray1 must be set
+	private function DrawGraph()
 	{
+		if($this->inputArray1 != NULL)
+		{
+			$min = $this->inputArray1Min;
+			$max = $this->inputArray1Max;
+			
+			$this->DrawGraphLines($this->inputArray1, $min, $max);
+		}
+		if($this->inputArray2 != NULL)
+		{
+			$min = $this->inputArray2Min;
+			$max = $this->inputArray2Max;
+			
+			$this->DrawGraphLines($this->inputArray2, $min, $max);
+		}
+		else
+		{
+			$text = 'Waiting for input...';
+			
+			$this->DrawText($text,
+				$this->sidePadding + 10,
+				0.5*$this->height,
+				$this->textColor);
+		}
+	}
+	
+	private function DrawVerticalAxisInformation($isArray2, $min, $max)
+	{
+		if(!$isArray2)
+		{
+			$textColor = $this->residentsColor;
+			$xPosition = 0.2 * $this->sidePadding;
+		}
+		else
+		{
+			$textColor = $this->workersColor;
+			$xPosition = $this->width - (0.8 * $this->sidePadding);
+		}
+	
+		
+		$yMin = $this->height - $this->heightPadding;
+		$yMax = $this->heightPadding;
+	
+		$this->DrawText($min, $xPosition, $yMin, $textColor);
+		$this->DrawText($max, $xPosition, $yMax, $textColor);
+	}
+	
+	// Here we actually draw graph lines based on an input array
+	// and a specified color.
+	// PRE: Arraylength must be more than 1
+	private function DrawGraphLines($inputArray, $min, $max)
+	{
+		$length = count($inputArray);
+		if($length > 1)
+		{
+			if($inputArray == $this->inputArray1)
+				$lineColor = $this->residentsColor;
+			elseif($inputArray == $this->inputArray2)
+				$lineColor = $this->workersColor;
+		
+			//normalize all entries in inputArray
+			for($i = 0; $i < $length ; $i++)
+			{
+				$inputArray[$i] = $this->Normalize($inputArray[$i], $min, $max);
+			}	
+		
+			$topEnd = $this->heightPadding;
+			$bottomEnd = $this->height - $this->heightPadding;
+			$verticalAxisLength = $bottomEnd - $topEnd;
+			
+			for($i = 1; $i < $length; $i++)
+			{
+				$y1 = $inputArray[$i - 1]*$verticalAxisLength;
+				$correctedY1 = $bottomEnd - $y1;
+				
+				$y2 = $inputArray[$i]*$verticalAxisLength;
+				$correctedY2 = $bottomEnd - $y2;
+				
+				
+				$this->DrawGraphLine(
+					$this->markersArray[$i - 1],
+					$correctedY1,
+					$this->markersArray[$i],
+					$correctedY2, 
+					$lineColor);
+				
+			}
+			
+		}
+	}
+	
+	private function Normalize($value, $min, $max)
+	{
+		$difference = $max - $min;
+		$part = ($value - $min) / $difference;
+		return $part;
+	}
+		
+	private function DrawGraphLine($x1, $y1, $x2, $y2, $lineColor)
+	{
+		imageline($this->image, $x1, $y1, $x2, $y2, $lineColor);
 	}
 	
 	private function DrawBackground()
@@ -174,7 +294,15 @@ class GraphImage
 	{
 		$xPlacing = $this->sidePadding;
 		
-		$this->DrawLine($xPlacing, $this->heightPadding, $xPlacing, $this->height - $this->heightPadding);
+		$this->DrawLine($xPlacing, $this->heightPadding, 
+			$xPlacing, $this->height - $this->heightPadding);
+		
+		if($this->inputArray2 != NULL)
+		{
+			$xPlacing = $this->width - $this->sidePadding;
+			$this->DrawLine($xPlacing, $this->heightPadding, 
+				$xPlacing, $this->height - $this->heightPadding);
+		}
 	}
 	
 	private function DrawMarkers()
@@ -191,28 +319,49 @@ class GraphImage
 	}
 	
 	// PRE: Need divisionCount
-	// This places all information on the image
+	// This places some information on the image
 	private function DrawAxisInformation()
 	{
 		//Draw the element in the axisInfoArray at each xPosition in markersArray
 		for($i = 0; $i < $this->divisionCount + 1; $i++)
 		{
-			$this->DrawText($this->axisInfoArray[$i], $this->markersArray[$i], $this->height - 10); //magic number, temp
+			$this->DrawText($this->axisInfoArray[$i], 
+				$this->markersArray[$i] - GraphImage::$H_OFFSET, 
+				$this->height - GraphImage::$V_OFFSET,
+				$this->textColor);
+		}
+		
+		if($this->inputArray1 != NULL)
+		{
+			$min = $this->inputArray1Min;
+			$max = $this->inputArray1Max;
+			$this->DrawVerticalAxisInformation(false, $min, $max);
+		}
+		if($this->inputArray2 != NULL)
+		{
+			$min = $this->inputArray2Min;
+			$max = $this->inputArray2Max;
+			$this->DrawVerticalAxisInformation(true, $min, $max);
 		}
 	}
 	
-	private function DrawText($text, $xPosition, $yPosition)
+	
+	
+	private function DrawText($text, $xPosition, $yPosition, $textColor)
 	{
-		$font = $_SERVER['DOCUMENT_ROOT'].'/fonts/corbel.ttf';
-		$fontSize = 12.0;
+		$font = $_SERVER['DOCUMENT_ROOT'].'/SprintStad/fonts/'.GraphImage::$FONT;
+		$fontSize = GraphImage::$FONT_SIZE;
 		$angle = 0.0;
-		imagettftext($this->image, $fontSize, $angle, $xPosition, $yPosition, $this->textColor, $font, $text);
+		imagettftext($this->image, $fontSize, $angle, $xPosition, $yPosition, $textColor, $font, $text);
 	}
 		
 	// other
 	
 	public function GetImage()
 	{
+		$this->DrawStuff();
+		$this->DrawGraph();
+		
 		return $this->image;
 	}
 	
@@ -226,12 +375,6 @@ class GraphImage
 			$this->lineColor);
 	}
 	
-	private function DrawTestText()
-	{
-		$text = "Testin yoooo";
-		$font = $_SERVER['DOCUMENT_ROOT'].'/fonts/corbel.ttf';
-		imagettftext($this->image, 12.0, 0.0, 50, 50, $this->textColor, $font, $text);
-	}
 
 }
 
