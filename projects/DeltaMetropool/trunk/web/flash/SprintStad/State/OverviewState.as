@@ -7,6 +7,8 @@
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.text.TextField;
+	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import flash.ui.Mouse;
 	import flash.utils.ByteArray;
 	import SprintStad.Data.Data;
@@ -85,6 +87,7 @@
 			SetButtons(station);
 			
 			RefreshBars(station);
+			RefreshMobility(station);
 			
 			SetTransformArea(station);
 		}
@@ -219,6 +222,19 @@
 			}
 		}
 		
+		private function RefreshMobility(station:Station):void
+		{
+			var view:MovieClip = parent.overview_movie;
+			
+			var textAreaFormat:TextFormat = new TextFormat();
+			textAreaFormat.align = TextFormatAlign.JUSTIFY;
+			textAreaFormat.size = 9;
+			
+			view.mobilityDevelopment.editable = false;
+			view.mobilityDevelopment.setStyle("textFormat", textAreaFormat);
+			view.mobilityDevelopment.text = station.description_future;
+		}
+		
 		private function ChangePlannedBarTitles():void
 		{
 			Debug.out("Changing Planned/Assigned Bar titles...");
@@ -283,6 +299,7 @@
 			var parent:MovieClip = parent.overview_movie;
 			parent.spacePanelElements.visible = false;
 			parent.mobilityPanelElements.visible = false;
+			parent.mobilityDevelopment.visible = false;
 			
 			parent.space_button.visible = false;
 			parent.mobility_button.visible = false;
@@ -333,6 +350,9 @@
 			{
 				// set panel
 				parent.mobilityPanelElements.visible = true;
+				
+				// set description
+				parent.mobilityDevelopment.visible = true;
 				
 				// set button
 				parent.space_button.visible = true;
