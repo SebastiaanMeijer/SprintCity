@@ -1,7 +1,7 @@
 <?php
 
-class GraphImage
-{	
+class LineGraph
+{
 	// attributes
 	private $image;
 	
@@ -46,7 +46,6 @@ class GraphImage
 	// fonts
 	private static $FONT = 'verdana.ttf';
 	private static $FONT_SIZE = 10;
-
 	
 	public function __construct($width, $height)
 	{
@@ -61,7 +60,7 @@ class GraphImage
 		$this->SetMarkerLength(10);
 		$this->SetAxisInformation();
 	}
-		
+	
 	// set-methods
 	public function SetSize($width, $height)
 	{
@@ -95,11 +94,10 @@ class GraphImage
 	// Fills the markersArray with xPositions according to the divisionCount
 	private function SetMarkers($divisionCount)
 	{
-
 		$this->markersArray = array();
 		$graphWidth = $this->width - 2*$this->sidePadding;
 		$divisionWidth = $graphWidth / $divisionCount; //This is a float
-	
+		
 		// We will now fill the markersArray with xPositions
 		for($i = 0; $i < $divisionCount + 1 ; $i++) //+1 because we need 6 lines
 		{
@@ -191,7 +189,7 @@ class GraphImage
 			$textColor = $this->workersColor;
 			$xPosition = $this->width - (0.8 * $this->sidePadding);
 		}
-	
+		
 		
 		$yMin = $this->height - $this->heightPadding;
 		$yMax = $this->heightPadding;
@@ -212,13 +210,13 @@ class GraphImage
 				$lineColor = $this->residentsColor;
 			elseif($inputArray == $this->inputArray2)
 				$lineColor = $this->workersColor;
-		
+			
 			//normalize all entries in inputArray
 			for($i = 0; $i < $length ; $i++)
 			{
 				$inputArray[$i] = $this->Normalize($inputArray[$i], $min, $max);
 			}	
-		
+			
 			$topEnd = $this->heightPadding;
 			$bottomEnd = $this->height - $this->heightPadding;
 			$verticalAxisLength = $bottomEnd - $topEnd;
@@ -247,7 +245,10 @@ class GraphImage
 	private function Normalize($value, $min, $max)
 	{
 		$difference = $max - $min;
-		$part = ($value - $min) / $difference;
+		if ($difference != 0)
+			$part = ($value - $min) / $difference;
+		else
+			$part = 0;
 		return $part;
 	}
 		
@@ -326,8 +327,8 @@ class GraphImage
 		for($i = 0; $i < $this->divisionCount + 1; $i++)
 		{
 			$this->DrawText($this->axisInfoArray[$i], 
-				$this->markersArray[$i] - GraphImage::$H_OFFSET, 
-				$this->height - GraphImage::$V_OFFSET,
+				$this->markersArray[$i] - LineGraph::$H_OFFSET, 
+				$this->height - LineGraph::$V_OFFSET,
 				$this->textColor);
 		}
 		
@@ -345,18 +346,15 @@ class GraphImage
 		}
 	}
 	
-	
-	
 	private function DrawText($text, $xPosition, $yPosition, $textColor)
 	{
-		$font = $_SERVER['DOCUMENT_ROOT'].'/SprintStad/fonts/'.GraphImage::$FONT;
-		$fontSize = GraphImage::$FONT_SIZE;
+		$font = $_SERVER['DOCUMENT_ROOT'].'/SprintStad/fonts/'.LineGraph::$FONT;
+		$fontSize = LineGraph::$FONT_SIZE;
 		$angle = 0.0;
 		imagettftext($this->image, $fontSize, $angle, $xPosition, $yPosition, $textColor, $font, $text);
 	}
-		
-	// other
 	
+	// other
 	public function GetImage()
 	{
 		$this->DrawStuff();
@@ -366,7 +364,6 @@ class GraphImage
 	}
 	
 	// TEST METHODS
-	
 	private function DrawTestLine()
 	{
 		$padding = 5;
@@ -374,9 +371,5 @@ class GraphImage
 			$padding, $padding, $this->width - $padding, $this->height - $padding, 
 			$this->lineColor);
 	}
-	
-
 }
-
-
 ?>
