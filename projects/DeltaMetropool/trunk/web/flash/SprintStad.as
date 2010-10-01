@@ -13,7 +13,7 @@
 		public static const WIDTH:int = 1024;
 		public static const HEIGHT:int = 768;
 		public static const DOMAIN:String = "/Sprintstad/";
-		public var session:String = "";
+		public static var session:String = "";
 		public static const LOADER:MovieClip = new LoadingScreen();
 		
 		public static const STATE_INTRO:int = 0;
@@ -57,7 +57,7 @@
 			for (var key:String in args) 
 			{
 				if (key == "session")
-					session = String(args[key]);
+					SprintStad.session = String(args[key]);
 			}
 		}
 		

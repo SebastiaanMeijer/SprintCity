@@ -2,6 +2,7 @@
 {
 	import fl.motion.Color;
 	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
@@ -13,6 +14,7 @@
 	import flash.utils.ByteArray;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Graph.LineGraph;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.Stations;
@@ -22,6 +24,7 @@
 	import SprintStad.Debug.Debug;
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Calculators.StationStatsCalculator;
+	import SprintStad.Drawer.LineGraphDrawer;
 	public class OverviewState  implements IState
 	{
 		private var parent:SprintStad = null;
@@ -37,6 +40,8 @@
 		private var barReality:AreaBarDrawer;
 		private var barPlanned:AreaBarDrawer;
 		private var barAllocated:AreaBarDrawer;
+		
+		private var lineGraph:LineGraphDrawer;
 		
 		// switch between space and mobility modes
 		private static const SPACE_MODE:int = 0;
@@ -69,6 +74,72 @@
 			
 			SetMode(OverviewState.SPACE_MODE);
 		}
+		
+		/* INTERFACE SprintStad.State.IState */
+		
+		public function Activate():void 
+		{
+			try
+			{
+				Debug.out("Activate OverviewState");
+				var view:MovieClip = parent.overview_movie;
+				var station:Station;
+				
+				parent.addChild(SprintStad.LOADER);
+				
+				//LoadStations();
+				Debug.out("Load the stations");
+				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
+				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+				
+				// buttons
+				view.program_button.buttonMode = true;
+				view.program_button.addEventListener(MouseEvent.CLICK, OnProgramButton);
+				view.info_button.buttonMode = true;
+				view.info_button.addEventListener(MouseEvent.CLICK, OnInfoButton);
+				view.values_button.buttonMode = true;
+				view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
+				view.mobility_button.buttonMode = true;
+				view.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
+				view.space_button.buttonMode = true;
+				view.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
+				Debug.out("Activated buttons");
+				
+				// bar graphs
+				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+				barInitial = new AreaBarDrawer(spacePanel.graph_initial);
+				barMasterplan = new AreaBarDrawer(spacePanel.graph_masterplan);
+				barReality = new AreaBarDrawer(spacePanel.graph_reality);
+				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
+				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
+				
+				lineGraph = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				
+				
+				// station buttons
+				var stations:Stations = Data.Get().GetStations();
+				for (var i:int = 0; i < stations.GetStationCount(); i++)
+				{
+					station = stations.GetStation(i);
+					var movie:MovieClip = GetStationMovieClip(station);
+					movie.buttonMode = true;
+					movie.addEventListener(MouseEvent.CLICK, OnStationClick);
+				}
+				
+				// initial selection
+				parent.overview_movie.addChild(selection);
+				selection.x = -500;
+				selection.y = -500;
+				selection.width = 42;
+				selection.height = 42;
+			}
+			catch (e:Error)
+			{
+				Debug.out(e.name);
+				Debug.out(e.message);
+				Debug.out(e.getStackTrace());
+			}
+		}
 			
 		private function SelectStation(stationIndex:int):void
 		{
@@ -88,8 +159,8 @@
 			
 			RefreshBars(station);
 			RefreshMobility(station);
-			
-			SetTransformArea(station);
+			RefreshLineGraphs(station);
+			RefreshTransformArea(station);
 		}
 		
 		private function FillStationCircles(stations:Stations):void
@@ -159,6 +230,30 @@
 			}
 		}
 		
+				// Should set the number in the textfield to the 
+		// amount of the available transformable area in the current round
+		private function RefreshTransformArea(station:Station)
+		{
+			try 
+			{
+			
+			var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+			
+			// amount Ha last
+				if (station != null)
+				{
+					var transFormArea:int = StationStatsCalculator.GetTransformArea(station);
+					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
+				}
+			}
+			catch (e:Error)
+			{
+				
+				Debug.out(e.name);
+				Debug.out(e.getStackTrace());
+			}
+		}
+		
 		private function RefreshBars(station:Station):void
 		{
 			var pastStationInstance:StationInstance = StationInstance.CreateInitial(station);
@@ -218,6 +313,12 @@
 			view.mobilityDevelopment.editable = false;
 			view.mobilityDevelopment.setStyle("textFormat", textAreaFormat);
 			view.mobilityDevelopment.text = station.description_future;
+		}
+		
+		private function RefreshLineGraphs(station:Station):void
+		{
+			// todo: Refresh after selecting station
+			
 		}
 		
 		private function ChangePlannedBarTitles():void
@@ -468,43 +569,11 @@
 			}
 		}
 			
-		/* INTERFACE SprintStad.State.IState */
 		
-		public function Activate():void 
-		{
-			try
-			{
-				var view:MovieClip = parent.overview_movie;
-				var station:Station;
-				
-				parent.addChild(SprintStad.LOADER);
-				
-				//LoadStations();
-				Debug.out("Load the stations");
-				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
-				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
-				
-				// buttons
-				view.program_button.buttonMode = true;
-				view.program_button.addEventListener(MouseEvent.CLICK, OnProgramButton);
-				view.info_button.buttonMode = true;
-				view.info_button.addEventListener(MouseEvent.CLICK, OnInfoButton);
-				view.values_button.buttonMode = true;
-				view.values_button.addEventListener(MouseEvent.CLICK, OnValuesButton);
-				view.mobility_button.buttonMode = true;
-				view.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
-				view.space_button.buttonMode = true;
-				view.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
-				Debug.out("Activated buttons");
-				
-				// bar graphs
-				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
-				barInitial = new AreaBarDrawer(spacePanel.graph_initial);
-				barMasterplan = new AreaBarDrawer(spacePanel.graph_masterplan);
-				barReality = new AreaBarDrawer(spacePanel.graph_reality);
-				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
-				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
+		
 
+<<<<<<< .mine
+=======
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();
@@ -531,7 +600,10 @@
 				Debug.out(e.getStackTrace());
 			}
 		}
+>>>>>>> .r349
 		
+<<<<<<< .mine
+=======
 		// Should set the number in the textfield to the 
 		// amount of the available transformable area in the current round
 		private function SetTransformArea(station:Station)
@@ -561,6 +633,7 @@
 			}
 		}
 		
+>>>>>>> .r349
 		public function Deactivate():void
 		{
 		
