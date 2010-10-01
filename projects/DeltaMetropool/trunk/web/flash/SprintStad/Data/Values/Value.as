@@ -6,6 +6,7 @@
 		public var title:String = "";
 		public var description:String = "";
 		public var checked:Boolean = false;
+		public var team_instance_id:int = 0;
 		
 		public function Value() 
 		{
@@ -13,6 +14,7 @@
 			this.title = title;
 			this.description = description;
 			this.checked = checked;
+			this.team_instance_id = team_instance_id;
 		}
 		
 		public function Check():void
@@ -37,6 +39,7 @@
 			xmlString += "<value>";
 			xmlString += "<id>" + id + "</id>";
 			xmlString += "<checked>" + int(checked) + "</checked>";
+			xmlString += "<team_instance_id>" + team_instance_id + "</team_instance_id>";
 			xmlString += "</value>";
 			
 			return xmlString;

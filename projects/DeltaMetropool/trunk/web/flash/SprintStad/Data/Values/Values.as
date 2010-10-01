@@ -1,6 +1,8 @@
 ﻿package SprintStad.Data.Values 
 {
 	import SprintStad.Data.IDataCollection;
+	import SprintStad.Debug.Debug;
+	
 	public class Values implements IDataCollection
 	{
 		private var values:Array = new Array();
@@ -31,6 +33,17 @@
 			return null;
 		}
 		
+		public function getValuesByTeam(id:int):Array
+		{
+			var result:Array = new Array()
+			for each (var val:Value in values)
+			{
+				if (val.team_instance_id == id)
+					result.push(val);
+			}
+			return result;
+		}
+		
 		public function GetValueCount():int
 		{
 			return values.length;
@@ -55,7 +68,6 @@
 				if (valueInfo.name() == "description")
 					this.description = valueInfo;
 			}
-			
 			valueList = xmlData.value.children();
 			for each (valueInfo in valueList) 
 			{
@@ -70,10 +82,16 @@
 				else if (tag == "checked")
 				{
 					value.checked = Boolean(int(valueInfo));
+				}
+				else if (tag == "team_instance_id")
+				{
+					value.team_instance_id = int(valueInfo);
 					this.AddValue(value);
 					value = new Value();
 				}
 			}
+			
+			
 		}
 		
 		
@@ -94,6 +112,7 @@
 			xmlString += "</description>";
 			xmlString += "</values>";
 			
+			Debug.out(xmlString);
 			return xmlString;
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿package SprintStad.State 
 {
 	import fl.controls.CheckBox;
+	import fl.controls.RadioButton;
 	import fl.controls.TextArea;
 	import flash.display.Loader;
 	import flash.display.MovieClip;
@@ -18,10 +19,15 @@
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
+	import SprintStad.Data.Values.Values;
+	import SprintStad.Data.Team.Teams;
 	
 	public class ValuesState implements IState
 	{
 		private var parent:SprintStad = null;
+		
+		private var amountSelected:int = 0;
+		private var disabled:Boolean = false;
 		
 		var filter:GlowFilter = new GlowFilter(0xffffff, 1, 6, 6, 1, 1);
 		
@@ -31,8 +37,7 @@
 		{
 			this.parent = parent;
 		}	
-		
-		
+
 		private function drawUI():void
 		{
 			var data:Data = Data.Get();
@@ -47,23 +52,31 @@
 			var y:Number = entrySpace / 2;
 			var width:Number = field.width - CHECKBOX_HORIZONTAL_MARGIN * 2;
 			
-			for (var i:int = 0; i < data.GetValues().GetValueCount(); i++)
+			var values:Array = Data.Get().GetValues().getValuesByTeam(parent.GetCurrentStation().team_id);
+			amountSelected = 0;
+			disabled = false;
+			for (var i:int = 0; i < values.length; i++)
 			{
-				var value:Value = Data.Get().GetValues().GetValue(i);
+				
+				var value:Value = values[i];
 				var checkBox:CheckBox = new CheckBox();
 				
 				checkBox.name = String(value.id);
 				checkBox.label = value.title;
 				checkBox.labelPlacement = "right";
 				checkBox.selected = value.checked;
+				if (checkBox.selected)
+					amountSelected++;
+				
 				checkBox.x = CHECKBOX_HORIZONTAL_MARGIN;
 				checkBox.y = y;
 				checkBox.width = width;
 				checkBox.addEventListener(Event.CHANGE, checkBoxChanged);
 				field.addChild(checkBox);
-				
 				y += entrySpace;
-			}			
+			}
+			if (amountSelected >= 3)
+				disabled = true;
 		}
 		
 		private function uploadXML():void 
@@ -76,6 +89,7 @@
 			request.data = vars;
 			loader.load(request);
 		}
+		
 		
 		private function onContinueEvent(event:MouseEvent):void
 		{
@@ -96,11 +110,48 @@
 				parent.values_movie.continue_button.filters = [filter];
 		}
 		
+
+		
 		private function checkBoxChanged(event:Event):void
 		{
+			
 			var value:Value = Data.Get().GetValues().GetValueById(int(event.target.name));
 			if (value != null)
-				value.checked = event.target.selected;
+			{
+				Debug.out("Current team: " + Data.Get().GetTeams().GetOwnTeam().id);
+				Debug.out("Team belonging to value: " + value.team_instance_id);
+				if (Data.Get().current_round_id != 1 || Data.Get().GetTeams().GetOwnTeam().id != value.team_instance_id)
+				{
+					event.target.selected = (!event.target.selected);
+					return;
+				}
+
+				if(disabled && event.target.selected == false)
+				{	
+					value.checked = event.target.selected;
+					amountSelected--;
+				}
+				else if(!disabled && event.target.selected == true)
+				{
+					value.checked = event.target.selected;
+					amountSelected++;
+				}
+				else if (!disabled && event.target.selected == false)
+				{
+					value.checked = event.target.selected;
+					amountSelected--;
+				}
+				else
+				{
+					event.target.selected = (!event.target.selected);
+					return;
+				}
+
+			}
+			if (amountSelected >= 3)
+				disabled = true;
+			else
+				disabled = false;
 		}
 		
 		private function descriptionChanged(event:Event):void
