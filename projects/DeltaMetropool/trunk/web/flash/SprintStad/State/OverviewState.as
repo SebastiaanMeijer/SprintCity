@@ -99,6 +99,7 @@
 				var station:Station = stations.GetStation(i);
 				var movie:MovieClip = GetStationMovieClip(station);
 				
+			
 				var colorTransform:ColorTransform = new ColorTransform();
 				colorTransform.color = parseInt("0x" + station.owner.color, 16);
 				movie.outline.transform.colorTransform = colorTransform;				
@@ -247,6 +248,8 @@
 			//Get the round name belonging to the current round through one of the stations.
 			var roundNameStart:String = "";
 			var roundNameFinish:String = "";
+			
+			//TODO AREA OPEN
 			for each (var round:Round in Data.Get().GetStations().GetStation(stationIndex).rounds)
 			{
 				if (round.round_info_id == roundID)
@@ -254,6 +257,14 @@
 				else if (round.round_info_id == roundID - 1)
 					roundNameStart = round.name;
 			}
+			if (roundNameFinish == "")
+			{
+				roundNameFinish = "2030";
+				//Uncomment the next line for a nicer way of giving the last rounds name, when the rounds are called different than years.
+				//roundNameFinish = "einde";
+				
+			}
+			//TODO AREA CLOSE
 			view.plannedPeriod.text = roundNameStart + " - " + roundNameFinish;
 			view.allocatedPeriod.text = roundNameStart + " - " + roundNameFinish;
 		}
@@ -511,6 +522,7 @@
 				selection.y = -500;
 				selection.width = 42;
 				selection.height = 42;
+				
 			}
 			catch (e:Error)
 			{
@@ -527,13 +539,18 @@
 			try 
 			{
 			
-			var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
 			
-			// amount Ha last
+				// amount Ha last
 				if (station != null)
 				{
-					var transFormArea:int = StationStatsCalculator.GetTransformArea(station);
-					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
+					if(Data.Get().current_round_id > 2)
+					{
+						var transFormArea:int = station.GetRoundById(Data.Get().current_round_id - 1).exec_program.TotalArea();
+						TextField(spacePanel.amountHaAllocated).text = transFormArea + " Ha";
+					}
+					var totalArea:int = station.GetTotalTransformArea();
+					TextField(spacePanel.amountHaTotal).text = totalArea + " Ha";
 				}
 			}
 			catch (e:Error)

@@ -45,6 +45,39 @@
 			}
 		}
 		
+		public function drawStationCircle(allocated:Number)
+		{
+			this.clearBar();
+			var newColorClip:MovieClip = new MovieClip();
+			
+			var R:uint = 0;
+			var G:uint = 0;
+			
+			if (allocated > 0.5)
+			{
+				R = 255 * (1 - allocated);
+				G = 255;
+			}
+			else
+			{
+				R = 255;
+				G = 255 * allocated;
+			}
+
+			var B:uint = 0;
+			
+			R = R << 16;
+			G = G << 8;
+			var RGB:uint = R + G + 50;
+			if(RGB == 0)
+				RGB = (255 << 16);
+			newColorClip.graphics.clear();
+			newColorClip.graphics.beginFill(RGB);
+			newColorClip.graphics.drawCircle(17.5, 17.5, 17.5);
+			newColorClip.graphics.endFill();
+			this.appendClipByMovieClip(newColorClip, 1, 1);
+		}
+		
 		/*	function drawStationInstanceBar
 		*	@param: station:Station - The station for which the bar needs to be drawn
 		* 	@param currentRound:int - The ID of the current round
@@ -113,6 +146,7 @@
 			bar.visible = true;
 			
 			var total_area:int = station.area_cultivated_home + station.area_cultivated_mixed + station.area_cultivated_work + station.area_undeveloped_rural + station.area_undeveloped_urban;
+			var total_special:int = specialHome + specialLeisure + specialWork;
 			
 			//Go through all the categories in the right order
 			var categories:Array = new Array("average_home", "home", "average_work", "work", "average_leisure", "leisure");
@@ -124,19 +158,19 @@
 				for each(var type:Type in cattypes)
 				{
 					if (type.type == "average_home")
-						allocated[type.id - 1] += stationInstance.area_cultivated_home - specialHome;
+						allocated[type.id - 1] += stationInstance.area_cultivated_home - (1/5)*total_special;
 					else if (type.type == "average_work")
-						allocated[type.id - 1] += stationInstance.area_cultivated_work - specialWork;
+						allocated[type.id - 1] += stationInstance.area_cultivated_work - (1/5)*total_special;
 					else if (type.type == "average_leisure")
-						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - specialLeisure;
+						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - (1/5)*total_special;
 					
 					appendClip(type, total_area, allocated[type.id - 1]);
 				}
 			}
 		
 			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
-			appendClipByMovieClip(new ColorUrban(), total_area, stationInstance.area_undeveloped_urban);
-			appendClipByMovieClip(new ColorRural(), total_area, stationInstance.area_undeveloped_rural);
+			appendClipByMovieClip(new ColorUrban(), total_area, stationInstance.area_undeveloped_urban - (1/5)*total_special);
+			appendClipByMovieClip(new ColorRural(), total_area, stationInstance.area_undeveloped_rural - (1/5)*total_special);
 			
 		}
 

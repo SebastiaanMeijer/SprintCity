@@ -65,7 +65,14 @@
 		
 		public function RefreshAreaBar():void
 		{
-			areaBar.DrawBar(area_cultivated_home, area_cultivated_work, area_cultivated_mixed, area_undeveloped_urban, area_undeveloped_rural, 0);
+			var allocated:Number = 1
+			if (Data.Get().current_round_id > 2)
+			{
+				var round:Round = GetRoundById(Data.Get().current_round_id - 1);
+				allocated = round.exec_program.TotalArea() / round.plan_program.TotalArea();
+			}
+
+			areaBar.drawStationCircle(allocated);
 		}
 		
 		public function AddRound(round:Round):void
