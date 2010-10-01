@@ -130,7 +130,6 @@
 					else if (type.type == "average_leisure")
 						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - specialLeisure;
 					
-					Debug.out("Appending clip of type " + type.name + " " + allocated[type.id - 1] + " with colour " + type.color);
 					appendClip(type, total_area, allocated[type.id - 1]);
 				}
 			}

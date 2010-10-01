@@ -169,13 +169,14 @@
 				pastStationInstance.area_undeveloped_rural,
 				0);
 			
+
 			barMasterplan.DrawBar(
 				station.program.area_home, 
 				station.program.area_work, 
 				station.program.area_leisure, 
 				0,
 				0,
-				0);
+				station.GetTotalTransformArea() - station.program.area_home - station.program.area_leisure - station.program.area_work);
 			
 			barReality.drawStationCurrentBar(station, this.GetCurrentRound());
 			var roundID:int = Data.Get().current_round_id;
@@ -189,23 +190,6 @@
 				{
 					barPlanned.drawPeriodBar(station, round.plan_program);
 					barAllocated.drawPeriodBar(station, round.exec_program);
-					
-					/*barPlanned.DrawBar(
-						round.plan_program.area_home,
-						round.plan_program.area_work,
-						round.plan_program.area_leisure,
-						0,
-						0,
-						station.GetTotalTransformArea() - round.plan_program.area_home - round.plan_program.area_work - round.plan_program.area_leisure);
-					
-					//Decide how much of the planned program hasn't been allocated and draw the corresponding allocated bar
-					barAllocated.DrawBar(
-						round.exec_program.area_home,
-						round.exec_program.area_work,
-						round.exec_program.area_leisure,
-						0,
-						0,
-						station.GetTotalTransformArea() - round.exec_program.area_home - round.exec_program.area_leisure - round.exec_program.area_work);*/
 				}
 				else
 				{
