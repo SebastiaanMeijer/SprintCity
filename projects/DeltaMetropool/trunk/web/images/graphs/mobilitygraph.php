@@ -25,11 +25,12 @@ function LoadTravelerData($session_id, $station_id)
 }
 
 // Construct
-$graph = new LineGraph(240,110);
+$graph = new LineGraph(720,330);
 
 // Set input
 $graph->SetInputArray($povnData);
 $graph->SetInputArray($travelerData);
+$graph->SetToMobilityColors();
 
 // Get image
 $image = $graph->GetImage(); //must fail if there is no width, height or inputArray
