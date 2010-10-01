@@ -315,7 +315,8 @@ function CalculateFinalPrograms($game_id)
 			IF(Program.type_home = Types.id, SUM(Program.area_home), 0) AS area_home, 
 			IF(Program.type_work = Types.id, SUM(Program.area_work), 0) AS area_work, 
 			IF(Program.type_leisure = Types.id, SUM(Program.area_leisure), 0) AS area_leisure 
-		FROM Types, Program 
+		FROM Program 
+		INNER JOIN Types ON Program.type_home = Types.id OR Program.type_work = Types.id OR Program.type_leisure = Types.id
 		INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
