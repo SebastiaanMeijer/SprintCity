@@ -19,9 +19,9 @@
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
-	import SprintStad.Data.Values.Values;
+<<<<<<< .mine	import SprintStad;=======	import SprintStad.Data.Values.Values;
 	import SprintStad.Data.Team.Teams;
-	
+>>>>>>> .r349	
 	public class ValuesState implements IState
 	{
 		private var parent:SprintStad = null;
@@ -84,7 +84,8 @@
 			var loader:URLLoader = new URLLoader();
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
 			var vars:URLVariables = new URLVariables();
-			vars.session = parent.session;
+			vars.session = SprintStad.session;
+
 			vars.data = Data.Get().GetValues().GetXmlString();
 			request.data = vars;
 			loader.load(request);

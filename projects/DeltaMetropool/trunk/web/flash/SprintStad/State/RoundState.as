@@ -23,6 +23,7 @@
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Drawer.ProgramEditor;
 	import SprintStad.Drawer.ProgramSlider;
+	import SprintStad;
 	public class RoundState implements IState
 	{		
 		private var parent:SprintStad = null;
@@ -158,7 +159,7 @@
 			var loader:URLLoader = new URLLoader();
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
 			var vars:URLVariables = new URLVariables();
-			vars.session = parent.session;
+			vars.session = SprintStad.session;
 			vars.data = GetCurrentRound().plan_program.GetXmlString();
 			request.data = vars;
 			loader.load(request);

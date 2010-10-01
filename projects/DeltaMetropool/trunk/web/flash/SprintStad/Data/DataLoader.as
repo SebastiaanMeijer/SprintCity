@@ -7,6 +7,7 @@
 	import flash.net.URLVariables;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
+	import SprintStad;
 	public class DataLoader
 	{
 		private static var instance:DataLoader = new DataLoader();
@@ -103,7 +104,7 @@
 			{
 				// prepare loader vars
 				var vars:URLVariables = new URLVariables();
-				vars.session = root.session;
+				vars.session = SprintStad.session;
 				// load station data
 				var loader:URLLoader = new URLLoader();
 				var request:URLRequest = new URLRequest(SprintStad.DOMAIN + sources[currentJob]);
