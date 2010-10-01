@@ -16,14 +16,14 @@
 		$db = Database::getDatabase();
 		$xml_array = xml2array($xml);
 		
-		$query = "
+		/*$query = "
 			SELECT team_instance_id
 			FROM ClientSession 
 			WHERE ClientSession.id = :id";
 		$args = array('id' => session_id());
 		$result = $db->query($query, $args);
 		
-		$team_instance_id = $db->getValue($result);
+		$team_instance_id = $db->getValue($result);*/
 		
 		foreach ($xml_array['values']['value'] as $value)
 		{
@@ -35,7 +35,7 @@
 			$args = array(
 				'checked' => $value['checked'], 
 				'value_id' => $value['id'], 
-				'team_instance_id' => $team_instance_id);
+				'team_instance_id' => $value['team_instance_id']);
 			$db->query($query, $args);
 		}
 		
@@ -58,14 +58,13 @@
 		echo '<values>';
 		
 		$query = "
-			SELECT Value.id, Value.title, Value.description, ValueInstance.checked
+			SELECT Value.id, Value.title, Value.description, ValueInstance.checked, ValueInstance.team_instance_id
 			FROM Value 
 			INNER JOIN ValueInstance 
 			ON ValueInstance.value_id = Value.id 
 			INNER JOIN TeamInstance 
 			ON TeamInstance.id = ValueInstance.team_instance_id 
 			INNER JOIN ClientSession 
-			ON ClientSession.team_instance_id = TeamInstance.id 
 			WHERE ClientSession.id = :id";
 		$args = array('id' => session_id());
 		$result = $db->query($query, $args);
@@ -77,6 +76,7 @@
 			echo '<title>' . $row['title'] . '</title>';
 			echo '<description>' . $row['description'] . '</description>';
 			echo '<checked>' . $row['checked'] . '</checked>';
+			echo '<team_instance_id>' . $row['team_instance_id'] . '</team_instance_id>';
 			echo '</value>';
 		}
 		
