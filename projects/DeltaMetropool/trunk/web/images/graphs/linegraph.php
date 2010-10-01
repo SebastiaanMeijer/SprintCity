@@ -18,8 +18,8 @@ class LineGraph
 	private $markersArray;
 	private $markerLength;
 	private $divisionCount;
-	private static $H_OFFSET = 10;
-	private static $V_OFFSET = 15;
+	private static $H_OFFSET = 7;
+	private static $V_OFFSET = 8;
 	
 	// axis information
 	private $beginYear = 2010;
@@ -40,8 +40,14 @@ class LineGraph
 	private $lineColor;
 	private $textColor;
 	
+	private $workingGraphLineColor1;
+	private $workingGraphLineColor2;
+	// space colors
 	private $residentsColor;
 	private $workersColor;
+	// mobility colors
+	private $networkValueColor;
+	private $travelersColor;
 	
 	// fonts
 	private static $FONT = 'verdana.ttf';
@@ -53,7 +59,8 @@ class LineGraph
 		
 		$this->SetSize($width, $height); 		
 		$this->SetColors();  // change colors here
-		$this->SetPadding(0.07, 0.13);	// parts of whole
+		// $this->SetPaddingParts(0.07, 0.13);	// parts of whole
+		$this->SetPaddingFixed(60,30);
 		
 		$this->SetDivisionCount(5);
 		$this->SetMarkers($this->divisionCount); 
@@ -73,17 +80,42 @@ class LineGraph
 	{
 		$this->backgroundColor = imagecolorallocatealpha($this->image, 0, 0, 0 , 127); //transparant
 		$this->borderColor = imagecolorallocate($this->image, 0, 0, 0);
-		$this->lineColor = imagecolorallocatealpha($this->image, 100, 100, 100, 20); //grayish
+		$this->lineColor = imagecolorallocatealpha($this->image, 50, 50, 50, 20); //grayish
 		$this->textColor = imagecolorallocate($this->image, 0, 0, 0);
+		
+		// colors are colorpicked from flash
 		$this->residentsColor = imagecolorallocate($this->image, 230, 172, 173); 
 		$this->workersColor = imagecolorallocate($this->image, 201, 165, 196);
+		$this->networkValueColor = imagecolorallocate($this->image, 107, 111, 112);
+		$this->travelersColor = imagecolorallocate($this->image, 175, 177, 178);
+		
+		$this->SetToSpaceColors(); // default
+	}
+	
+	public function SetToSpaceColors()
+	{
+		$this->workingGraphLineColor1 = $this->residentsColor;
+		$this->workingGraphLineColor2 = $this->workersColor;
+	}
+	
+	// uses mobility colors instead
+	public function SetToMobilityColors()
+	{
+		$this->workingGraphLineColor1 = $this->networkValueColor;
+		$this->workingGraphLineColor2 = $this->travelersColor;
 	}
 	
 	// width and height parts are in pieces of 1, like 0.03 
-	public function SetPadding($widthPart, $heightPart)
+	public function SetPaddingParts($widthPart, $heightPart)
 	{
 		$this->sidePadding = $this->width*$widthPart;
 		$this->heightPadding = $this->height*$heightPart;
+	}
+	
+	public function SetPaddingFixed($sidePadding, $heightPadding)
+	{
+		$this->sidePadding = $sidePadding;
+		$this->heightPadding = $heightPadding;
 	}
 	
 	public function SetDivisionCount($count)
@@ -181,12 +213,12 @@ class LineGraph
 	{
 		if(!$isArray2)
 		{
-			$textColor = $this->residentsColor;
+			$textColor = $this->workingGraphLineColor1;
 			$xPosition = 0.2 * $this->sidePadding;
 		}
 		else
 		{
-			$textColor = $this->workersColor;
+			$textColor = $this->workingGraphLineColor2;
 			$xPosition = $this->width - (0.8 * $this->sidePadding);
 		}
 		
@@ -207,9 +239,9 @@ class LineGraph
 		if($length > 1)
 		{
 			if($inputArray == $this->inputArray1)
-				$lineColor = $this->residentsColor;
+				$lineColor = $this->workingGraphLineColor1;
 			elseif($inputArray == $this->inputArray2)
-				$lineColor = $this->workersColor;
+				$lineColor = $this->workingGraphLineColor2;
 			
 			//normalize all entries in inputArray
 			for($i = 0; $i < $length ; $i++)
@@ -254,8 +286,39 @@ class LineGraph
 		
 	private function DrawGraphLine($x1, $y1, $x2, $y2, $lineColor)
 	{
-		imageline($this->image, $x1, $y1, $x2, $y2, $lineColor);
+		$lineThickness = 2;
+		
+		$this->imagelinethick($this->image, $x1, $y1, $x2, $y2, $lineColor, $lineThickness);
+		
+		// todo: if we have time -> sidelines a bit less opac, for faking anti-alias
 	}
+
+	// code from official PHP Manual
+	private function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
+	{
+		/* this way it works well only for orthogonal lines
+		imagesetthickness($image, $thick);
+		return imageline($image, $x1, $y1, $x2, $y2, $color);
+		*/
+		if ($thick == 1) {
+			return imageline($image, $x1, $y1, $x2, $y2, $color);
+		}
+		$t = $thick / 2 - 0.5;
+		if ($x1 == $x2 || $y1 == $y2) {
+			return imagefilledrectangle($image, round(min($x1, $x2) - $t), round(min($y1, $y2) - $t), round(max($x1, $x2) + $t), round(max($y1, $y2) + $t), $color);
+		}
+		$k = ($y2 - $y1) / ($x2 - $x1); //y = kx + q
+		$a = $t / sqrt(1 + pow($k, 2));
+		$points = array(
+			round($x1 - (1+$k)*$a), round($y1 + (1-$k)*$a),
+			round($x1 - (1-$k)*$a), round($y1 - (1+$k)*$a),
+			round($x2 + (1+$k)*$a), round($y2 - (1-$k)*$a),
+			round($x2 + (1-$k)*$a), round($y2 + (1+$k)*$a),
+		);
+		imagefilledpolygon($image, $points, 4, $color);
+		return imagepolygon($image, $points, 4, $color);
+	}
+
 	
 	private function DrawBackground()
 	{
@@ -273,7 +336,7 @@ class LineGraph
 	
 	private function DrawLine($x1, $y1, $x2, $y2)
 	{
-		imageline($this->image, $x1, $y1, $x2, $y2, $this->lineColor);
+		$this->imagelinethick($this->image, $x1, $y1, $x2, $y2, $this->lineColor, 2);
 	}
 	
 	private function DrawAxis()
@@ -362,6 +425,8 @@ class LineGraph
 		
 		return $this->image;
 	}
+	
+
 	
 	// TEST METHODS
 	private function DrawTestLine()
