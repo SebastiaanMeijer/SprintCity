@@ -3,6 +3,9 @@ require_once '../includes/master.inc.php';
 
 if(!$Auth->loggedIn()) redirect('../login.php');
 
+define('DEFAULT_HOME_TYPE', 3);
+define('DEFAULT_WORK_TYPE', 7);
+define('DEFAULT_LEISURE_TYPE', 12);
 
 $action = isset($_REQUEST['Action']) ? $_REQUEST['Action'] : "";
 $vars = preg_split('/,/', $action);
@@ -114,7 +117,11 @@ function NewGame()
 			foreach ($rounds as $round_key => $round_value)
 			{
 				// rounds program
-				$query = "INSERT INTO `Program` (type_home, type_work, type_leisure) VALUES (3, 7, 12);";
+				$query = "
+					INSERT INTO `Program` 
+						(type_home, type_work, type_leisure) 
+					VALUES 
+						(" . DEFAULT_HOME_TYPE . ", " . DEFAULT_WORK_TYPE . ", " . DEFAULT_LEISURE_TYPE . ");";
 				$db->query($query);
 				$program_id = Program::getMaxId();
 				
@@ -168,8 +175,10 @@ function BackStepGame($vars)
 	
 	// reset exec programs previous round
 	ResetExecPrograms($game->id, $previous_round);
+	// reset plan programs current round
+	ResetPlanPrograms($game->id, $game->current_round_id);
 	
-	// set new round
+	// set previous round as current round
 	if ($game->current_round_id != $previous_round)
 	{
 		$query = "
@@ -197,14 +206,51 @@ function ResetExecPrograms($game_id, $round_id)
 		SET 
 			Program.area_home = :area_home, 
 			Program.area_work = :area_work, 
-			Program.area_leisure = :area_leisure 
+			Program.area_leisure = :area_leisure, 
+			Program.type_home = :type_home, 
+			Program.type_work = :type_work, 
+			Program.type_leisure = :type_leisure
 		WHERE TeamInstance.game_id = :game_id AND RoundInfo.id = :round_id;";
 	$args = array(
 		'game_id' => $game_id, 
 		'round_id' => $round_id, 
 		'area_home' => 0, 
 		'area_work' => 0, 
-		'area_leisure' => 0);
+		'area_leisure' => 0, 
+		'type_home' => DEFAULT_HOME_TYPE, 
+		'type_work' => DEFAULT_WORK_TYPE, 
+		'type_leisure' => DEFAULT_LEISURE_TYPE);
+	$db->query($query, $args);
+}
+
+// sets all area fields of plan programs of a certain round to zero
+function ResetPlanPrograms($game_id, $round_id)
+{
+	$db = Database::getDatabase();
+	$query = "
+		UPDATE Program 
+		INNER JOIN RoundInstance ON Program.id = RoundInstance.plan_program_id 
+		INNER JOIN Round ON RoundInstance.round_id = Round.id 
+		INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
+		INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id 
+		SET 
+			Program.area_home = :area_home, 
+			Program.area_work = :area_work, 
+			Program.area_leisure = :area_leisure, 
+			Program.type_home = :type_home, 
+			Program.type_work = :type_work, 
+			Program.type_leisure = :type_leisure
+		WHERE TeamInstance.game_id = :game_id AND RoundInfo.id = :round_id;";
+	$args = array(
+		'game_id' => $game_id, 
+		'round_id' => $round_id, 
+		'area_home' => 0, 
+		'area_work' => 0, 
+		'area_leisure' => 0, 
+		'type_home' => DEFAULT_HOME_TYPE, 
+		'type_work' => DEFAULT_WORK_TYPE, 
+		'type_leisure' => DEFAULT_LEISURE_TYPE);
 	$db->query($query, $args);
 }
 

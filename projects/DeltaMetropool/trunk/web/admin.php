@@ -29,7 +29,7 @@
 						file_exists('pages/' . $_GET['view'] . '.php')) 
 						include('pages/' . $_GET['view'] . '.php');
 					else 
-						include('pages/start.php');
+						include('pages/games.php');
 				?>
 				
 			</div>
