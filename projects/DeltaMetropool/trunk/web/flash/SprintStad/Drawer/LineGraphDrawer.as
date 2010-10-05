@@ -12,21 +12,19 @@ package SprintStad.Drawer
 	// for now just a container that may contain graphs
 	public class LineGraphDrawer 
 	{
-		private var lineGraph:Array = new Array();
+		private var lineGraphs:Array = new Array();
 		
 		public function LineGraphDrawer(parent:Sprite) 
 		{
 			var sessionID:String = FindSession();
 			var stations:Stations = Data.Get().GetStations();
-		
-
+			
 			LoadGraphs(sessionID, stations);
 			
-			parent.addChild(lineGraph[2]);
-			
+			var lineGraph:LineGraph = lineGraphs[2];
+			parent.addChild(lineGraph);
 		}
 		
-		// Todo: Implement find session
 		private function FindSession():String
 		{
 			return SprintStad.session;
@@ -35,12 +33,12 @@ package SprintStad.Drawer
 		private function LoadGraphs(sessionID:String, stations:Stations):void
 		{
 			for (var i:int = 0; i < stations.GetStationCount(); i++)
-				lineGraph[i] = new LineGraph(sessionID, i);
+				lineGraphs[i] = new LineGraph(sessionID, i);
 		}
 		
 		public function GetGraph(stationID: int)
 		{
-			return lineGraph[stationID];
+			return lineGraphs[stationID];
 		}
 	}
 
