@@ -19,9 +19,10 @@
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.State.IState;
-<<<<<<< .mine	import SprintStad;=======	import SprintStad.Data.Values.Values;
+	import SprintStad;
+	import SprintStad.Data.Values.Values;
 	import SprintStad.Data.Team.Teams;
->>>>>>> .r349	
+	
 	public class ValuesState implements IState
 	{
 		private var parent:SprintStad = null;

@@ -75,6 +75,7 @@
 			newColorClip.graphics.beginFill(RGB);
 			newColorClip.graphics.drawCircle(17.5, 17.5, 17.5);
 			newColorClip.graphics.endFill();
+			newColorClip.alpha = 0.4;
 			this.appendClipByMovieClip(newColorClip, 1, 1);
 		}
 		

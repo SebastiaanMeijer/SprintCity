@@ -16,7 +16,6 @@ package SprintStad.Data.Graph
 			this.stationID = stationID;
 			
 			LoadImage();
-
 		}
 		
 		private function LoadImage():void
@@ -25,14 +24,10 @@ package SprintStad.Data.Graph
 			loader.load(new URLRequest(SprintStad.DOMAIN + 
 				"images/graphs/spacegraph.php?session=" + this.sessionID + 
 				"&station=" + this.stationID));
-			
-
-				
 			this.addChild(loader);
+			this.width = 240;
+			this.height = 110;
 		}
-	
-		
-		
 	}
 
 }

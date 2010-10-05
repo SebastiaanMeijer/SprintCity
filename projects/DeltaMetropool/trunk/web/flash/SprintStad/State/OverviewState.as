@@ -243,7 +243,7 @@
 				if (station != null)
 				{
 					var transFormArea:int = StationStatsCalculator.GetTransformArea(station);
-					TextField(spacePanel.amountHa).text = transFormArea + " Ha";
+					TextField(spacePanel.amountHaProgram).text = transFormArea + " ha";
 				}
 			}
 			catch (e:Error)
@@ -568,42 +568,7 @@
 				Debug.out("removed loadscreen removed" );
 			}
 		}
-			
 		
-		
-
-<<<<<<< .mine
-=======
-				
-				// station buttons
-				var stations:Stations = Data.Get().GetStations();
-				for (var i:int = 0; i < stations.GetStationCount(); i++)
-				{
-					station = stations.GetStation(i);
-					var movie:MovieClip = GetStationMovieClip(station);
-					movie.buttonMode = true;
-					movie.addEventListener(MouseEvent.CLICK, OnStationClick);
-				}
-				
-				// initial selection
-				parent.overview_movie.addChild(selection);
-				selection.x = -500;
-				selection.y = -500;
-				selection.width = 42;
-				selection.height = 42;
-				
-			}
-			catch (e:Error)
-			{
-				Debug.out(e.name);
-				Debug.out(e.message);
-				Debug.out(e.getStackTrace());
-			}
-		}
->>>>>>> .r349
-		
-<<<<<<< .mine
-=======
 		// Should set the number in the textfield to the 
 		// amount of the available transformable area in the current round
 		private function SetTransformArea(station:Station)
@@ -633,7 +598,6 @@
 			}
 		}
 		
->>>>>>> .r349
 		public function Deactivate():void
 		{
 		
