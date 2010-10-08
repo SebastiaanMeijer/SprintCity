@@ -41,7 +41,7 @@
 		private var barPlanned:AreaBarDrawer;
 		private var barAllocated:AreaBarDrawer;
 		
-		private var lineGraph:LineGraphDrawer;
+		private var lineGraphDrawer:LineGraphDrawer;
 		
 		// switch between space and mobility modes
 		private static const SPACE_MODE:int = 0;
@@ -115,7 +115,7 @@
 				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 				
-				lineGraph = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
 				
 				
 				// station buttons
@@ -320,8 +320,14 @@
 		
 		private function RefreshLineGraphs(station:Station):void
 		{
-			// todo: Refresh after selecting station
-			
+			Debug.out("Refreshing Line Graphs, stationID:" + station.id);
+			try{
+			lineGraphDrawer.DrawGraph(station.id);
+			}
+			catch (e:Error)
+			{
+				Debug.out(e.getStackTrace());
+			}
 		}
 		
 		private function ChangePlannedBarTitles():void
