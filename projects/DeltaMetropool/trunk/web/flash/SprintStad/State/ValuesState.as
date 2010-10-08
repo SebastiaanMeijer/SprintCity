@@ -47,6 +47,17 @@
 			parent.values_movie.description_field.text = data.GetValues().description;
 			parent.values_movie.description_field.addEventListener(Event.CHANGE, descriptionChanged);
 			
+			try
+			{
+				parent.values_movie.valuesTeamName.text = data.GetTeams().GetTeamById(parent.GetCurrentStation().team_id).name;
+			}
+			catch (e:Error)
+			{
+				Debug.out(e.name);
+				Debug.out(e.message);
+				Debug.out(e.getStackTrace());
+			}
+			
 			// build checkboxes field
 			var field:MovieClip = parent.values_movie.checkbox_field;
 			var entrySpace:Number = field.height / ((data.GetValues().GetValueCount()/data.GetTeams().GetTeamCount()) + 1);
@@ -120,8 +131,6 @@
 		{
 			var value:Value = Data.Get().GetValues().getValueByTeam(parent.GetCurrentStation().team_id, int(event.target.name));
 			
-			
-			
 			if (value != null)
 			{
 				if (Data.Get().current_round_id != 1 || Data.Get().GetTeams().GetOwnTeam().id != value.team_instance_id)
@@ -166,6 +175,9 @@
 		public function OnLoadingDone(data:int)
 		{
 			Debug.out(this + " I know " + data);
+			
+			
+			
 			drawUI();
 			parent.removeChild(SprintStad.LOADER);
 		}
