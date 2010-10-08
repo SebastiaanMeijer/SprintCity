@@ -90,7 +90,7 @@
 			clearBar();
 			
 			var stationInstance:StationInstance = StationInstance.CreateInitial(station);
-			if (currentRound == null)
+			/*if (currentRound == null)
 			{
 				DrawBar(stationInstance.area_cultivated_home,
 						stationInstance.area_cultivated_work,
@@ -99,7 +99,7 @@
 						stationInstance.area_undeveloped_rural,
 						0);
 				return;
-			}	
+			}*/	
 			var allocated:Array = new Array();
 			for (var k:int = 0; k < types.GetTypeCount(); k++)
 			{
@@ -110,9 +110,18 @@
 			var specialWork:int = 0;
 			var specialLeisure:int = 0;
 			
-			//For each round up until the current, decide the following:
-			//Get the allocated value belonging to the type and increase the value.
-			for (var i:int = 0; i < currentRound.round_info_id; i++)
+			var round_id:int = 1;
+			if(currentRound != null)
+				round_id = currentRound.round_info_id;
+			else if (Data.Get().current_round_id > 1)
+			{
+				Debug.out("Amount of rounds in a station: " + station.rounds.length);
+				round_id = station.GetRound(station.rounds.length - 1).round_info_id + 1;
+			}
+			Debug.out("RoundID = " + round_id);
+			//For every round up until now:
+			//Get the allocated value belonging to the type and increase the value
+			for (var i:int = 0; i < round_id; i++)
 			{
 				var round:Round = station.GetRoundById(i);
 				
@@ -139,7 +148,7 @@
 							if (round.exec_program.type_leisure.type != "average_leisure")
 								specialLeisure += round.exec_program.area_leisure;
 						}
-						if(round.round_info_id + 1 < currentRound.round_info_id)
+						if(round.round_info_id + 1 <= round_id)
 							stationInstance.ApplyRound(round);
 				}
 			}
@@ -159,19 +168,22 @@
 				for each(var type:Type in cattypes)
 				{
 					if (type.type == "average_home")
-						allocated[type.id - 1] += stationInstance.area_cultivated_home - (1/5)*total_special;
+						allocated[type.id - 1] += stationInstance.area_cultivated_home - specialHome;
 					else if (type.type == "average_work")
-						allocated[type.id - 1] += stationInstance.area_cultivated_work - (1/5)*total_special;
+						allocated[type.id - 1] += stationInstance.area_cultivated_work - specialWork;
 					else if (type.type == "average_leisure")
-						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - (1/5)*total_special;
+						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - specialLeisure;
 					
 					appendClip(type, total_area, allocated[type.id - 1]);
 				}
 			}
 		
 			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
-			appendClipByMovieClip(new ColorUrban(), total_area, stationInstance.area_undeveloped_urban - (1/5)*total_special);
-			appendClipByMovieClip(new ColorRural(), total_area, stationInstance.area_undeveloped_rural - (1/5)*total_special);
+			if(stationInstance.area_undeveloped_urban > 0)
+				appendClipByMovieClip(new ColorUrban(), total_area, stationInstance.area_undeveloped_urban);
+			if(stationInstance.area_undeveloped_rural > 0)
+				appendClipByMovieClip(new ColorRural(), total_area, stationInstance.area_undeveloped_rural);
+			
 			
 		}
 
