@@ -115,10 +115,8 @@
 				round_id = currentRound.round_info_id;
 			else if (Data.Get().current_round_id > 1)
 			{
-				Debug.out("Amount of rounds in a station: " + station.rounds.length);
 				round_id = station.GetRound(station.rounds.length - 1).round_info_id + 1;
 			}
-			Debug.out("RoundID = " + round_id);
 			//For every round up until now:
 			//Get the allocated value belonging to the type and increase the value
 			for (var i:int = 0; i < round_id; i++)

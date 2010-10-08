@@ -240,14 +240,29 @@
 			try 
 			{
 			
-			var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
+				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
 			
 			// amount Ha last
 				if (station != null)
 				{
-					var transFormArea:int = StationStatsCalculator.GetTransformArea(station);
-					TextField(spacePanel.amountHaProgram).text = transFormArea + " ha";
-				}
+					var instance:StationInstance = StationInstance.Create(station);
+					
+					var transformArea:int  = instance.GetTotalTransformArea();
+					TextField(spacePanel.amountHa2TransformArea).text = transformArea + " ha";	
+						
+					if (GetPreviousRound().round_info_id > 1)
+					{
+						var plannedArea:int = GetPreviousRound().plan_program.TotalArea();
+						TextField(spacePanel.amountHaPlanned).text = plannedArea + " ha";
+						var allocatedArea:int = GetPreviousRound().exec_program.TotalArea();
+						TextField(spacePanel.amountHaAllocated).text = allocatedArea + " ha";
+					}
+					else
+					{
+						TextField(spacePanel.amountHaPlanned).text = "";
+						TextField(spacePanel.amountHaAllocated).text = "";
+					}
+				}	
 			}
 			catch (e:Error)
 			{
@@ -374,7 +389,6 @@
 				//roundNameFinish = "einde";
 				
 			}
-			//TODO AREA CLOSE
 			view.plannedPeriod.text = roundNameStart + " - " + roundNameFinish;
 			view.allocatedPeriod.text = roundNameStart + " - " + roundNameFinish;
 		}
@@ -488,7 +502,7 @@
 			if (roundID == 1)
 				return null;
 			else
-				return parent.GetCurrentStation().GetRoundById(roundID);
+				return parent.GetCurrentStation().GetRoundById(roundID-1);
 		}
 		
 		private function GetCurrentRound():Round
