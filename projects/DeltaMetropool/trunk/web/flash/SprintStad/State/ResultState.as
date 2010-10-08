@@ -43,8 +43,22 @@
 		public function ResultState(parent:SprintStad) 
 		{
 			this.parent = parent;
+
 		}
 			
+		
+		public function NextStationEvent(e:Event):void
+		{
+			parent.currentStationIndex = Data.Get().GetStations().GetNextStation(parent.currentStationIndex);
+			DrawUI(parent.GetCurrentStation());
+		}
+		
+		public function PreviousStationEvent(e:Event):void
+		{
+			parent.currentStationIndex = Data.Get().GetStations().GetPreviousStation(parent.currentStationIndex);
+			DrawUI(parent.GetCurrentStation());
+		}
+		
 		private function DrawUI(station:Station):void
 		{
 			// draw stuff
@@ -228,6 +242,10 @@
 			barPastTransformArea = new AreaBarDrawer(view.past_info.transform_area_bar);
 			barCurrentArea = new AreaBarDrawer(view.current_info.area_bar);
 			barCurrentTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
+			
+			//Activate next/previous buttons
+			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
+			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
 			
 			// draw editor
 			var types:Types = Data.Get().GetTypes();

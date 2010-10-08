@@ -180,6 +180,7 @@
 			parent.values_movie.continue_button.addEventListener(MouseEvent.CLICK, onContinueEvent);
 			parent.values_movie.continue_button.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverEvent);
 			parent.values_movie.continue_button.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutEvent);
+			
 			DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
 		}
 		
