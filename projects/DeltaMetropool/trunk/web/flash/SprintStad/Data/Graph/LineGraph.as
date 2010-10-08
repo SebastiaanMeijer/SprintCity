@@ -9,6 +9,8 @@ package SprintStad.Data.Graph
 	{
 		private var sessionID:String;
 		private var stationID:int;
+		private var graphWidth:int = 240;
+		private var graphHeight:int = 110;
 		
 		public function LineGraph(sessionID:String, stationID:int) 
 		{
@@ -23,10 +25,11 @@ package SprintStad.Data.Graph
 			var loader:Loader = new Loader(); 
 			loader.load(new URLRequest(SprintStad.DOMAIN + 
 				"images/graphs/spacegraph.php?session=" + this.sessionID + 
-				"&station=" + this.stationID));
+				"&station=" + this.stationID + "&width=" + 
+				this.graphWidth + "&height=" + this.graphHeight));
+
 			this.addChild(loader);
-			this.width = 240;
-			this.height = 110;
+			
 		}
 	}
 
