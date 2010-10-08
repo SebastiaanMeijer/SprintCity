@@ -18,8 +18,8 @@ class LineGraph
 	private $markersArray;
 	private $markerLength;
 	private $divisionCount;
-	private static $H_OFFSET = 7;
-	private static $V_OFFSET = 8;
+	private static $H_OFFSET = 15;
+	private static $V_OFFSET = 3;
 	
 	// axis information
 	private $beginYear = 2010;
@@ -33,6 +33,7 @@ class LineGraph
 	private $inputArray2;
 	private $inputArray2Min;
 	private $inputArray2Max;
+	private $lineThickness = 1;
 	
 	// colors
 	private $backgroundColor;
@@ -51,20 +52,21 @@ class LineGraph
 	
 	// fonts
 	private static $FONT = 'verdana.ttf';
-	private static $FONT_SIZE = 10;
+	private static $FONT_SIZE = 7;
 	
 	public function __construct($width, $height)
 	{
-			$this->image = imagecreate($width, $height);
+		$this->image = imagecreatetruecolor($width, $height);
+		imageantialias($this->image, true);
 		
 		$this->SetSize($width, $height); 		
 		$this->SetColors();  // change colors here
 		// $this->SetPaddingParts(0.07, 0.13);	// parts of whole
-		$this->SetPaddingFixed(60,30);
+		$this->SetPaddingFixed(40,20);
 		
 		$this->SetDivisionCount(5);
 		$this->SetMarkers($this->divisionCount); 
-		$this->SetMarkerLength(10);
+		$this->SetMarkerLength(5);
 		$this->SetAxisInformation();
 	}
 	
@@ -78,7 +80,8 @@ class LineGraph
 	// change colors here
 	private function SetColors()
 	{
-		$this->backgroundColor = imagecolorallocatealpha($this->image, 0, 0, 0 , 127); //transparant
+		//$this->backgroundColor = imagecolorallocatealpha($this->image, 0, 0, 0 , 127); //transparant
+		$this->backgroundColor = imagecolorallocate($this->image, 238, 244, 247);
 		$this->borderColor = imagecolorallocate($this->image, 0, 0, 0);
 		$this->lineColor = imagecolorallocatealpha($this->image, 50, 50, 50, 20); //grayish
 		$this->textColor = imagecolorallocate($this->image, 0, 0, 0);
@@ -175,7 +178,7 @@ class LineGraph
 	private function DrawStuff()
 	{
 		$this->DrawBackground();
-		$this->DrawBorder();		
+		//$this->DrawBorder();		
 		$this->DrawAxis();
 		$this->DrawMarkers();
 		$this->DrawAxisInformation();
@@ -285,16 +288,12 @@ class LineGraph
 	}
 		
 	private function DrawGraphLine($x1, $y1, $x2, $y2, $lineColor)
-	{
-		$lineThickness = 2;
-		
-		$this->imagelinethick($this->image, $x1, $y1, $x2, $y2, $lineColor, $lineThickness);
-		
-		// todo: if we have time -> sidelines a bit less opac, for faking anti-alias
+	{	
+		$this->Imagelinethick($this->image, $x1, $y1, $x2, $y2, $lineColor, $this->lineThickness);
 	}
 
 	// code from official PHP Manual
-	private function imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
+	private function Imagelinethick($image, $x1, $y1, $x2, $y2, $color, $thick = 1)
 	{
 		/* this way it works well only for orthogonal lines
 		imagesetthickness($image, $thick);
@@ -336,7 +335,7 @@ class LineGraph
 	
 	private function DrawLine($x1, $y1, $x2, $y2)
 	{
-		$this->imagelinethick($this->image, $x1, $y1, $x2, $y2, $this->lineColor, 2);
+		$this->Imagelinethick($this->image, $x1, $y1, $x2, $y2, $this->lineColor, 2);
 	}
 	
 	private function DrawAxis()
