@@ -250,7 +250,7 @@
 					var transformArea:int  = instance.GetTotalTransformArea();
 					TextField(spacePanel.amountHa2TransformArea).text = transformArea + " ha";	
 						
-					if (GetPreviousRound().round_info_id > 1)
+					if (Data.Get().current_round_id > 1 && GetPreviousRound().round_info_id > 1)
 					{
 						var plannedArea:int = GetPreviousRound().plan_program.TotalArea();
 						TextField(spacePanel.amountHaPlanned).text = plannedArea + " ha";
