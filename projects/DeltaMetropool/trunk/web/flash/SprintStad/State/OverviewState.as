@@ -53,6 +53,8 @@
 		public function OverviewState(parent:SprintStad) 
 		{
 			this.parent = parent;
+			
+			
 		}
 		
 		private function Init():void
@@ -64,7 +66,7 @@
 			// fill in the demand windows
 			FillDemandWindows();
 			
-
+			
 			// select first station
 			SelectStation(parent.currentStationIndex);
 			

@@ -49,11 +49,13 @@
 			
 			// build checkboxes field
 			var field:MovieClip = parent.values_movie.checkbox_field;
-			var entrySpace:Number = field.height / (data.GetValues().GetValueCount() + 1);
+			var entrySpace:Number = field.height / ((data.GetValues().GetValueCount()/data.GetTeams().GetTeamCount()) + 1);
 			var y:Number = entrySpace / 2;
 			var width:Number = field.width - CHECKBOX_HORIZONTAL_MARGIN * 2;
 			
-			var values:Array = Data.Get().GetValues().getValuesByTeam(parent.GetCurrentStation().team_id);
+			var values:Array;
+			values = Data.Get().GetValues().getValuesByTeam(parent.GetCurrentStation().team_id);
+			
 			amountSelected = 0;
 			disabled = false;
 			for (var i:int = 0; i < values.length; i++)
@@ -116,12 +118,12 @@
 		
 		private function checkBoxChanged(event:Event):void
 		{
+			var value:Value = Data.Get().GetValues().getValueByTeam(parent.GetCurrentStation().team_id, int(event.target.name));
 			
-			var value:Value = Data.Get().GetValues().GetValueById(int(event.target.name));
+			
+			
 			if (value != null)
 			{
-				Debug.out("Current team: " + Data.Get().GetTeams().GetOwnTeam().id);
-				Debug.out("Team belonging to value: " + value.team_instance_id);
 				if (Data.Get().current_round_id != 1 || Data.Get().GetTeams().GetOwnTeam().id != value.team_instance_id)
 				{
 					event.target.selected = (!event.target.selected);

@@ -44,6 +44,17 @@
 			return result;
 		}
 		
+		public function getValueByTeam(teamID:int, id:int):Value
+		{
+			var vals:Array = getValuesByTeam(teamID);
+			for each(var val:Value in vals)
+			{
+				if (val.id == id)
+					return val;
+			}
+			return null;
+		}
+		
 		public function GetValueCount():int
 		{
 			return values.length;
@@ -112,7 +123,6 @@
 			xmlString += "</description>";
 			xmlString += "</values>";
 			
-			Debug.out(xmlString);
 			return xmlString;
 		}
 	}
