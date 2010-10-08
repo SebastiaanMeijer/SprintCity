@@ -163,6 +163,7 @@
 			RefreshMobility(station);
 			RefreshLineGraphs(station);
 			RefreshTransformArea(station);
+			
 		}
 		
 		private function FillStationCircles(stations:Stations):void
