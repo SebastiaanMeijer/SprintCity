@@ -426,6 +426,8 @@
 			parent.spaceTitle.visible = false;
 			parent.mobilityTitle.visible = false;
 			
+			parent.lineGraphContainer.visible = false;
+			
 			parent.space_button.removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
 			parent.mobility_button.removeEventListener(MouseEvent.CLICK, OnMobilityButton);
 			
@@ -450,6 +452,9 @@
 				
 				// set title
 				parent.spaceTitle.visible = true;
+				
+				// graph
+				parent.lineGraphContainer.visible = true;
 				
 				// set panels
 				Debug.out("...Entered Space Mode");
