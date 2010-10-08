@@ -175,6 +175,15 @@
 			var clip:MovieClip;
 			var bitmap:Bitmap;
 			
+			//Clear all the demand ha strings so places that won't be used won't be showing.
+			for (i = 0; i < 6; i++)
+			{
+				view.home_window.getChildByName("type_" + (i + 1)).type_area.text = "";
+				view.work_window.getChildByName("type_" + (i + 1)).type_area.text = "";
+				view.leisure_window.getChildByName("type_" + (i + 1)).type_area.text = "";
+			}
+			
+			
 			cat_types = types.GetTypesOfCategory("home");
 			for (i = 0; i < cat_types.length; i++)
 			{
@@ -186,6 +195,8 @@
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
+				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
+				clip.type_area.background = true;
 				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
 			}
 			
@@ -200,6 +211,8 @@
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
+				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
+				clip.type_area.background = true;
 				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
 			}
 			
@@ -214,6 +227,8 @@
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.buttonMode = true;
+				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
+				clip.type_area.background = true;
 				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
 			}
 		}
