@@ -55,20 +55,20 @@
 			
 			if (allocated > 0.5)
 			{
-				R = 255 * (1 - allocated);
+				R = 255 * ((1 - allocated) / 0.5);
 				G = 255;
 			}
 			else
 			{
 				R = 255;
-				G = 255 * allocated;
+				G = 255 * (allocated / 0.5);
 			}
 
 			var B:uint = 0;
 			
 			R = R << 16;
 			G = G << 8;
-			var RGB:uint = R + G + 50;
+			var RGB:uint = R + G;
 			if(RGB == 0)
 				RGB = (255 << 16);
 			newColorClip.graphics.clear();
