@@ -48,8 +48,6 @@
 			states[STATE_ROUND] = new RoundState(this);
 			states[STATE_RESULT] = new ResultState(this);
 			states[STATE_OVERVIEW] = new OverviewState(this);
-			
-			
 		}
 		
 		private function ResolveSessionHash():void
