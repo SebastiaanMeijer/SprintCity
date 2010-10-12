@@ -87,8 +87,8 @@ class LineGraph
 		$this->textColor = imagecolorallocate($this->image, 0, 0, 0);
 		
 		// colors are colorpicked from flash
-		$this->residentsColor = imagecolorallocate($this->image, 230, 172, 173); 
-		$this->workersColor = imagecolorallocate($this->image, 201, 165, 196);
+		$this->residentsColor = imagecolorallocate($this->image, 216, 93, 93); 
+		$this->workersColor = imagecolorallocate($this->image, 187, 136, 177);
 		$this->networkValueColor = imagecolorallocate($this->image, 107, 111, 112);
 		$this->travelersColor = imagecolorallocate($this->image, 175, 177, 178);
 		
@@ -299,9 +299,9 @@ class LineGraph
 		imagesetthickness($image, $thick);
 		return imageline($image, $x1, $y1, $x2, $y2, $color);
 		*/
-		if ($thick == 1) {
+		//if ($thick == 1) {
 			return imageline($image, $x1, $y1, $x2, $y2, $color);
-		}
+		//}
 		$t = $thick / 2 - 0.5;
 		if ($x1 == $x2 || $y1 == $y2) {
 			return imagefilledrectangle($image, round(min($x1, $x2) - $t), round(min($y1, $y2) - $t), round(max($x1, $x2) + $t), round(max($y1, $y2) + $t), $color);
