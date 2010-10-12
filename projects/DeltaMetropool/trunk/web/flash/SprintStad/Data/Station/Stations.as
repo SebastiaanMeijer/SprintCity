@@ -73,7 +73,7 @@
 			do
 			{
 				index = (index + 1) % stations.length;
-				if (stations[index].team_id == currentStation.team_id)
+				if (stations[index].team_id == team.id)
 					return index;
 			}
 			while (index != currentStationIndex)
