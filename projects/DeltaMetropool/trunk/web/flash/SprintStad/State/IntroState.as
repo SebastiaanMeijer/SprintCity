@@ -23,7 +23,7 @@
 		
 		private function OnContinueEvent(event:MouseEvent):void
 		{
-			parent.gotoAndPlay(SprintStad.FRAME_VALUES);
+			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
 		}
 		
 		public function OnStageOneLoadingDone(data:int)

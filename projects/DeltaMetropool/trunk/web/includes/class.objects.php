@@ -93,6 +93,38 @@
 				$id);
 		}
 		
+		public static function getInitialCitizenCount($id)
+		{
+			if (isset($id))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT ROUND(Station.count_home_total * Constants.average_citizens_per_home) AS InitialCitizenCount
+					FROM Constants, Station
+					WHERE Station.id = :station_id;";
+				$args = array('station_id' => $id);
+				$result = $db->query($query, $args);
+				return $db->getValue($result);
+			}
+			return null;
+		}
+		
+		public static function getInitialWorkerCount($id)
+		{
+			if (isset($id))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT ROUND(Station.count_work_total * Constants.average_workers_per_bvo) AS InitialWorkersCount
+					FROM Constants, Station
+					WHERE Station.id = :station_id;";
+				$args = array('station_id' => $id);
+				$result = $db->query($query, $args);
+				return $db->getValue($result);
+			}
+			return null;
+		}
+		
 		public static function rowCount()
 		{
 			$db = Database::getDatabase();

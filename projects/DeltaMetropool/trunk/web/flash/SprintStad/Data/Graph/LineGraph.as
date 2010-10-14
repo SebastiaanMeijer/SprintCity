@@ -7,16 +7,13 @@ package SprintStad.Data.Graph
 	
 	public class LineGraph extends Sprite
 	{
-		private var sessionID:String;
 		private var stationID:int;
 		private var graphWidth:int = 240;
 		private var graphHeight:int = 110;
 		
-		public function LineGraph(sessionID:String, stationID:int) 
+		public function LineGraph(stationID:int) 
 		{
-			this.sessionID = sessionID;
 			this.stationID = stationID;
-			
 			LoadImage();
 		}
 		
@@ -24,13 +21,9 @@ package SprintStad.Data.Graph
 		{
 			var loader:Loader = new Loader(); 
 			loader.load(new URLRequest(SprintStad.DOMAIN + 
-				"images/graphs/spacegraph.php?session=" + this.sessionID + 
-				"&station=" + this.stationID + "&width=" + 
+				"images/graphs/spacegraph.php?station=" + this.stationID + "&width=" + 
 				this.graphWidth + "&height=" + this.graphHeight));
-
 			this.addChild(loader);
-			
 		}
 	}
-
 }

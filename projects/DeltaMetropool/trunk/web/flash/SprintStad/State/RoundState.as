@@ -159,7 +159,6 @@
 			var loader:URLLoader = new URLLoader();
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/program.php");
 			var vars:URLVariables = new URLVariables();
-			vars.session = SprintStad.session;
 			vars.data = GetCurrentRound().plan_program.GetXmlString();
 			request.data = vars;
 			loader.load(request);
