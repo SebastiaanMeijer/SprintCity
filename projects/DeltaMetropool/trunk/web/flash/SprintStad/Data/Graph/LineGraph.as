@@ -8,8 +8,8 @@ package SprintStad.Data.Graph
 	public class LineGraph extends Sprite
 	{
 		private var stationID:int;
-		private var graphWidth:int = 240;
-		private var graphHeight:int = 110;
+		private var graphWidth:int = 480;
+		private var graphHeight:int = 220;
 		
 		public function LineGraph(stationID:int) 
 		{
