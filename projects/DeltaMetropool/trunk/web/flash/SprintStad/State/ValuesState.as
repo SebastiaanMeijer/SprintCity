@@ -98,7 +98,6 @@
 			var loader:URLLoader = new URLLoader();
 			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
 			var vars:URLVariables = new URLVariables();
-			vars.session = SprintStad.session;
 
 			vars.data = Data.Get().GetValues().GetXmlString();
 			request.data = vars;
@@ -175,8 +174,6 @@
 		public function OnLoadingDone(data:int)
 		{
 			Debug.out(this + " I know " + data);
-			
-			
 			
 			drawUI();
 			parent.removeChild(SprintStad.LOADER);

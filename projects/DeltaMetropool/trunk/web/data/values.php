@@ -1,9 +1,7 @@
 <?php
 	require_once '../includes/master.inc.php';
 
-	if (isset($_REQUEST['session']) &&
-		$_REQUEST['session'] == session_id() &&
-		ClientSession::hasSession($_REQUEST['session']))
+	if (ClientSession::hasSession(session_id()))
 	{
 		if (isset($_REQUEST['data']))
 			submitValues($_REQUEST['data']);
@@ -48,12 +46,13 @@
 			'id' => $team_instance_id);
 		$db->query($query, $args);
 		
-		$session = new ClientSession($_GET['session']);
+		$session = new ClientSession(session_id());
 	}
 	
 	function printValues()
 	{
 		$db = Database::getDatabase();
+		//$game_id = Game::getGameIdOfSession(session_id())
 		
 		echo '<values>';
 		

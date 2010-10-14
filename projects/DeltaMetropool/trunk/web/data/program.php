@@ -1,12 +1,10 @@
 <?php
 	require_once '../includes/master.inc.php';
 	
-	if (isset($_REQUEST['session']) &&
-		$_REQUEST['session'] == session_id() &&
-		ClientSession::hasSession($_REQUEST['session']))
+	if (ClientSession::hasSession(session_id()))
 	{
 		if (isset($_REQUEST['data']))
-			submitProgram($_REQUEST['session'], $_REQUEST['data']);
+			submitProgram(session_id(), $_REQUEST['data']);
 	}
 	
 	function submitProgram($session_id, $xml)

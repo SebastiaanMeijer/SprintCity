@@ -104,7 +104,6 @@
 			{
 				// prepare loader vars
 				var vars:URLVariables = new URLVariables();
-				vars.session = SprintStad.session;
 				// load station data
 				var loader:URLLoader = new URLLoader();
 				var request:URLRequest = new URLRequest(SprintStad.DOMAIN + sources[currentJob]);

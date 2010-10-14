@@ -14,7 +14,6 @@ package SprintStad.Drawer
 	public class LineGraphDrawer 
 	{
 		private var parent:Sprite;
-		
 		private var lineGraphs:Array = new Array();
 		private var currentGraph:LineGraph;
 		
@@ -22,42 +21,24 @@ package SprintStad.Drawer
 		{
 			this.parent = parent;
 			
-			var sessionID:String = FindSession();
 			var stations:Stations = Data.Get().GetStations();
 			
-			LoadGraphs(sessionID, stations);
+			LoadGraphs(stations);
 		}
 		
-		private function FindSession():String
-		{
-			return SprintStad.session;
-		}
-		
-		private function LoadGraphs(sessionID:String, stations:Stations):void
+		private function LoadGraphs(stations:Stations):void
 		{
 			var stationCount:int = stations.GetStationCount();
-			
-			Debug.out("before for each");
-			
-			
 			
 			for (var i:int = 0; i < stationCount; i++)
 			{
 				var station:Station = stations.stations[i];
-				
-				
-				lineGraphs[station.id] = new SprintStad.Data.Graph.LineGraph(sessionID, station.id);
-				Debug.out("In foreachloopieee: StationID:" + station.id);
+				lineGraphs[station.id] = new LineGraph(station.id);
 			}
-			
-			//for (var i:int = 0; i < stationCount; i++)
-				//lineGraphs[i] = new LineGraph(sessionID, i);
-			Debug.out("Loaded graphs, sessionID:" + sessionID + " and stationcount:" + stationCount);
 		}
 		
 		public function DrawGraph(stationID: int):void
 		{
-			
 			var lineGraph:LineGraph = lineGraphs[stationID];
 			
 			if (currentGraph != null)
@@ -67,8 +48,6 @@ package SprintStad.Drawer
 			}
 			
 			parent.addChild(lineGraph);
-			
 		}
 	}
-
 }

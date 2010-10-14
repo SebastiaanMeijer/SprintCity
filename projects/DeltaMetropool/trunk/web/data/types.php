@@ -1,9 +1,7 @@
 <?php
 	require_once '../includes/master.inc.php';
 
-	if (isset($_REQUEST['session']) &&
-		$_REQUEST['session'] == session_id() &&
-		ClientSession::hasSession($_REQUEST['session']))
+	if (ClientSession::hasSession(session_id()))
 	{
 		printTypes();
 	}
