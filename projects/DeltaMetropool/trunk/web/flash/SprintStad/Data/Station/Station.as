@@ -65,11 +65,12 @@
 		
 		public function RefreshAreaBar():void
 		{
-			var allocated:Number = 1
+			var allocated:Number = 1;
 			if (Data.Get().current_round_id > 2)
 			{
 				var round:Round = GetRoundById(Data.Get().current_round_id - 1);
-				allocated = round.exec_program.TotalArea() / round.plan_program.TotalArea();
+				if (round.plan_program.TotalArea() > 0)
+					allocated = round.exec_program.TotalArea() / round.plan_program.TotalArea();
 			}
 
 			areaBar.drawStationCircle(allocated);
