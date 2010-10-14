@@ -33,7 +33,7 @@ class LineGraph
 	private $inputArray2;
 	private $inputArray2Min;
 	private $inputArray2Max;
-	private $lineThickness = 1;
+	private $lineThickness = 2;
 	
 	// colors
 	private $backgroundColor;
@@ -52,7 +52,7 @@ class LineGraph
 	
 	// fonts
 	private static $FONT = 'verdana.ttf';
-	private static $FONT_SIZE = 7;
+	private static $FONT_SIZE = 14;
 	
 	public function __construct($width, $height)
 	{
@@ -62,7 +62,7 @@ class LineGraph
 		$this->SetSize($width, $height); 		
 		$this->SetColors();  // change colors here
 		// $this->SetPaddingParts(0.07, 0.13);	// parts of whole
-		$this->SetPaddingFixed(40,20);
+		$this->SetPaddingFixed(75,30);
 		
 		$this->SetDivisionCount(5);
 		$this->SetMarkers($this->divisionCount); 
@@ -299,9 +299,9 @@ class LineGraph
 		imagesetthickness($image, $thick);
 		return imageline($image, $x1, $y1, $x2, $y2, $color);
 		*/
-		//if ($thick == 1) {
+		if ($thick == 1) {
 			return imageline($image, $x1, $y1, $x2, $y2, $color);
-		//}
+		}
 		$t = $thick / 2 - 0.5;
 		if ($x1 == $x2 || $y1 == $y2) {
 			return imagefilledrectangle($image, round(min($x1, $x2) - $t), round(min($y1, $y2) - $t), round(max($x1, $x2) + $t), round(max($y1, $y2) + $t), $color);
