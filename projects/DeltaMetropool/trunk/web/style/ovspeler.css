@@ -1,0 +1,79 @@
+/* OV-Speler Stylesheet */
+
+html, body 
+{
+	background-color: #ffffff;
+}
+
+/* divisions */
+
+div#wrapper
+{
+	width : 100%;
+	height: 99%; /* Not 100% so that scrollbar disappears in FF */
+	border: 2px solid #000066;
+}
+
+div#sidebar
+{
+	float: left;
+	width: 280px;
+	height: 100%;
+}
+
+div#nslogo
+{
+	width: 100%;
+	height: 50px;
+	background: #ffffff url('../images/ovspeler/ns-logo.png') 
+		no-repeat center center;
+}
+
+div#tab
+{
+	float: left;
+	position: relative;
+	margin-left: 0px;
+	height: 100%;
+	width: 20px;
+	background: white url('../images/ovspeler/tab_bg.png') repeat-y;
+	border-left: 1px solid #000066;
+}
+
+div#button
+{
+	margin-top: -50px; /*half of height */
+	width: 20px;
+	height: 100px;
+	background: url('../images/ovspeler/button_opened.png') no-repeat;
+}
+
+div#flashapp
+{
+	margin-left: 300px;
+	height: 100%;
+	background-color: white;
+	border-left: 1px solid #000066;
+}
+
+/* division classes */
+
+/* this one is for centering block elements */
+div.center  
+{
+	position: absolute;
+	top: 50%;
+	margin-left: auto;
+	margin-right: auto;	
+	text-align: center;
+}
+
+.ovTitle
+{
+	margin: 10px 0 0 0;
+	font-size: 1.6em;
+	font-family: Arial,sans-serif;
+	font-weight: bold;
+	color: #000066;
+	text-align: center;
+}
