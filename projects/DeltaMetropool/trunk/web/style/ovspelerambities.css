@@ -1,0 +1,23 @@
+/* OV-Speler ambities Stylesheet */
+
+div#wrapper
+{
+	
+}
+
+div#main
+{
+	margin: 0 auto 0 auto;
+	width: 600px;
+	height: 100%;
+	background: url('../images/ovspeler/nsambities.png') no-repeat 0 30%;
+
+}
+
+div#left
+{
+	float: left;
+	width: 300px;
+	height: 100%;
+}
+
