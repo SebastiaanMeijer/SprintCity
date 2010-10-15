@@ -240,7 +240,7 @@
 			// amount Ha last
 				if (station != null)
 				{
-					var instance:StationInstance = StationInstance.Create(station);
+					var instance:StationInstance = StationInstance.CreateInitial(station);
 					
 					var transformArea:int  = instance.GetTotalTransformArea();
 					TextField(spacePanel.amountHa2TransformArea).text = transformArea + " ha";	
@@ -271,11 +271,11 @@
 		{
 			var pastStationInstance:StationInstance = StationInstance.CreateInitial(station);
 			barInitial.DrawBar(
-				pastStationInstance.area_cultivated_home, 
-				pastStationInstance.area_cultivated_work, 
-				pastStationInstance.area_cultivated_mixed, 
-				pastStationInstance.area_undeveloped_urban,
-				pastStationInstance.area_undeveloped_rural,
+				pastStationInstance.transform_area_cultivated_home, 
+				pastStationInstance.transform_area_cultivated_work, 
+				pastStationInstance.transform_area_cultivated_mixed, 
+				pastStationInstance.transform_area_undeveloped_urban,
+				pastStationInstance.transform_area_undeveloped_mixed,
 				0);
 			
 
@@ -369,7 +369,6 @@
 			var roundNameStart:String = "";
 			var roundNameFinish:String = "";
 			
-			//TODO AREA OPEN
 			for each (var round:Round in Data.Get().GetStations().GetStation(stationIndex).rounds)
 			{
 				if (round.round_info_id == roundID)
@@ -591,36 +590,6 @@
 				Debug.out("removed loadscreen removed" );
 			}
 		}
-		
-		// Should set the number in the textfield to the 
-		// amount of the available transformable area in the current round
-		private function SetTransformArea(station:Station)
-		{
-			try 
-			{
-			
-				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
-			
-				// amount Ha last
-				if (station != null)
-				{
-					if(Data.Get().current_round_id > 2)
-					{
-						var transFormArea:int = station.GetRoundById(Data.Get().current_round_id - 1).exec_program.TotalArea();
-						TextField(spacePanel.amountHaAllocated).text = transFormArea + " Ha";
-					}
-					var totalArea:int = station.GetTotalTransformArea();
-					TextField(spacePanel.amountHaTotal).text = totalArea + " Ha";
-				}
-			}
-			catch (e:Error)
-			{
-				
-				Debug.out(e.name);
-				Debug.out(e.getStackTrace());
-			}
-		}
-		
 		public function Deactivate():void
 		{
 		

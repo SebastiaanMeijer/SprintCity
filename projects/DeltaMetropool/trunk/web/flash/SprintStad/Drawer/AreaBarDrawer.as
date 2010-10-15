@@ -79,27 +79,19 @@
 			this.appendClipByMovieClip(newColorClip, 1, 1);
 		}
 		
+		
 		/*	function drawStationInstanceBar
 		*	@param: station:Station - The station for which the bar needs to be drawn
 		* 	@param currentRound:int - The ID of the current round
 		* 	Pre: The station exists and the round exists
 		* 	Post: Has drawn the bar for this StationInstance
 		*/
-		public function drawStationCurrentBar(station:Station, currentRound:Round)
+		public function drawStationCurrentBar(station:Station, currentRound:Round, futureProgram:Program = null)
 		{
 			clearBar();
 			
 			var stationInstance:StationInstance = StationInstance.CreateInitial(station);
-			/*if (currentRound == null)
-			{
-				DrawBar(stationInstance.area_cultivated_home,
-						stationInstance.area_cultivated_work,
-						stationInstance.area_cultivated_mixed,
-						stationInstance.area_undeveloped_urban,
-						stationInstance.area_undeveloped_rural,
-						0);
-				return;
-			}*/	
+
 			var allocated:Array = new Array();
 			for (var k:int = 0; k < types.GetTypeCount(); k++)
 			{
@@ -109,6 +101,9 @@
 			var specialHome:int = 0;
 			var specialWork:int = 0;
 			var specialLeisure:int = 0;
+			
+			
+			var total_area:int = stationInstance.GetTotalTransformArea();
 			
 			var round_id:int = 1;
 			if(currentRound != null)
@@ -122,7 +117,6 @@
 			for (var i:int = 0; i < round_id; i++)
 			{
 				var round:Round = station.GetRoundById(i);
-				
 				if (round != null)
 				{
 						if (round.exec_program.area_home > 0)
@@ -151,14 +145,42 @@
 				}
 			}
 			
+			
+			//If this bar is to look into the future, calculate one more round of values depending on the future program.
+			if (futureProgram != null)
+			{
+				if (futureProgram.area_home > 0)
+				{
+					index = types.getIndex(futureProgram.type_home);
+					Debug.out(index);
+					allocated[index] += futureProgram.area_home;
+					if (futureProgram.type_home.type != "average_home")
+						specialHome += futureProgram.area_home;
+				}
+				if ( futureProgram.area_work > 0)
+				{
+					index = types.getIndex(futureProgram.type_work);
+					allocated[index] += futureProgram.area_work;
+					if (futureProgram.type_work.type != "average_work")
+						specialWork += futureProgram.area_work;
+				}
+				if ( futureProgram.area_leisure > 0)
+				{
+					index = types.getIndex(futureProgram.type_leisure);
+					allocated[index] += futureProgram.area_leisure;
+					if (futureProgram.type_leisure.type != "average_leisure")
+						specialLeisure += futureProgram.area_leisure;
+				}
+				stationInstance.ApplyProgram(futureProgram);	
+			}
+			
 			bar.visible = true;
 			
-			var total_area:int = station.area_cultivated_home + station.area_cultivated_mixed + station.area_cultivated_work + station.area_undeveloped_rural + station.area_undeveloped_urban;
-			var total_special:int = specialHome + specialLeisure + specialWork;
-			
+						
 			//Go through all the categories in the right order
 			var categories:Array = new Array("average_home", "home", "average_work", "work", "average_leisure", "leisure");
 			
+			var sum:int = 0;
 			
 			for each(var cat:String in categories)
 			{				
@@ -166,22 +188,37 @@
 				for each(var type:Type in cattypes)
 				{
 					if (type.type == "average_home")
-						allocated[type.id - 1] += stationInstance.area_cultivated_home - specialHome;
+					{
+						allocated[type.id - 1] += stationInstance.transform_area_cultivated_home;
+					}
 					else if (type.type == "average_work")
-						allocated[type.id - 1] += stationInstance.area_cultivated_work - specialWork;
+					{
+						allocated[type.id - 1] += stationInstance.transform_area_cultivated_work;
+					}
 					else if (type.type == "average_leisure")
-						allocated[type.id - 1] += stationInstance.area_cultivated_mixed - specialLeisure;
+					{
+						allocated[type.id - 1] += stationInstance.transform_area_cultivated_mixed;
+					}
 					
-					appendClip(type, total_area, allocated[type.id - 1]);
+					if (allocated[type.id - 1] > 0)
+					{
+						sum = sum + Math.ceil(allocated[type.id - 1]);
+						appendClip(type, total_area, Math.ceil(allocated[type.id - 1]));
+						
+					}
 				}
 			}
-		
-			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
-			if(stationInstance.area_undeveloped_urban > 0)
-				appendClipByMovieClip(new ColorUrban(), total_area, stationInstance.area_undeveloped_urban);
-			if(stationInstance.area_undeveloped_rural > 0)
-				appendClipByMovieClip(new ColorRural(), total_area, stationInstance.area_undeveloped_rural);
 			
+			var baseUrban:int = stationInstance.transform_area_undeveloped_urban;
+			var baseRural:int = stationInstance.transform_area_undeveloped_mixed;
+			
+			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
+			if(baseUrban > 0)
+				appendClipByMovieClip(new ColorUrban(), total_area, baseUrban);
+			if(baseRural > 0)
+				appendClipByMovieClip(new ColorRural(), total_area, baseRural);
+			
+				
 			
 		}
 
