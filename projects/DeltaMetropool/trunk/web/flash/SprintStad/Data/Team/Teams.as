@@ -76,9 +76,17 @@
 					firstTag = xml.name();
 				
 				if (tag == "is_player")
+				{
 					team[tag] = (int(xml) == 0 ? false : true);
+				}
+				else if (xml.name() == "values")
+				{
+					team.ParseXML(xml);
+				}
 				else
+				{
 					team[tag] = xml;
+				}
 			}
 			AddTeam(team);
 		}		

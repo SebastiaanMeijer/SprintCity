@@ -22,6 +22,7 @@
 	import SprintStad;
 	import SprintStad.Data.Values.Values;
 	import SprintStad.Data.Team.Teams;
+	import SprintStad.Data.Team.Team;
 	
 	public class ValuesState implements IState
 	{
@@ -42,43 +43,32 @@
 		private function drawUI():void
 		{
 			var data:Data = Data.Get();
+			var team:Team = parent.GetCurrentStation().owner;
+			var values:Values = data.GetValues();
 			
 			// set description field text
-			parent.values_movie.description_field.text = data.GetValues().description;
+			parent.values_movie.description_field.text = team.value_description;
 			parent.values_movie.description_field.addEventListener(Event.CHANGE, descriptionChanged);
-			
-			try
-			{
-				parent.values_movie.valuesTeamName.text = data.GetTeams().GetTeamById(parent.GetCurrentStation().team_id).name;
-			}
-			catch (e:Error)
-			{
-				Debug.out(e.name);
-				Debug.out(e.message);
-				Debug.out(e.getStackTrace());
-			}
+			parent.values_movie.valuesTeamName.text = team.name;
 			
 			// build checkboxes field
 			var field:MovieClip = parent.values_movie.checkbox_field;
-			var entrySpace:Number = field.height / ((data.GetValues().GetValueCount()/data.GetTeams().GetTeamCount()) + 1);
+			var entrySpace:Number = field.height / (data.GetValues().GetValueCount() + 1);
 			var y:Number = entrySpace / 2;
 			var width:Number = field.width - CHECKBOX_HORIZONTAL_MARGIN * 2;
 			
-			var values:Array;
-			values = Data.Get().GetValues().getValuesByTeam(parent.GetCurrentStation().team_id);
-			
 			amountSelected = 0;
 			disabled = false;
-			for (var i:int = 0; i < values.length; i++)
+			
+			for (var i:int = 0; i < values.GetValueCount(); i++)
 			{
-				
-				var value:Value = values[i];
+				var value:Value = values.GetValue(i);
 				var checkBox:CheckBox = new CheckBox();
 				
 				checkBox.name = String(value.id);
 				checkBox.label = value.title;
 				checkBox.labelPlacement = "right";
-				checkBox.selected = value.checked;
+				checkBox.selected = team.HasValue(value.id);
 				if (checkBox.selected)
 					amountSelected++;
 				
@@ -96,19 +86,17 @@
 		private function uploadXML():void 
 		{
 			var loader:URLLoader = new URLLoader();
-			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/values.php");
+			var request:URLRequest = new URLRequest(SprintStad.DOMAIN + "data/teams.php");
 			var vars:URLVariables = new URLVariables();
-
-			vars.data = Data.Get().GetValues().GetXmlString();
+			var teams:Teams = Data.Get().GetTeams();
+			vars.data = teams.GetTeamById(teams.GetOwnTeam().id).GetValuesXmlString();
 			request.data = vars;
 			loader.load(request);
-		}
-		
+		}		
 		
 		private function onContinueEvent(event:MouseEvent):void
 		{
 			parent.gotoAndPlay(SprintStad.FRAME_OVERVIEW);
-			//parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
 		private function onMouseOverEvent(event:MouseEvent):void
@@ -124,33 +112,35 @@
 				parent.values_movie.continue_button.filters = [filter];
 		}
 		
-
-		
 		private function checkBoxChanged(event:Event):void
 		{
-			var value:Value = Data.Get().GetValues().getValueByTeam(parent.GetCurrentStation().team_id, int(event.target.name));
+			var value:Value = Data.Get().GetValues().GetValueById(int(event.target.name));
 			
 			if (value != null)
 			{
-				if (Data.Get().current_round_id != 1 || Data.Get().GetTeams().GetOwnTeam().id != value.team_instance_id)
+				var team:Team = Data.Get().GetTeams().GetOwnTeam();
+				
+				// if not in the masterplan round or if the current values displayed are not yours, set the checkbox to it's original state and return
+				if (Data.Get().current_round_id != 1 || 
+					team.id != Data.Get().GetStations().GetStation(parent.currentStationIndex).owner.id)
 				{
 					event.target.selected = (!event.target.selected);
 					return;
 				}
-
+				
 				if(disabled && event.target.selected == false)
-				{	
-					value.checked = event.target.selected;
+				{
+					team.RemoveValue(value.id);
 					amountSelected--;
 				}
 				else if(!disabled && event.target.selected == true)
 				{
-					value.checked = event.target.selected;
+					team.AddValue(value.id);
 					amountSelected++;
 				}
 				else if (!disabled && event.target.selected == false)
 				{
-					value.checked = event.target.selected;
+					team.RemoveValue(value.id);
 					amountSelected--;
 				}
 				else
@@ -158,8 +148,8 @@
 					event.target.selected = (!event.target.selected);
 					return;
 				}
-
 			}
+			
 			if (amountSelected >= 3)
 				disabled = true;
 			else
@@ -168,7 +158,7 @@
 		
 		private function descriptionChanged(event:Event):void
 		{
-			Data.Get().GetValues().description = parent.values_movie.description_field.text;
+			Data.Get().GetTeams().GetOwnTeam().value_description = parent.values_movie.description_field.text;
 		}
 		
 		public function OnLoadingDone(data:int)

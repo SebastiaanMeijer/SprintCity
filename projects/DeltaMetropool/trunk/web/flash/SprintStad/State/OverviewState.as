@@ -53,8 +53,6 @@
 		public function OverviewState(parent:SprintStad) 
 		{
 			this.parent = parent;
-			
-			
 		}
 		
 		private function Init():void
@@ -66,11 +64,9 @@
 			// fill in the demand windows
 			FillDemandWindows();
 			
-			
 			// select first station
 			SelectStation(parent.currentStationIndex);
 			
-
 			// change the planned/assign bar titles
 			ChangePlannedBarTitles();
 			
@@ -116,7 +112,6 @@
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 				
 				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
-				
 				
 				// station buttons
 				var stations:Stations = Data.Get().GetStations();

@@ -5,44 +5,12 @@
 		public var id:int = 0;
 		public var title:String = "";
 		public var description:String = "";
-		public var checked:Boolean = false;
-		public var team_instance_id:int = 0;
 		
 		public function Value() 
 		{
 			this.id = id;
 			this.title = title;
 			this.description = description;
-			this.checked = checked;
-			this.team_instance_id = team_instance_id;
-		}
-		
-		public function Check():void
-		{
-			checked = true;
-		}
-		
-		public function UnCheck():void
-		{
-			checked = false;
-		}
-		
-		public function ToggeChecked():void
-		{
-			checked = !checked;
-		}
-		
-		public function GetXmlString():String
-		{
-			var xmlString:String = "";
-			
-			xmlString += "<value>";
-			xmlString += "<id>" + id + "</id>";
-			xmlString += "<checked>" + int(checked) + "</checked>";
-			xmlString += "<team_instance_id>" + team_instance_id + "</team_instance_id>";
-			xmlString += "</value>";
-			
-			return xmlString;
 		}
 	}
 }

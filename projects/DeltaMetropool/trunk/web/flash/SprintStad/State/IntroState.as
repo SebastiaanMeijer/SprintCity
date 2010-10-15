@@ -53,8 +53,8 @@
 		public function Activate():void 
 		{
 			// stage one loading
-			DataLoader.Get().AddJob(DataLoader.DATA_TEAMS, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_TEAMS, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_TYPES, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATION_TYPES, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_CONSTANTS, OnStageOneLoadingDone);
