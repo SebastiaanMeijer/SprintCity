@@ -119,7 +119,7 @@
 	{
 		$db = Database::getDatabase();
 		$query = "
-			SELECT Round.id, Round.new_transform_area, Round.POVN, Round.PWN, 
+			SELECT Round.id, Round.new_transform_area, RoundInstance.POVN, Round.PWN, 
 				RoundInfo.number, RoundInfo.name, RoundInfo.description, 
 				RoundInfo.id AS round_info_id, 
 				RoundInstance.plan_program_id, RoundInstance.exec_program_id
