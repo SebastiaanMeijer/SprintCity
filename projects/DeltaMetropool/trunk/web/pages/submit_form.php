@@ -3,6 +3,8 @@ require_once '../includes/master.inc.php';
 
 if(!$Auth->loggedIn()) redirect('../login.php');
 
+define('MOBILITY_TEAM_ID', 0);
+
 define('DEFAULT_HOME_TYPE', 3);
 define('DEFAULT_WORK_TYPE', 7);
 define('DEFAULT_LEISURE_TYPE', 12);
@@ -75,6 +77,50 @@ function NewGame()
 	if (sizeof($game_tree) <= 0)
 		return;
 		
+	// create round info instances
+	$rounds = RoundInfo::getRounds();
+	foreach ($rounds as $round_key => $round_value) 
+	{
+		$query = "
+			INSERT INTO `RoundInfoInstance` 
+				(`game_id`, `round_info_id`, `mobility_report`) 
+			VALUES 
+				(:game_id, :round_info_id, :mobility_report);";
+		$args = array(
+			'game_id' => $game_id,
+			'round_info_id' => $round_key,
+			'mobility_report' => "");
+		$db->query($query, $args);
+	}
+	
+	// create mobility team
+	$query = "
+		INSERT INTO `TeamInstance` 
+			(`game_id`, `team_id`) 
+		VALUES
+			(:game_id, :team_id);";
+	$args = array(
+		'game_id' => $game_id,
+		'team_id' => MOBILITY_TEAM_ID);
+	$db->query($query, $args);
+	$team_instance_id = mysql_insert_id($db->db);
+	
+	// Add value instances for the mobility team
+	$values = Value::getMobilityValues();
+	foreach ($values as $value_key => $value_value) 
+	{
+		$query = "
+			INSERT INTO `ValueInstance` 
+				(`value_id`, `team_instance_id`, `checked`) 
+			VALUES 
+				(:value_id, :team_instance_id, :checked);";
+		$args = array(
+			'value_id' => $value_key,
+			'team_instance_id' => $team_instance_id,
+			'checked' => 0);
+		$db->query($query, $args);
+	}
+	
 	// insert the game tree in the database
 	foreach($game_tree as $team_id => $station_collection)
 	{
@@ -141,7 +187,7 @@ function NewGame()
 		}
 		
 		// Add value instances for the participating teams
-		$values = Value::getValues();		
+		$values = Value::getAreaValues();		
 		foreach ($values as $value_key => $value_value) 
 		{
 			$query = "
@@ -466,7 +512,7 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 			Program.id AS id, 
 			Program.area_home AS area, 
 			ABS(Station.count_home_total / Station.area_cultivated_home - Types.density) AS density_delta, 
-			ABS(Round.POVN - Types.POVN) AS povn_delta 
+			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta 
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -516,7 +562,7 @@ function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 			Program.id AS id, 
 			Program.area_work AS area, 
 			ABS(Station.count_work_total / Station.area_cultivated_work - Types.density) AS density_delta, 
-			ABS(Round.POVN - Types.POVN) AS povn_delta
+			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -564,7 +610,7 @@ function RedistributeAreaOfLeisureType($game_id, $type, $distribute_area)
 		SELECT 
 			Program.id AS id, 
 			Program.area_leisure AS area,
-			ABS(Round.POVN - Types.POVN) AS povn_delta 
+			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta 
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 

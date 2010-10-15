@@ -8,24 +8,17 @@
 	
 	function printValues()
 	{
-		$result = getValues();
+		$values = Value::getAreaValues();
 		
 		echo '<values>';
-		while ($row = mysql_fetch_array($result))
-		{
+		foreach ($values as $value_key => $value_value) 
+	{
 			echo '<value>';
-			echo '<id>' . $row['id'] . '</id>';
-			echo '<title>' . $row['title'] . '</title>';
-			echo '<description>' . $row['description'] . '</description>';
+			echo '<id>' . $value_key . '</id>';
+			echo '<title>' . $value_value->title . '</title>';
+			echo '<description>' . $value_value->description . '</description>';
 			echo '</value>';
 		}
 		echo '</values>';
-	}
-	
-	function getValues()
-	{
-		$db = Database::getDatabase();
-		$query = "SELECT * FROM Value";
-		return $db->query($query);
 	}
 ?>

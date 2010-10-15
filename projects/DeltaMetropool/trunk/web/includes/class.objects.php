@@ -43,7 +43,7 @@
 		
 		public static function getTeams($fromIndex, $numberOfRecords)
 		{
-			return DBObject::glob("Team", "SELECT * FROM  `team` ORDER BY `created` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+			return DBObject::glob("Team", "SELECT * FROM team WHERE id > 0 ORDER BY `created` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
 		}
 		
 		public static function getTeamsInGame($gameId)
@@ -192,12 +192,17 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Value', array('id', 'title', 'description'), $id);
+			parent::__construct('Value', array('id', 'title', 'description', 'type'), $id);
 		}
 		
-		public static function getValues()
+		public static function getAreaValues()
 		{
-			return DBObject::glob("Value", "SELECT * FROM `value`");
+			return DBObject::glob("Value", "SELECT * FROM value WHERE type = 'area'");
+		}
+		
+		public static function getMobilityValues()
+		{
+			return DBObject::glob("Value", "SELECT * FROM value WHERE type = 'mobility'");
 		}
 	}
 	
@@ -276,7 +281,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'plan_program_id', 'exec_program_id', 'starttime'), $id);
+			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'plan_program_id', 'exec_program_id', 'starttime', 'POVN'), $id);
 		}
 		
 		public static function getCommittedRounds($game_id, $round_id)
