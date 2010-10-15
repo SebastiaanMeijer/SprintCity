@@ -145,19 +145,17 @@
 				station.area_cultivated_mixed + 
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
-			transform_area_bar.DrawBar(
-				station.transform_area_cultivated_home, 
-				station.transform_area_cultivated_work, 
-				station.transform_area_cultivated_mixed, 
-				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed,
-				0);
+			if(title == "2030")
+				transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), null);
+			else
+				transform_area_bar.drawStationCurrentBar(StationInstance.CreateInitial(station.station).station, null);
+
 			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_mixed) + " ha.)";
+				station.transform_area_undeveloped_mixed) + " ha resterend.)";
 				
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
