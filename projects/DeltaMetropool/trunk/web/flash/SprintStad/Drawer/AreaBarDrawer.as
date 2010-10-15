@@ -152,7 +152,6 @@
 				if (futureProgram.area_home > 0)
 				{
 					index = types.getIndex(futureProgram.type_home);
-					Debug.out(index);
 					allocated[index] += futureProgram.area_home;
 					if (futureProgram.type_home.type != "average_home")
 						specialHome += futureProgram.area_home;
