@@ -7,8 +7,8 @@ var sideBarWidthClosed = "0px";
 var flashAppMarginOpened = "300px";
 var flashAppMarginClosed = "20px";
 
-var buttonOpened = "url('../images/ovspeler/button_opened.png') no-repeat";
-var buttonClosed = "url('../images/ovspeler/button_closed.png') no-repeat";
+var buttonOpened = "url('./images/mobility/button_opened.png') no-repeat";
+var buttonClosed = "url('./images/mobility/button_closed.png') no-repeat";
 
 // TODO: If there is time, build in a transition
 function resize()
