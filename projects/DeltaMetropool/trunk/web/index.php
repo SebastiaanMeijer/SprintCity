@@ -35,7 +35,10 @@ if (isset($_REQUEST['action']))
 // if in a game, go to the game
 if (ClientSession::hasSession(session_id()))
 {
-	header('Location: ./game.php');
+	if(ClientSession::isMobilityTeam(session_id()))
+		header('Location: ./mobility.php');
+	else
+		header('Location: ./game.php');
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
