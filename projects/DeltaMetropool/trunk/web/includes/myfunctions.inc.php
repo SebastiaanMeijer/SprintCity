@@ -1,4 +1,6 @@
 <?php
+	define('MOBILITY_TEAM_ID', 0);
+	
 	function printPager($pager, $view)
 	{
 		// do not display if there is only one page

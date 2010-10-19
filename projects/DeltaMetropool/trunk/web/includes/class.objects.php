@@ -26,6 +26,18 @@
 					array('id' => $id));
 			return $db->getValue($result) > 0;
 		}
+		
+		public static function isMobilityTeam($id)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+					SELECT team_id 
+					FROM TeamInstance
+					INNER JOIN ClientSession ON TeamInstance.id = ClientSession.team_instance_id
+					WHERE ClientSession.id = :id;",
+					array('id' => $id));
+			return $db->getValue($result) == MOBILITY_TEAM_ID;
+		}
 	}
 	
 	class Team extends DBObject

@@ -3,8 +3,6 @@ require_once '../includes/master.inc.php';
 
 if(!$Auth->loggedIn()) redirect('../login.php');
 
-define('MOBILITY_TEAM_ID', 0);
-
 define('DEFAULT_HOME_TYPE', 3);
 define('DEFAULT_WORK_TYPE', 7);
 define('DEFAULT_LEISURE_TYPE', 12);
