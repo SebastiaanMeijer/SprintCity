@@ -137,6 +137,23 @@
 			return null;
 		}
 		
+		public static function getInitialPOVNByStationInstanceId($stationInstanceId)
+		{
+			if (isset($stationInstanceId))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT POVN
+					FROM Station
+					INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+					WHERE StationInstance.id = :station_instance_id;";
+				$args = array('station_instance_id' => $stationInstanceId);
+				$result = $db->query($query, $args);
+				return $db->getValue($result);
+			}
+			return null;
+		}
+		
 		public static function rowCount()
 		{
 			$db = Database::getDatabase();
@@ -146,6 +163,24 @@
 		public static function getStations($fromIndex, $numberOfRecords)
 		{
 			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `code` ASC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+		}
+		
+		public static function getStationsUsedInGame($gameId)
+		{
+			if (isset($gameId))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT Station.* 
+					FROM Station 
+					INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+					INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+					WHERE TeamInstance.game_id = :game_id;";
+				$args = array('game_id' => $gameId);
+				$result = $db->query($query, $args);
+				return DBObject::glob("Station", $result);
+			}
+			return null;
 		}
 	}
 	
@@ -313,6 +348,24 @@
 				WHERE TeamInstance.game_id=" . $game_id . "
 				AND RoundInstance.round_id" . $round_id_condition . "
 				AND RoundInstance.plan_program_id IS NOT NULL");
+		}
+		
+		public static function getCurrentRoundInstances($game_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInstance.*
+				FROM RoundInstance
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
+				INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON RoundInfo.id = Game.current_round_id AND TeamInstance.game_id = Game.id
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				WHERE Game.id = :game_id;";
+			$args = array('game_id' => $game_id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("RoundInstance", $result);
 		}
 	}
 	

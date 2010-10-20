@@ -156,7 +156,7 @@ function NewGame()
 			$db->query($query, $args);
 			
 			// add empty round_instances and programs for every station
-			$station_instance_id = StationInstance::getMaxId();
+			$station_instance_id = mysql_insert_id();
 			$rounds = Round::getRoundsByStation($station_id);
 			foreach ($rounds as $round_key => $round_value)
 			{
@@ -167,19 +167,20 @@ function NewGame()
 					VALUES 
 						(" . DEFAULT_HOME_TYPE . ", " . DEFAULT_WORK_TYPE . ", " . DEFAULT_LEISURE_TYPE . ");";
 				$db->query($query);
-				$program_id = Program::getMaxId();
+				$program_id = mysql_insert_id();
 				
 				// round instance
 				$query = "
 					INSERT INTO `RoundInstance` 
-						(`round_id`, `station_instance_id`, `plan_program_id`, `starttime`)
+						(`round_id`, `station_instance_id`, `plan_program_id`, `starttime`, `POVN`)
 					VALUES 
-						(:round_id, :station_instance_id, :plan_program_id, :starttime);";
+						(:round_id, :station_instance_id, :plan_program_id, :starttime, :povn);";
 				$args = array(
 					'round_id' => $round_key, 
 					'station_instance_id' => $station_instance_id, 
 					'plan_program_id' => $program_id, 
-					'starttime' => date( 'Y-m-d H:i:s'));
+					'starttime' => date( 'Y-m-d H:i:s'),
+					'povn' => Station::getInitialPOVNByStationInstanceId($station_instance_id));
 				$db->query($query, $args);
 			}
 		}
@@ -744,29 +745,47 @@ function SetNextRound($game_id)
 	$db = Database::getDatabase();
 	$rounds = RoundInfo::GetRounds();
 	$game = new Game($game_id);
-	$temp_key = -1;
+	$next_round_id = -1;
 	
 	// find id of next round
 	foreach ($rounds as $key => $value)
 	{
-		if ($temp_key > -1)
+		if ($next_round_id > -1)
 		{
-			$temp_key = $key;
+			$next_round_id = $key;
 			break;
 		}
 		if ($game->current_round_id == $key)
-			$temp_key = $key;
+			$next_round_id = $key;
 	}
 	
 	// set new round
-	if ($game->current_round_id != $temp_key)
+	if ($game->current_round_id != $next_round_id)
 	{
+		// copy RoundInstance POVN from last round to next round
+		$rounds = RoundInstance::getCurrentRoundInstances($game_id);
+		foreach ($rounds as $key => $value)
+		{
+			$query = "
+				UPDATE RoundInstance
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				SET RoundInstance.POVN = :povn
+				WHERE Round.round_info_id = :next_round_id AND 
+					RoundInstance.station_instance_id = :station_instance_id;";
+			$args = array(
+				'povn' => $value->POVN,
+				'next_round_id' => $next_round_id,
+				'station_instance_id' => $value->station_instance_id);
+			$db->query($query, $args);
+		}
+		
+		// update round
 		$query = "
 			UPDATE `game` 
 			SET `current_round_id` = :round_id
 			WHERE `id` = :game_id;";
 		$args = array(
-			'round_id' => $temp_key, 
+			'round_id' => $next_round_id, 
 			'game_id' => $game->id);
 		$db->query($query, $args);
 	}
