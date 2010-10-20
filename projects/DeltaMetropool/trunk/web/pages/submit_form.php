@@ -141,7 +141,7 @@ function NewGame()
 			// 'masterplan' program
 			$query = "INSERT INTO `Program` () VALUES ();";
 			$db->query($query);
-			$program_id = Program::getMaxId();
+			$program_id = mysql_insert_id();
 			
 			// station instance
 			$query = "
