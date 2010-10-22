@@ -25,7 +25,6 @@ function resize()
 		flashApp.style.marginLeft = flashAppMarginClosed;
 		button.style.background = buttonClosed;
 		
-		document.title = "Closed";
 		mode = CLOSED;
 	}
 	else
@@ -36,7 +35,6 @@ function resize()
 		flashApp.style.marginLeft = flashAppMarginOpened
 		button.style.background = buttonOpened;
 		
-		document.title = "Opened";
 		mode = OPENED;
 	}
 }
