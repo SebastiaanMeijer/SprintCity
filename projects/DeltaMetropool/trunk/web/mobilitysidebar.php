@@ -15,21 +15,39 @@
 		
 		if(isset($ambitionBoxes))
 		{
-			// $query = "";
-			// $args = array();
-			// $db->query($query, $args);
+			$resetQuery = "
+				UPDATE valueinstance, team, teaminstance
+				SET checked = false
+				WHERE valueinstance.team_instance_id = teaminstance.id
+				AND teaminstance.team_id = team.id
+				AND team.name = \"NS\"";
+
+			$db->query($resetQuery);
+				
+			foreach($ambitionBoxes as $valueID)
+			{
+				$query = "
+					UPDATE valueinstance, teaminstance, team
+					SET checked = true
+					WHERE valueinstance.value_id = :value_id
+					AND valueinstance.team_instance_id = teaminstance.id
+					AND teaminstance.team_id = team.id
+					AND team.name = \"NS\";";
+				$args = array("value_id" => $valueID);
+				$db->query($query, $args);
+			}
+		
 		}
 		
 		if(isset($motivation))
 		{	
-			// $query = "
-				// UPDATE teaminstance
-				// SET value_description = " . $motivation . "
-				// WHERE teaminstance.team_id = team.id
-					// AND team.name = NS;
-						// ";
-			// $args = array();
-			// $db->query($query, $args);
+			$query = "
+				UPDATE teaminstance, team
+				SET value_description = :motivation
+				WHERE teaminstance.team_id = team.id
+				AND team.name = \"NS\"; ";
+			 $args = array("motivation" => $motivation);
+			 $db->query($query, $args);
 		}
 	}
 	
@@ -49,7 +67,8 @@
 			<caption>Ambities</caption>
 			<?php
 				$ambitionCount = 5;
-				for($i = 0; $i < $ambitionCount; $i++)
+				$startID = 7;
+				for($i = $startID; $i < $ambitionCount + $startID; $i++)
 				{
 					?>
 					<tr>
@@ -116,7 +135,7 @@
 				</table>
 				<h1>Motivatie</h1>
 				<p>
-					<textarea class="textfield" type="text" name="motivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
+					<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
 				</p>
 				<p><input type="submit" value="Doorvoeren"></p>
 			</form>
