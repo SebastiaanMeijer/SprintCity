@@ -20,3 +20,9 @@ function checkMax()
 		}
 	}
 }
+
+
+function showConfirm()
+{
+	confirm("Uw ambities worden nu vastgelegd.");
+}

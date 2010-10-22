@@ -7,5 +7,5 @@
 		<link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 		<link rel="stylesheet" type="text/css" href="style/mobility.css">
 		<script type="text/javascript" src="script/mobility/resize.js"></script>
-		<script type="text/javascript" src="script/mobility/checkMax.js"></script>
+		<script type="text/javascript" src="script/mobility/ambition.js"></script>
 	</head>
