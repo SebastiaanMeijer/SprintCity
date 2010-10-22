@@ -7,6 +7,11 @@ html, body
 	color: #000066;
 }
 
+iframe
+{
+	border: 0;
+}
+
 h1
 {
 	margin-top: 1em;
@@ -22,6 +27,11 @@ table
 {
 	width: 260px;
 	margin: auto;
+}
+
+table.ambitions /*ugly hack? */
+{
+	margin-top: -80px;
 }
 
 caption
@@ -45,7 +55,7 @@ tr
 
 td
 {
-	width: 50%;
+	width: auto;
 	//border: 1px solid #000066;*/
 }
 
@@ -115,6 +125,11 @@ div#flashapp
 
 /* division classes */
 
+div.sidebarWindow
+{
+	border-top: 2px solid #000066;
+}
+
 /* this one is for centering block elements */
 div.center  
 {
@@ -149,11 +164,10 @@ div.center
 .form
 {
 	padding: 1em 0;
-	border-top: 2px solid #000066;
 }
 
 .textfield
 {
 	width: 220px;
-	height: 80px;
+	height: 4em;
 }
