@@ -182,6 +182,29 @@
 			}
 			return null;
 		}
+		
+		public static function getStationsAndPOVNUsedInGame($gameId)
+		{
+			if (isset($gameId))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT Station.id, Station.name, RoundInstance.POVN
+					FROM Station 
+					INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+					INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+					INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+					INNER JOIN Round ON RoundInstance.round_id = Round.id
+					INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
+					INNER JOIN Game ON RoundInfo.id = Game.current_round_id AND TeamInstance.game_id = Game.id
+					WHERE Game.id = :game_id
+					ORDER BY Station.code ASC;";
+				$args = array('game_id' => $gameId);
+				$result = $db->query($query, $args);
+				return $result;
+			}
+			return null;
+		}
 	}
 	
 	class Game extends DBObject
