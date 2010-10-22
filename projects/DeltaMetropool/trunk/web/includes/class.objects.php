@@ -100,7 +100,7 @@
 				'image', 'town', 'region', 
 				'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
-				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
+				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_mixed', 
 				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform'), 
 				$id);
 		}
@@ -181,6 +181,24 @@
 				return DBObject::glob("Station", $result);
 			}
 			return null;
+		}
+		
+		public static function getStationNamesByTeam($teamId)
+		{
+			return DBObject::glob("Station", 	"SELECT station.*
+												FROM station 
+												INNER JOIN stationinstance ON Station.id = StationInstance.station_id
+												INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+												WHERE TeamInstance.id = " .$teamId);
+												
+		}
+		
+		public static function getStationInstanceId($stationId)
+		{
+			$db = Database::getDatabase();
+			return $db->getValue(	"SELECT stationinstance.id
+									FROM stationinstance INNER JOIN station ON stationinstance.station_id = station.id
+									WHERE station.id = " . $stationId);
 		}
 		
 		public static function getStationsAndPOVNUsedInGame($gameId)
@@ -274,6 +292,31 @@
 		{
 			return DBObject::glob("Value", "SELECT * FROM value WHERE type = 'mobility'");
 		}
+		
+		public static function getValueDescription($valueid)
+		{
+			$db = Database::getDatabase();
+			return $db->getValue("SELECT title FROM value WHERE id = " . $valueid);
+		}
+	}
+	
+	class ValueInstance extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('ValueInstance', array('id', 'value_id', 'team_instance_id', 'checked'), $id);
+		}
+		
+		public static function getValueInstances()
+		{
+			return DBObject::glob("ValueInstance", "SELECT * FROM valueinstance");
+		}
+		
+		public static function getCheckedValuesByTeam($teamid)
+		{
+			return DBObject::glob("ValueInstance", "SELECT * FROM valueinstance WHERE checked = 1 && team_instance_id = " . $teamid);
+		}
+	
 	}
 	
 	class RoundInfo extends DBObject
@@ -382,6 +425,24 @@
 			$result = $db->query($query, $args);
 			return DBObject::glob("RoundInstance", $result);
 		}
+		
+		public static function getStationAppliedPrograms($stationid, $roundId)
+		{
+			
+		}
+	}
+	
+	class Type extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Type', array('id', 'name', 'description', 'color', 'image', 'density', 'povn'), $id);
+		}
+		
+		public static function getTypes()
+		{
+			return DBObject::glob("Type", "SELECT * FROM types");
+		}
 	}
 	
 	class Program extends DBObject
@@ -427,6 +488,24 @@
 					Program.id = :id;", 
 					array('session_id' => $session_id, 'id' => $id));
 			return $db->getValue($result) > 0;
+		}
+		
+		public static function getMasterplan($stationId)
+		{
+			return DBObject::glob("Program", "SELECT *
+									FROM program INNER JOIN stationinstance ON program.id = stationinstance.program_id
+									WHERE stationinstance.id = " . $stationId);
+
+		}
+		
+		public static function getStationAppliedPrograms($stationId, $roundId)
+		{
+			return DBObject::glob("Program", 	"SELECT program.*
+												FROM program
+												INNER JOIN roundinstance ON program.id = roundinstance.exec_program_id
+												INNER JOIN round ON roundinstance.round_id = round.id
+												INNER JOIN stationinstance ON roundinstance.station_instance_id = stationinstance.id
+												WHERE round.round_info_id <". $roundId . " AND stationinstance.id = ". $stationId);
 		}
 	}
 
