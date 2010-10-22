@@ -29,6 +29,7 @@ caption
 	font-size: 1.3em;
 	text-align: center;
 	font-weight: bold;
+	margin-bottom: 1em;
 }
 
 th
@@ -44,13 +45,19 @@ tr
 
 td
 {
-	border: 1px solid #000066;*/
+	width: 50%;
+	//border: 1px solid #000066;*/
+}
+
+td.checkbox
+{
+	padding-right: 1em;
 }
 
 td.leftAlign
 {
 	text-align: left;
-	padding-left: 1em;
+	padding-left: 0;
 }
 
 /* divisions */
@@ -141,11 +148,12 @@ div.center
 
 .form
 {
-
+	padding: 1em 0;
+	border-top: 2px solid #000066;
 }
 
 .textfield
 {
 	width: 220px;
-	height: 200px;
+	height: 80px;
 }
