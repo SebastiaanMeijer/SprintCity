@@ -4,143 +4,190 @@
 	$ambitionBoxes = $_POST['ambitionCheckbox'];
 	
 	require_once('includes/master.inc.php');
-	require_once 'mobilityheader.php';
+	require_once('mobilityheader.php');
 
 	if (ClientSession::hasSession(session_id()))
 	{
-		//Send POST-information to database here
-				
-		$db = Database::getDatabase();
-		$query = NULL;
-		
-		if(isset($ambitionBoxes))
+		if(isset($ambitionBoxes) && isset($ambitionMotivation))
 		{
-			$resetQuery = "
-				UPDATE valueinstance, team, teaminstance
-				SET checked = false
-				WHERE valueinstance.team_instance_id = teaminstance.id
-				AND teaminstance.team_id = team.id
-				AND team.name = \"NS\"";
-
-			$db->query($resetQuery);
-				
-			foreach($ambitionBoxes as $valueID)
+			$db = Database::getDatabase();
+			$game_id = Game::getGameIdOfSession(session_id());
+			// uncheck all ambitions for the mobility player
+			$query = "
+				UPDATE ValueInstance
+				INNER JOIN TeamInstance ON ValueInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Team ON TeamInstance.team_id = Team.id
+				SET ValueInstance.checked = false
+				WHERE TeamInstance.game_id = :game_id
+					AND Team.id = :team_id";
+			$args = array(
+				'game_id' => $game_id,
+				'team_id' => MOBILITY_TEAM_ID);
+			$db->query($query, $args);
+			
+			// check selected ambitions
+			foreach($ambitionBoxes as $valueInstanceId)
 			{
 				$query = "
-					UPDATE valueinstance, teaminstance, team
-					SET checked = true
-					WHERE valueinstance.value_id = :value_id
-					AND valueinstance.team_instance_id = teaminstance.id
-					AND teaminstance.team_id = team.id
-					AND team.name = \"NS\";";
-				$args = array("value_id" => $valueID);
+					UPDATE ValueInstance
+					SET ValueInstance.checked = true
+					WHERE ValueInstance.id = :value_instance_id";
+				$args = array('value_instance_id' => $valueInstanceId);
 				$db->query($query, $args);
 			}
-		
-		}
-		
-		if(isset($motivation))
-		{	
+			
+			// fill ambition motivation
 			$query = "
-				UPDATE teaminstance, team
-				SET value_description = :motivation
-				WHERE teaminstance.team_id = team.id
-				AND team.name = \"NS\"; ";
-			 $args = array("motivation" => $motivation);
+				UPDATE TeamInstance
+				SET TeamInstance.value_description = :motivation
+				WHERE TeamInstance.game_id = :game_id
+					AND TeamInstance.team_id = :team_id";
+			 $args = array(
+				'motivation' => $motivation,
+				'game_id' => $game_id,
+				'team_id' => MOBILITY_TEAM_ID);
 			 $db->query($query, $args);
 		}
 	}
 	
+	function PrintAmbitionForm()
+	{
 ?>
-				
-<p class="ovTitle">Openbaar Vervoer</p>
-<div id="nslogo"></div>
-<div class="stationText">
-	<div class="sidebarWindow">
-		<?php
-		
-		if(!isset($motivation))
-		{
-		?>
 		<form class="form" action="mobilitysidebar.php" method="post">
 			<table class="ambitions">
 			<caption>Ambities</caption>
-			<?php
-				$ambitionCount = 5;
-				$startID = 7;
-				for($i = $startID; $i < $ambitionCount + $startID; $i++)
+<?php
+				$game_id = Game::getGameIdOfSession(session_id());
+				$motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
+				$result = ValueInstance::getValuesByGameAndTeam($game_id, MOBILITY_TEAM_ID);
+				while ($row = mysql_fetch_array($result))
 				{
-					?>
+?>
 					<tr>
-					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value= <?php echo $i; ?> onClick="checkMax()"></td>
-					<td class="leftAlign">Ambitie nummertje <?php echo $i; ?></td><br />
-					<?php
+						<td class="checkbox"><input type="checkbox" name="ambitionCheckbox" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
+						<td class="leftAlign"><?php echo $row['title']; ?></td>
+					</tr>
+<?php
 				}
-			?>
+?>
 			</table>
 			<h1>Motivatie</h1>
-				<p>
-					<textarea class="textfield" type="text" name="motivation">[ Plaats hier je motivatie voor de geselecteerde ambities! ]</textarea>
-				</p>
-			<p class="inputbutton"><input type="submit" value="Ambities vastleggen" onClick="showConfirm()"><br /></p>
-			</form>
-		<?php
-		}
-		else // what comes after sending:
-		{
-			if (isset($ambitionBoxes))
+			<p>
+				<textarea class="textfield" type="text" name="ambitionMotivation"><?php echo $motivation; ?></textarea>
+			</p>
+			<p class="inputbutton">
+				<input type="submit" value="Ambities vastleggen" onClick="showConfirm()">
+			</p>
+		</form>
+<?php
+	}
+	
+	function PrintAmbitionText()
+	{
+?>
+		<table>
+			<caption>Ambities</caption>
+<?php
+			$game_id = Game::getGameIdOfSession(session_id());
+			$motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
+			$result = ValueInstance::getValuesByGameAndTeam($game_id, MOBILITY_TEAM_ID);
+			while ($row = mysql_fetch_array($result))
 			{
-				echo("<p class=\"ovTitle\">Ambities</p>
-					<br /><b>Je hebt de volgende ambities geselecteerd:</b> <br />");
-				
-				foreach($ambitionBoxes as $ambitionBox)
+				if ($row['checked'] == 1)
 				{
-					echo $ambitionBox . "<br />";
+?>
+					<tr>
+						<td><?php echo $row['title']; ?></td>
+					</tr>
+<?php
 				}
 			}
-			else
-			{
-				echo "<br /> Je hebt geen ambities! <br />";
-			}
-			
-			echo("<br /><b>Met als motivatie:</b> <br />\"");
-			echo $motivation . "\"<br /><br />";
+?>
+		</table>
+		<h1>Motivatie</h1>
+		<p>
+			<?php echo $motivation; ?>
+		</p>
+<?php
+	}
+
+	function PrintStationForm()
+	{
+?>
+		<form class="form" action="mobilitysidebar.php" method="post">
+			<table class="ambitions">
+			<caption>Ambities</caption>
+<?php
+		$game_id = Game::getGameIdOfSession(session_id());
+		$motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
+		$result = ValueInstance::getValuesByGameAndTeam($game_id, MOBILITY_TEAM_ID);
+		while ($row = mysql_fetch_array($result))
+		{
+?>
+					<tr>
+						<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
+						<td class="leftAlign"><?php echo $row['title']; ?></td>
+					</tr>
+<?php
 		}
-		?>
+?>
+			</table>
+			<h1>Motivatie</h1>
+			<p>
+				<textarea class="textfield" type="text" name="motivation"><?php echo $motivation; ?></textarea>
+			</p>
+			<p class="inputbutton">
+				<input type="submit" value="Ambities vastleggen" onClick="showConfirm()">
+			</p>
+		</form>
+<?php
+	}
+?>
+
+	<p class="ovTitle">Openbaar Vervoer</p>
+	<div id="nslogo"></div>
+	<div class="stationText">
+	<div class="sidebarWindow">
+<?php
+	if(!isset($motivation))
+		PrintAmbitionForm();
+	else
+		PrintAmbitionText();
+?>
 	</div>
-	<?php
+
+<?php
 	if(isset($motivation))
 	{
-		?>
-		<div class="sidebarWindow">
-			<p class="ovTitle">Netwerkwaarden</p>
-			<form class="form" name="input" action="mobilitysidebar.php" method="post">
-				<table>
-					<tr>
-						<th>Station</th>
-						<th>Netwerkwaarde</th>
-
-					<?php
-						$stationCount = 5;
-						for($i = 0; $i < $stationCount; $i++)
-						{
-							?>
-							<tr>
-							<td>Station <?php echo $i; ?></td>
-							<td><input class="input" type="text" name="povn1" value="old povn"/></td>
-							</tr>
-							<?php
-						}
-					?>		
-				</table>
-				<h1>Motivatie</h1>
-				<p>
-					<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
-				</p>
-				<p><input type="submit" value="Doorvoeren"></p>
-			</form>
-		</div>
-		<?php
+?>
+	<div class="sidebarWindow">
+		<p class="ovTitle">Netwerkwaarden</p>
+		<form class="form" name="input" action="mobilitysidebar.php" method="post">
+			<table>
+				<tr>
+					<th>Station</th>
+					<th>Netwerkwaarde</th>
+				</tr>
+<?php
+		$stationCount = 5;
+		for($i = 0; $i < $stationCount; $i++)
+		{
+?>
+				<tr>
+					<td>Station <?php echo $i; ?></td>
+					<td><input class="input" type="text" name="povn1" value="old povn"/></td>
+				</tr>
+<?php
+		}
+?>		
+			</table>
+			<h1>Motivatie</h1>
+			<p>
+				<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
+			</p>
+			<p><input type="submit" value="Doorvoeren"></p>
+		</form>
+	</div>
+<?php
 	}
-	?>
-</div>
+?>

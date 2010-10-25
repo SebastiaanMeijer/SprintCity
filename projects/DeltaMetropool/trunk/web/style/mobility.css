@@ -29,11 +29,6 @@ table
 	margin: auto;
 }
 
-table.ambitions /*ugly hack? */
-{
-	margin-top: -80px;
-}
-
 caption
 {
 	font-size: 1.3em;
