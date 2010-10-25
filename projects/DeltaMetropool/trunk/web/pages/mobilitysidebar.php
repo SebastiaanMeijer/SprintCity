@@ -1,60 +1,63 @@
 <?php
-	/* ambitions */
-	$motivation = $_POST['motivation'];
-	$ambitionBoxes = $_POST['ambitionCheckbox'];
-	
 	require_once('../includes/master.inc.php');
 
 	if (ClientSession::hasSession(session_id()))
 	{
-		if(isset($ambitionBoxes) && isset($ambitionMotivation))
+		if (RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID &&
+			isset($_POST['ambitionCheckbox']) && 
+			isset($_POST['ambitionMotivation']))
 		{
-			$db = Database::getDatabase();
-			$game_id = Game::getGameIdOfSession(session_id());
-			// uncheck all ambitions for the mobility player
-			$query = "
-				UPDATE ValueInstance
-				INNER JOIN TeamInstance ON ValueInstance.team_instance_id = TeamInstance.id
-				INNER JOIN Team ON TeamInstance.team_id = Team.id
-				SET ValueInstance.checked = false
-				WHERE TeamInstance.game_id = :game_id
-					AND Team.id = :team_id";
-			$args = array(
-				'game_id' => $game_id,
-				'team_id' => MOBILITY_TEAM_ID);
-			$db->query($query, $args);
-			
-			// check selected ambitions
-			foreach($ambitionBoxes as $valueInstanceId)
-			{
-				$query = "
-					UPDATE ValueInstance
-					SET ValueInstance.checked = true
-					WHERE ValueInstance.id = :value_instance_id";
-				$args = array('value_instance_id' => $valueInstanceId);
-				$db->query($query, $args);
-			}
-			
-			// fill ambition motivation
-			$query = "
-				UPDATE TeamInstance
-				SET TeamInstance.value_description = :motivation
-				WHERE TeamInstance.game_id = :game_id
-					AND TeamInstance.team_id = :team_id";
-			 $args = array(
-				'motivation' => $motivation,
-				'game_id' => $game_id,
-				'team_id' => MOBILITY_TEAM_ID);
-			 $db->query($query, $args);
+			SaveAmbitions();
 		}
 	}
 	
-	function PrintAmbitionForm()
+	function SaveAmbitions()
+	{
+		$db = Database::getDatabase();
+		$game_id = Game::getGameIdOfSession(session_id());
+		// uncheck all ambitions for the mobility player
+		$query = "
+			UPDATE ValueInstance
+			INNER JOIN TeamInstance ON ValueInstance.team_instance_id = TeamInstance.id
+			INNER JOIN Team ON TeamInstance.team_id = Team.id
+			SET ValueInstance.checked = false
+			WHERE TeamInstance.game_id = :game_id
+				AND Team.id = :team_id";
+		$args = array(
+			'game_id' => $game_id,
+			'team_id' => MOBILITY_TEAM_ID);
+		$db->query($query, $args);
+		
+		// check selected ambitions
+		foreach($_POST['ambitionCheckbox'] as $valueInstanceId)
+		{
+			$query = "
+				UPDATE ValueInstance
+				SET ValueInstance.checked = true
+				WHERE ValueInstance.id = :value_instance_id";
+			$args = array('value_instance_id' => $valueInstanceId);
+			$db->query($query, $args);
+		}
+		
+		// fill ambition motivation
+		$query = "
+			UPDATE TeamInstance
+			SET TeamInstance.value_description = :motivation
+			WHERE TeamInstance.game_id = :game_id
+				AND TeamInstance.team_id = :team_id";
+		 $args = array(
+			'motivation' => $_POST['ambitionMotivation'],
+			'game_id' => $game_id,
+			'team_id' => MOBILITY_TEAM_ID);
+		 $db->query($query, $args);
+	}
+	
+	function ShowAmbitionForm()
 	{
 ?>
-		<form class="form" action="mobilitysidebar.php" method="post">
-			<table class="ambitions">
-			<caption>Ambities</caption>
+		<form class="form" id="ambitions" action="mobilitysidebar.php" method="post">
+			<table>
+				<caption>Ambities</caption>
 <?php
 				$game_id = Game::getGameIdOfSession(session_id());
 				$motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
@@ -62,10 +65,10 @@
 				while ($row = mysql_fetch_array($result))
 				{
 ?>
-					<tr>
-						<td class="checkbox"><input type="checkbox" name="ambitionCheckbox" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
-						<td class="leftAlign"><?php echo $row['title']; ?></td>
-					</tr>
+				<tr>
+					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax('ambitionCheckbox[]', 2, this)" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
+					<td class="leftAlign"><?php echo $row['title']; ?></td>
+				</tr>
 <?php
 				}
 ?>
@@ -81,7 +84,7 @@
 <?php
 	}
 	
-	function PrintAmbitionText()
+	function ShowAmbitionText()
 	{
 ?>
 		<table>
@@ -110,7 +113,7 @@
 <?php
 	}
 
-	function PrintStationForm()
+	function ShowStationForm()
 	{
 ?>
 		<form class="form" action="mobilitysidebar.php" method="post">
@@ -123,10 +126,10 @@
 		while ($row = mysql_fetch_array($result))
 		{
 ?>
-					<tr>
-						<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
-						<td class="leftAlign"><?php echo $row['title']; ?></td>
-					</tr>
+				<tr>
+					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
+					<td class="leftAlign"><?php echo $row['title']; ?></td>
+				</tr>
 <?php
 		}
 ?>
@@ -158,10 +161,10 @@
 		<div class="stationText">
 		<div class="sidebarWindow">
 <?php
-	if(!isset($motivation))
-		PrintAmbitionForm();
+	if(RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID)
+		ShowAmbitionForm();
 	else
-		PrintAmbitionText();
+		ShowAmbitionText();
 ?>
 		</div>
 

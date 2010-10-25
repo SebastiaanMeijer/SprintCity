@@ -1,28 +1,25 @@
 /* vars go here */
-var MAX = 3;
-var MESSAGE = "Laten we maximaal " + MAX + " ambities aanhouden. ";
+var max = 1;
+var message = "Er mag maximaal " + max + " ambitie ingevuld worden.";
 
-
-function checkMax()
+function checkMax(checkgroup, limit, current)
 {
-	var checkBoxForm = document.ambitions;
-	var total = 0;
-
-	for(var i = 0; i < checkBoxForm.checkbox.length; i++)
+	max = limit
+	var checkedcount = 0
+	var checkboxes = document.getElementsByName(checkgroup)
+	for (var i = 0; i < checkboxes.length; i++)
 	{
-		if ( checkBoxForm.checkbox[i].checked )
-			total++;
-		if ( total > MAX)
+		checkedcount += (checkboxes[i].checked) ? 1 : 0
+		if (checkedcount > limit)
 		{
-			alert(MESSAGE);
-			checkBoxForm.checkbox[i].checked = false;
-			return;
+			alert(message)
+			current.checked = false
+			return
 		}
 	}
 }
 
-
 function showConfirm()
 {
-	confirm("Uw ambities worden nu vastgelegd.");
+	checkMax();
 }
