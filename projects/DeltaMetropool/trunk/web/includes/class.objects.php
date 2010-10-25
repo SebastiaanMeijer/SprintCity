@@ -60,12 +60,16 @@
 		
 		public static function getTeamsInGame($gameId)
 		{
-			return DBObject::glob("Team", "
+			
+			$db = Database::getDatabase();
+			$query = "
 				SELECT Team.id, Team.name, Team.description, Team.cpu, Team.created
 				FROM Team
-				INNER JOIN TeamInstance
-				ON TeamInstance.team_id=Team.id
-				WHERE TeamInstance.game_id=" . $gameId . ";");
+				INNER JOIN TeamInstance ON TeamInstance.team_id = Team.id
+				WHERE TeamInstance.game_id = :game_id;";
+			$args = array('game_id' => $gameId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Team", $result);
 		}
 	}
 	
@@ -85,6 +89,18 @@
 					WHERE game_id = :gameId 
 					AND team_id = :teamId 
 					LIMIT 0, 1",
+					array('gameId' => $gameId, 'teamId' => $teamId));
+			return $db->getValue($result);
+		}
+		
+		public static function getValueDescription($gameId, $teamId)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+					SELECT value_description
+					FROM TeamInstance
+					WHERE game_id = :gameId 
+					AND team_id = :teamId",
 					array('gameId' => $gameId, 'teamId' => $teamId));
 			return $db->getValue($result);
 		}
@@ -185,20 +201,29 @@
 		
 		public static function getStationNamesByTeam($teamId)
 		{
-			return DBObject::glob("Station", 	"SELECT station.*
-												FROM station 
-												INNER JOIN stationinstance ON Station.id = StationInstance.station_id
-												INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-												WHERE TeamInstance.id = " .$teamId);
-												
+			$db = Database::getDatabase();
+			$query =  "
+				SELECT Station.*
+				FROM Station 
+				INNER JOIN StationIinstance ON Station.id = StationInstance.station_id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				WHERE TeamInstance.id = :team_id;";
+			$args = array('team_id' => $teamId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
 		}
 		
 		public static function getStationInstanceId($stationId)
 		{
 			$db = Database::getDatabase();
-			return $db->getValue(	"SELECT stationinstance.id
-									FROM stationinstance INNER JOIN station ON stationinstance.station_id = station.id
-									WHERE station.id = " . $stationId);
+			$query = "
+				SELECT StationInstance.id
+				FROM StationInstance
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				WHERE Station.id = :station_id";
+			$args = array('station_id' => $stationId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
 		}
 		
 		public static function getStationsAndPOVNUsedInGame($gameId)
@@ -293,10 +318,13 @@
 			return DBObject::glob("Value", "SELECT * FROM value WHERE type = 'mobility'");
 		}
 		
-		public static function getValueDescription($valueid)
+		public static function getValueDescription($valueId)
 		{
 			$db = Database::getDatabase();
-			return $db->getValue("SELECT title FROM value WHERE id = " . $valueid);
+			$query = "SELECT title FROM value WHERE id = :value_id;";
+			$args = array('value_id' => $valueId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
 		}
 	}
 	
@@ -309,12 +337,37 @@
 		
 		public static function getValueInstances()
 		{
-			return DBObject::glob("ValueInstance", "SELECT * FROM valueinstance");
+			return DBObject::glob("ValueInstance", "SELECT * FROM ValueInstance");
 		}
 		
-		public static function getCheckedValuesByTeam($teamid)
+		public static function getValuesByGameAndTeam($gameId, $teamId)
 		{
-			return DBObject::glob("ValueInstance", "SELECT * FROM valueinstance WHERE checked = 1 && team_instance_id = " . $teamid);
+			$db = Database::getDatabase();
+			$query = "
+				SELECT ValueInstance.id, Value.title, ValueInstance.checked
+				FROM ValueInstance
+				INNER JOIN Value ON ValueInstance.value_id = Value.id
+				INNER JOIN TeamInstance ON ValueInstance.team_instance_id = TeamInstance.id
+				WHERE TeamInstance.game_id = :game_id
+					AND TeamInstance.team_id = :team_id";
+			$args = array(
+				'game_id' => $gameId,
+				'team_id' => $teamId);
+			$result = $db->query($query, $args);
+			return $result;
+		}
+		
+		public static function getCheckedValuesByTeam($teamInstanceId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT ValueInstance.* 
+				FROM ValueInstance 
+				WHERE checked = 1 
+					AND team_instance_id = :team_instance_id";
+			$args = array('team_instance_id' => $teamInstanceId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("ValueInstance", $result);
 		}
 	
 	}
@@ -337,10 +390,13 @@
 			return DBObject::glob("RoundInfo", "SELECT * FROM  `roundinfo` ORDER BY `number` ASC");
 		}
 		
-		public static function getRoundId($round_number)
+		public static function getRoundId($roundNumber)
 		{
 			$db = Database::getDatabase();
-			return $db->getValue("SELECT `id` FROM `roundinfo` ORDER BY `number` ASC LIMIT " . $round_number . ", 1");
+			$query = "SELECT id FROM RoundInfo ORDER BY number ASC LIMIT :round_number, 1";
+			$args = array('round_number' => $roundNumber);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
 		}
 		
 		public static function getCurrentRoundIdBySessionId($session_id)
@@ -370,15 +426,18 @@
 			parent::__construct('StationInstance', array('id', 'station_id', 'team_instance_id'), $id);
 		}
 		
-		public static function rowCountByGame($game_id)
+		public static function rowCountByGame($gameId)
 		{
 			$db = Database::getDatabase();
-			return $db->getValue("
+			$query = "
 				SELECT COUNT(*) 
 				FROM StationInstance
 				INNER JOIN TeamInstance
 				ON TeamInstance.id=StationInstance.team_instance_id
-				WHERE TeamInstance.game_id = " . $game_id);
+				WHERE TeamInstance.game_id = :game_id";
+			$args = array('game_id' => $gameId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
 		}
 	}
 	
@@ -389,23 +448,26 @@
 			parent::__construct('RoundInstance', array('id', 'round_id', 'station_instance_id', 'plan_program_id', 'exec_program_id', 'starttime', 'POVN'), $id);
 		}
 		
-		public static function getCommittedRounds($game_id, $round_id)
+		public static function getCommittedRounds($gameId, $roundId)
 		{
-			if ($round_id == "")
-				$round_id_condition = " IS NULL";
+			if ($roundId == "")
+				$round_id_condition = "IS NULL";
 			else
-				$round_id_condition = "=" . $round_id;
+				$round_id_condition = "= " . $roundId;
 			$db = Database::getDatabase();
-			return $db->getValue("
+			$query = "
 				SELECT count(*)
 				FROM RoundInstance
-				INNER JOIN StationInstance
-				ON StationInstance.id=RoundInstance.station_instance_id
-				INNER JOIN TeamInstance
-				ON TeamInstance.id=StationInstance.team_instance_id
-				WHERE TeamInstance.game_id=" . $game_id . "
-				AND RoundInstance.round_id" . $round_id_condition . "
-				AND RoundInstance.plan_program_id IS NOT NULL");
+				INNER JOIN StationInstance ON StationInstance.id = RoundInstance.station_instance_id
+				INNER JOIN TeamInstance ON TeamInstance.id = StationInstance.team_instance_id
+				WHERE TeamInstance.game_id = :game_id
+					AND RoundInstance.round_id :round_condition
+					AND RoundInstance.plan_program_id IS NOT NULL";
+			$args = array(
+				'game_id' => $gameId, 
+				'round_id' => $roundId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
 		}
 		
 		public static function getCurrentRoundInstances($game_id)
@@ -492,20 +554,34 @@
 		
 		public static function getMasterplan($stationId)
 		{
-			return DBObject::glob("Program", "SELECT *
-									FROM program INNER JOIN stationinstance ON program.id = stationinstance.program_id
-									WHERE stationinstance.id = " . $stationId);
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Program
+				INNER JOIN StationInstance ON Program.id = StationInstance.program_id
+				WHERE StationInstance.id = :station_id";
+			$args = array('station_id' => $stationId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Program", $result);
 
 		}
 		
 		public static function getStationAppliedPrograms($stationId, $roundId)
 		{
-			return DBObject::glob("Program", 	"SELECT program.*
-												FROM program
-												INNER JOIN roundinstance ON program.id = roundinstance.exec_program_id
-												INNER JOIN round ON roundinstance.round_id = round.id
-												INNER JOIN stationinstance ON roundinstance.station_instance_id = stationinstance.id
-												WHERE round.round_info_id <". $roundId . " AND stationinstance.id = ". $stationId);
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Program.*
+				FROM Program
+				INNER JOIN RoundInstance ON Program.id = RoundInstance.exec_program_id
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+				WHERE Round.round_info_id < :round_id 
+					AND StationInstance.id = :station_id;";
+			$args = array(
+				'round_id' => $roundId,
+				'station_id' => $stationId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Program", $result);
 		}
 	}
 
