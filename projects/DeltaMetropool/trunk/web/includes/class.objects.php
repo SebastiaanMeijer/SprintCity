@@ -461,11 +461,9 @@
 				INNER JOIN StationInstance ON StationInstance.id = RoundInstance.station_instance_id
 				INNER JOIN TeamInstance ON TeamInstance.id = StationInstance.team_instance_id
 				WHERE TeamInstance.game_id = :game_id
-					AND RoundInstance.round_id :round_condition
+					AND RoundInstance.round_id " . $round_id_condition . " 
 					AND RoundInstance.plan_program_id IS NOT NULL";
-			$args = array(
-				'game_id' => $gameId, 
-				'round_id' => $roundId);
+			$args = array('game_id' => $gameId);
 			$result = $db->query($query, $args);
 			return $db->getValue($result);
 		}
