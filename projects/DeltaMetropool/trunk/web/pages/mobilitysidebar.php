@@ -3,8 +3,7 @@
 	$motivation = $_POST['motivation'];
 	$ambitionBoxes = $_POST['ambitionCheckbox'];
 	
-	require_once('includes/master.inc.php');
-	require_once('mobilityheader.php');
+	require_once('../includes/master.inc.php');
 
 	if (ClientSession::hasSession(session_id()))
 	{
@@ -144,50 +143,62 @@
 	}
 ?>
 
-	<p class="ovTitle">Openbaar Vervoer</p>
-	<div id="nslogo"></div>
-	<div class="stationText">
-	<div class="sidebarWindow">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta name="keywords" content="">
+		<meta name="description" content="">
+		<link rel="stylesheet" type="text/css" href="../style/reset-fonts-grids.css">
+		<link rel="stylesheet" type="text/css" href="../style/mobility.css">
+		<script type="text/javascript" src="../script/mobility/ambition.js"></script>
+	</head>
+	<body>
+		<p class="ovTitle">Openbaar Vervoer</p>
+		<div id="nslogo"></div>
+		<div class="stationText">
+		<div class="sidebarWindow">
 <?php
 	if(!isset($motivation))
 		PrintAmbitionForm();
 	else
 		PrintAmbitionText();
 ?>
-	</div>
+		</div>
 
 <?php
 	if(isset($motivation))
 	{
 ?>
-	<div class="sidebarWindow">
-		<p class="ovTitle">Netwerkwaarden</p>
-		<form class="form" name="input" action="mobilitysidebar.php" method="post">
-			<table>
-				<tr>
-					<th>Station</th>
-					<th>Netwerkwaarde</th>
-				</tr>
+		<div class="sidebarWindow">
+			<p class="ovTitle">Netwerkwaarden</p>
+			<form class="form" name="input" action="mobilitysidebar.php" method="post">
+				<table>
+					<tr>
+						<th>Station</th>
+						<th>Netwerkwaarde</th>
+					</tr>
 <?php
 		$stationCount = 5;
 		for($i = 0; $i < $stationCount; $i++)
 		{
 ?>
-				<tr>
-					<td>Station <?php echo $i; ?></td>
-					<td><input class="input" type="text" name="povn1" value="old povn"/></td>
-				</tr>
+					<tr>
+						<td>Station <?php echo $i; ?></td>
+						<td><input class="input" type="text" name="povn1" value="old povn"/></td>
+					</tr>
 <?php
 		}
 ?>		
-			</table>
-			<h1>Motivatie</h1>
-			<p>
-				<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
-			</p>
-			<p><input type="submit" value="Doorvoeren"></p>
-		</form>
-	</div>
+				</table>
+				<h1>Motivatie</h1>
+				<p>
+					<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
+				</p>
+				<p><input type="submit" value="Doorvoeren"></p>
+			</form>
+		</div>
 <?php
 	}
 ?>
+	</body>
+</html>
