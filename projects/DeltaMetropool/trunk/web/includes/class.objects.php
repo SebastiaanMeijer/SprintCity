@@ -301,6 +301,29 @@
 		}
 	}
 	
+	class RoundInfoInstance extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent:: __construct('RoundInfoInstance',
+				array('id', 'game_id', 'round_info_id', 'mobility_report'), $id);
+		}
+		
+		public static function getMobilityReport($gameId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInfoInstance.mobility_report
+				FROM RoundInfoInstance
+				INNER JOIN Game ON RoundInfoInstance.game_id = Game.id
+					AND RoundInfoInstance.round_info_id = Game.current_round_id
+				WHERE Game.id = :game_id";
+			$args = array('game_id' => $gameId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
+		}
+	}
+	
 	class Value extends DBObject
 	{
 		public function __construct($id = null)
