@@ -11,8 +11,10 @@ if (ClientSession::hasSession(session_id()))
 	$width = isset($_REQUEST['width']) ? $_REQUEST['width'] : 480;
 	$height = isset($_REQUEST['height']) ? $_REQUEST['height'] : 220;
 	
-	$povnData = LoadPOVNData($_REQUEST['session'], $_REQUEST['station']);
-	$travelerData = LoadTravelerData($_REQUEST['session'], $_REQUEST['station']);
+	$povnData = LoadPOVNData(session_id(), $_REQUEST['station']);
+	$travelerData = LoadTravelerData(session_id(), $_REQUEST['station']);
+	$initPovnCount = Station::getInitialPOVNByStationInstanceId(Station::getStationInstanceId($_REQUEST['station']));
+	$initTravelerCount = 0;
 	
 	if(isset($povnData))
 		array_unshift($povnData, $initPovnCount);
@@ -51,21 +53,20 @@ if (ClientSession::hasSession(session_id()))
 
 function LoadPOVNData($session_id, $station_id)
 {
+	$game_id = Game::getGameIdOfSession($session_id);
 	if (isset($game_id) && isset($station_id))
 	{
 		$db = Database::getDatabase();
-		$query = ""
+		$query = 	"SELECT POVN FROM RoundInstance
+					INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+					INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+					INNER JOIN Game ON TeamInstance.game_id = Game.id
+					WHERE Game.id = :game_id AND StationInstance.station_id = :station_id
+				";
 		$args = array('game_id' => $game_id, 'station_id' => $station_id);
 		$result = $db->query($query, $args);
-		if (mysql_num_rows($result) > 0)
-		{
-			$data = array();
-			while ($row = mysql_fetch_array($result))
-				$data[] = round($row['CitizenCount']);
-			return $data;
-		}
-		else
-			return NULL;return array(0);
+		return $db->getValues($result);
+	}
 }
 
 function LoadTravelerData($session_id, $station_id)

@@ -232,31 +232,7 @@
 				
 				}
 				
-					/* NEEDS FIXING				
-					if(!($round->id == 1 || $round->id == 7) && $round->id < $roundId)
-					{
-						
-						$program = Program::getProgram(Station::getStationInstanceId($station->id), $round->id);
-						$area[$program->type_home-1] += $program->area_home;
-						$area[$program->type_work-1] += $program->area_work;
-						$area[$program->type_leisure-1] += $program->area_leisure;
-						
-						for($i = 14; $i < 19; $i++)
-						{
-							$area[$i] -= round(($program->area_home + $program->area_work + $program->area_leisure) * ($area[$i] / array_sum($initial)));
-						}
-					
-					?>
-						<tr><th><?php echo $round->name ?></th>
-						<?php
-						foreach($area as $key => $element)
-						{
-							?>
-							<td><?php echo $element; ?></td>
-						<?php
-						}
-					}*/
-				
+								
 				?>
 				
 				
