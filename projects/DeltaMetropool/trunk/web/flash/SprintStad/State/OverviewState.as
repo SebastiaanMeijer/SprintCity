@@ -190,7 +190,14 @@
 				var type:Type = types.GetType(i);
 				if (type.id < 15)
 				{
-					TextField(view.getChildByName("type_" + type.id)).text = type.GetDemandUntilNow() + " ha";
+					if (Data.Get().current_round_id == 1)
+					{
+						TextField(view.getChildByName("type_" + type.id)).text = type.getTotalDemand() + " ha";
+					}
+					else
+					{
+						TextField(view.getChildByName("type_" + type.id)).text = type.GetDemandUntilNow() + " ha";
+					}
 				}
 			}
 		}

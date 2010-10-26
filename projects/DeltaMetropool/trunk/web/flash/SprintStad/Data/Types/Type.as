@@ -39,6 +39,16 @@
 			demands.push(demand);
 		}
 		
+		public function getTotalDemand():Number
+		{
+			var result:Number = 0;
+			for each (var demand:Demand in demands)
+			{
+				result += demand.amount
+			}
+			return result;
+		}
+		
 		public function GetDemandUntilNow():Number
 		{
 			var currentRound:int = Data.Get().current_round_id;
