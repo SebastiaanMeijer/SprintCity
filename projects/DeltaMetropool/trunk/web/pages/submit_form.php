@@ -743,40 +743,33 @@ function DistributeArea($data, $distribute_area)
 function SetNextRound($game_id)
 {
 	$db = Database::getDatabase();
-	$rounds = RoundInfo::GetRounds();
-	$game = new Game($game_id);
-	$next_round_id = -1;
+	$current_round_id = RoundInfo::getCurrentRoundIdBySessionId(session_id());
 	
 	// find id of next round
-	foreach ($rounds as $key => $value)
-	{
-		if ($next_round_id > -1)
-		{
-			$next_round_id = $key;
-			break;
-		}
-		if ($game->current_round_id == $key)
-			$next_round_id = $key;
-	}
+	$next_round_id = RoundInfo::getRoundInfoIdAfter($current_round_id);
 	
 	// set new round
-	if ($game->current_round_id != $next_round_id)
+	if ($next_round_id != '')
 	{
-		// copy RoundInstance POVN from last round to next round
-		$rounds = RoundInstance::getCurrentRoundInstances($game_id);
-		foreach ($rounds as $key => $value)
+		// copy RoundInstance POVN from next round to the round after that
+		$round_after_next_round_id = RoundInfo::getRoundInfoIdAfter($next_round_id);
+		if ($round_after_next_round_id != '')
 		{
-			$query = "
-				UPDATE RoundInstance
-				INNER JOIN Round ON RoundInstance.round_id = Round.id
-				SET RoundInstance.POVN = :povn
-				WHERE Round.round_info_id = :next_round_id AND 
-					RoundInstance.station_instance_id = :station_instance_id;";
-			$args = array(
-				'povn' => $value->POVN,
-				'next_round_id' => $next_round_id,
-				'station_instance_id' => $value->station_instance_id);
-			$db->query($query, $args);
+			$rounds = RoundInstance::getRoundInstances($game_id, $next_round_id);
+			foreach ($rounds as $key => $value)
+			{
+				$query = "
+					UPDATE RoundInstance
+					INNER JOIN Round ON RoundInstance.round_id = Round.id
+					SET RoundInstance.POVN = :povn
+					WHERE Round.round_info_id = :round_after_next_round_id AND 
+						RoundInstance.station_instance_id = :station_instance_id;";
+				$args = array(
+					'povn' => $value->POVN,
+					'round_after_next_round_id' => $round_after_next_round_id,
+					'station_instance_id' => $value->station_instance_id);
+				$db->query($query, $args);
+			}
 		}
 		
 		// update round
@@ -786,7 +779,7 @@ function SetNextRound($game_id)
 			WHERE `id` = :game_id;";
 		$args = array(
 			'round_id' => $next_round_id, 
-			'game_id' => $game->id);
+			'game_id' => $game_id);
 		$db->query($query, $args);
 	}
 }

@@ -539,6 +539,24 @@
 			return DBObject::glob("RoundInstance", $result);
 		}
 		
+		public static function getRoundInstances($game_id, $round_info_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInstance.*
+				FROM RoundInstance
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				WHERE TeamInstance.game_id = :game_id
+					AND Round.round_info_id = :round_info_id;";
+			$args = array(
+				'game_id' => $game_id,
+				'round_info_id' => $round_info_id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("RoundInstance", $result);
+		}
+		
 		public static function getStationAppliedPrograms($stationid, $roundId)
 		{
 			
