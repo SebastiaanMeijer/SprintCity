@@ -320,8 +320,6 @@
 		{
 			var view:MovieClip = parent.overview_movie;
 			
-			DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
-			
 			var textAreaFormat:TextFormat = new TextFormat();
 			textAreaFormat.align = TextFormatAlign.JUSTIFY;
 			textAreaFormat.size = 9;
@@ -583,7 +581,7 @@
 		{
 			Debug.out(this + " I know " + data);
 			loadCount++;
-			if (loadCount >= 2)
+			if (loadCount >= 3)
 			{
 				loadCount = 0;
 				Init();
