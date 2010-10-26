@@ -89,6 +89,7 @@
 				Debug.out("Load the stations");
 				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+				DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
 				
 				// buttons
 				view.program_button.buttonMode = true;
@@ -319,13 +320,15 @@
 		{
 			var view:MovieClip = parent.overview_movie;
 			
+			DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
+			
 			var textAreaFormat:TextFormat = new TextFormat();
 			textAreaFormat.align = TextFormatAlign.JUSTIFY;
 			textAreaFormat.size = 9;
 			
 			view.mobilityDevelopment.editable = false;
 			view.mobilityDevelopment.setStyle("textFormat", textAreaFormat);
-			view.mobilityDevelopment.text = station.description_future;
+			view.mobilityDevelopment.text = Data.Get().GetMobilityReport().getReport();
 		}
 		
 		private function RefreshLineGraphs(station:Station):void
@@ -463,7 +466,6 @@
 		{
 			var parent:MovieClip = parent.overview_movie;
 			Debug.out("Now entering Mobility mode.")
-			
 			try 
 			{
 				// set panel
