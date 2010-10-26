@@ -83,11 +83,11 @@ div#sidebar
 	height: 100%;
 }
 
-div#nslogo
+div#ovlogo
 {
 	width: 100%;
 	height: 50px;
-	background: #ffffff url('../images/mobility/ns-logo.png') 
+	background: #ffffff url('../images/mobility/ov-logo.png') 
 		no-repeat center center;
 }
 

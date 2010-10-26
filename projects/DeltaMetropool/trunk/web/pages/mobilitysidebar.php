@@ -212,7 +212,7 @@
 	</head>
 	<body>
 		<p class="ovTitle">Openbaar Vervoer</p>
-		<div id="nslogo"></div>
+		<div id="ovlogo"></div>
 		<div class="stationText"></div>
 		<div class="sidebarWindow">
 <?php
