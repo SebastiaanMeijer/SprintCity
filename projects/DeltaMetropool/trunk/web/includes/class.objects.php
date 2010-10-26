@@ -440,6 +440,36 @@
 				return 0;
 			return $db->getValue($result);
 		}
+		
+		public static function getRoundInfoIdAfter($roundInfoId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInfo.id
+				FROM RoundInfo
+				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo2.id = :round_info_id
+				WHERE RoundInfo.number > RoundInfo2.number
+				ORDER BY RoundInfo.number ASC
+				LIMIT 0, 1";
+			$args = array('round_info_id' => $roundInfoId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
+		}
+		
+		public static function getRoundInfoIdBefore($roundInfoId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInfo.id
+				FROM RoundInfo
+				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo2.id = :round_info_id
+				WHERE RoundInfo.number < RoundInfo2.number
+				ORDER BY RoundInfo.number DESC
+				LIMIT 0, 1";
+			$args = array('round_info_id' => $roundInfoId);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
+		}
 	}
 	
 	class StationInstance extends DBObject
