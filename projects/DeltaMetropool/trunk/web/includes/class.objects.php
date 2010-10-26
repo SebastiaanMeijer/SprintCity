@@ -225,17 +225,7 @@
 			$result = $db->query($query, $args);
 			return $db->getValue($result);
 		}
-		
-		/*public static function getPOVN($stationId)
-		{
-			$db = Database::getDatabase();
-			$query = 	"SELECT RoundInstance.POVN
-						FROM Station
-						INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-						INNER JOIN RoundInstance on StationInstance.id = RoundInstance.station_instance_id
-						WHERE " 
-						
-		}*/
+
 		
 		public static function getStationsAndPOVNUsedInGame($gameId)
 		{
