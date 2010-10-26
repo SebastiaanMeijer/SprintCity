@@ -20,7 +20,8 @@
 		public static const DATA_TYPES:int = 3;
 		public static const DATA_CONSTANTS:int = 4;
 		public static const DATA_TEAMS:int = 5;
-		public static const DATA_CURRENT_ROUND:int = 6;
+		public static const DATA_MOBILITY_REPORT = 6
+		public static const DATA_CURRENT_ROUND:int = 7;
 		
 		private static const sources:Array = new Array(
 			"data/values.php",
@@ -29,6 +30,7 @@
 			"data/types.php",
 			"data/constants.php",
 			"data/teams.php",
+			"data/mobility_report.php",
 			"data/current_round.php");
 		
 		private static const targets:Array = new Array(
@@ -38,9 +40,10 @@
 			Data.Get().GetTypes(),
 			Data.Get().GetConstants(),
 			Data.Get().GetTeams(),
+			Data.Get().GetMobilityReport(),
 			Data.Get());
 			
-		private var jobs:Array = new Array(new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array());
+		private var jobs:Array = new Array(new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array(), new Array());
 		private var jobsDone:Boolean = true;
 		private var currentJob:int = 0;
 			
