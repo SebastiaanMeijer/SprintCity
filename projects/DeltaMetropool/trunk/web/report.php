@@ -112,6 +112,7 @@
 				$total_home = 0;
 				$total_leisure = 0;
 				$total_work = 0;
+				$index = 0;
 				foreach($programs as $key => $program)
 				{
 					if($program->type_home < 15)
@@ -146,7 +147,13 @@
 						$simple_current[$i] -= round(($program->area_home + $program->area_work + $program->area_leisure) * ($initial[$i] / array_sum($initial)));
 						$current[$i] -= round(($program->area_home + $program->area_work + $program->area_leisure) * ($current[$i] / array_sum($initial)));
 					}
-					echo "Done once";
+					
+					for($i = 0; $i < sizeof($current); $i++)
+					{
+						$everyround[$index][$i] = $current[$i];
+					}
+					$index = $index + 1;
+					
 				}
 				
 			
@@ -211,13 +218,21 @@
 				<?php
 				
 				$area = $initial;
-				foreach($rounds as $key => $round)
+				foreach($everyround as $key => $currentround)
 				{
 				?>
-					<?php 
-					
-		
-	/* NEEDS FIXING				
+					<tr><th><?php echo 2014 + 4*$key ?></th>
+					<?php
+					foreach($currentround as $key => $element)
+					{
+					?>
+						<td><?php echo $element; ?></td>
+					<?php
+					}
+				
+				}
+				
+					/* NEEDS FIXING				
 					if(!($round->id == 1 || $round->id == 7) && $round->id < $roundId)
 					{
 						
@@ -241,7 +256,7 @@
 						<?php
 						}
 					}*/
-				}
+				
 				?>
 				
 				

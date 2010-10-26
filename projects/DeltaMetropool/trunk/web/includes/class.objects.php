@@ -205,7 +205,7 @@
 			$query =  "
 				SELECT Station.*
 				FROM Station 
-				INNER JOIN StationIinstance ON Station.id = StationInstance.station_id
+				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
 				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
 				WHERE TeamInstance.id = :team_id;";
 			$args = array('team_id' => $teamId);
