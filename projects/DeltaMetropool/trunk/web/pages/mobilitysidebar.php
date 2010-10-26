@@ -226,6 +226,9 @@
 		ShowStationForm();
 	}
 ?>
+		<p>
+			<a href="javascript:location.reload(true)">Volgende ronde</a>
+		</p>
 		</div>
 	</body>
 </html>
