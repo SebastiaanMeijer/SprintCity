@@ -98,6 +98,11 @@
 				else
 					$masterplan = array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 				
+				$everyround = array(array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+									array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+									array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+									array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+				
 				$simple_current = $initial;
 				$current = $initial;
 				$roundId = RoundInfo::getCurrentRoundIdBySessionId(session_id());
@@ -141,6 +146,7 @@
 						$simple_current[$i] -= round(($program->area_home + $program->area_work + $program->area_leisure) * ($initial[$i] / array_sum($initial)));
 						$current[$i] -= round(($program->area_home + $program->area_work + $program->area_leisure) * ($current[$i] / array_sum($initial)));
 					}
+					echo "Done once";
 				}
 				
 			
