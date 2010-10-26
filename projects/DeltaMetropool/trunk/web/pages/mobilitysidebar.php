@@ -3,11 +3,17 @@
 
 	if (ClientSession::hasSession(session_id()))
 	{
-		if (RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID &&
+		if (RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID && 
 			isset($_POST['ambitionCheckbox']) && 
 			isset($_POST['ambitionMotivation']))
 		{
 			SaveAmbitions();
+		}
+		
+		if (isset($_POST['povn']) &&
+			isset($_POST['povnMotivation']))
+		{
+			SavePOVN();
 		}
 	}
 	
@@ -52,6 +58,49 @@
 		 $db->query($query, $args);
 	}
 	
+	function SavePOVN()
+	{
+		$db = Database::getDatabase();
+		$game_id = Game::getGameIdOfSession(session_id());
+		$current_round_id = RoundInfo::getCurrentRoundIdBySessionId(session_id());
+		$next_round_id = RoundInfo::getRoundInfoIdAfter($current_round_id);
+		
+		if ($next_round_id == '')
+			return;
+		
+		// fill in new povn values in next round's round instance
+		foreach($_POST['povn'] as $key => $value)
+		{
+			$query = "
+				UPDATE RoundInstance
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				SET RoundInstance.POVN = :new_povn
+				WHERE Round.round_info_id = :next_round_id
+					AND StationInstance.station_id = :station_id
+					AND TeamInstance.game_id = :game_id;";
+			$args = array(
+				'new_povn' => $value,
+				'next_round_id' => $next_round_id,
+				'station_id' => $key,
+				'game_id' => $game_id);
+			$db->query($query, $args);
+		}
+		
+		// fill in motivation
+		$query = "
+			UPDATE RoundInfoInstance
+			SET RoundInfoInstance.mobility_report = :motivation
+			WHERE RoundInfoInstance.game_id = :game_id
+				AND RoundInfoInstance.round_info_id = :next_round_id";
+		$args = array(
+			'motivation' => $_POST['povnMotivation'],
+			'next_round_id' => $next_round_id,
+			'game_id' => $game_id);
+		$db->query($query, $args);
+	}
+	
 	function ShowAmbitionForm()
 	{
 ?>
@@ -66,7 +115,7 @@
 				{
 ?>
 				<tr>
-					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax('ambitionCheckbox[]', 2, this)" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
+					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax('ambitionCheckbox[]', 1, this)" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
 					<td class="leftAlign"><?php echo $row['title']; ?></td>
 				</tr>
 <?php
@@ -115,20 +164,26 @@
 
 	function ShowStationForm()
 	{
+		$gameId = Game::getGameIdOfSession(session_id());
+		$motivation = RoundInfoInstance::getMobilityReport($gameId);
+		$result = Station::getStationsAndPOVNUsedInGame($gameId);
+
+		if (mysql_num_rows($result) == 0)
+			return;
 ?>
 		<form class="form" action="mobilitysidebar.php" method="post">
 			<table class="ambitions">
-			<caption>Ambities</caption>
+				<caption>Netwerkwaarde</caption>
 <?php
-		$game_id = Game::getGameIdOfSession(session_id());
-		$motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
-		$result = ValueInstance::getValuesByGameAndTeam($game_id, MOBILITY_TEAM_ID);
+		$gameId = Game::getGameIdOfSession(session_id());
+		$motivation = RoundInfoInstance::getMobilityReport($gameId);
+		$result = Station::getStationsAndPOVNUsedInGame($gameId);
 		while ($row = mysql_fetch_array($result))
 		{
 ?>
 				<tr>
-					<td class="checkbox"><input type="checkbox" name="ambitionCheckbox[]" value="<?php echo $row['id']; ?>" onClick="checkMax()" <?php echo $row['checked'] == 1 ? "checked" : ""; ?>></td>
-					<td class="leftAlign"><?php echo $row['title']; ?></td>
+					<td><?php echo $row['name']; ?></td>
+					<td><input class="input" type="text" name="povn[<?php echo $row['id']; ?>]" value="<?php echo $row['POVN']; ?>"/></td>
 				</tr>
 <?php
 		}
@@ -136,10 +191,10 @@
 			</table>
 			<h1>Motivatie</h1>
 			<p>
-				<textarea class="textfield" type="text" name="motivation"><?php echo $motivation; ?></textarea>
+				<textarea class="textfield" type="text" name="povnMotivation"><?php echo $motivation; ?></textarea>
 			</p>
 			<p class="inputbutton">
-				<input type="submit" value="Ambities vastleggen" onClick="showConfirm()">
+				<input type="submit" value="Doorvoeren">
 			</p>
 		</form>
 <?php
@@ -158,50 +213,19 @@
 	<body>
 		<p class="ovTitle">Openbaar Vervoer</p>
 		<div id="nslogo"></div>
-		<div class="stationText">
+		<div class="stationText"></div>
 		<div class="sidebarWindow">
 <?php
 	if(RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID)
-		ShowAmbitionForm();
-	else
-		ShowAmbitionText();
-?>
-		</div>
-
-<?php
-	if(isset($motivation))
 	{
-?>
-		<div class="sidebarWindow">
-			<p class="ovTitle">Netwerkwaarden</p>
-			<form class="form" name="input" action="mobilitysidebar.php" method="post">
-				<table>
-					<tr>
-						<th>Station</th>
-						<th>Netwerkwaarde</th>
-					</tr>
-<?php
-		$stationCount = 5;
-		for($i = 0; $i < $stationCount; $i++)
-		{
-?>
-					<tr>
-						<td>Station <?php echo $i; ?></td>
-						<td><input class="input" type="text" name="povn1" value="old povn"/></td>
-					</tr>
-<?php
-		}
-?>		
-				</table>
-				<h1>Motivatie</h1>
-				<p>
-					<textarea class="textfield" type="text" name="networkmotivation">[ Plaats hier je motivatie voor de aangepaste netwerkwaarden! ]</textarea>
-				</p>
-				<p><input type="submit" value="Doorvoeren"></p>
-			</form>
-		</div>
-<?php
+		ShowAmbitionForm();
+	}
+	else
+	{
+		ShowAmbitionText();
+		ShowStationForm();
 	}
 ?>
+		</div>
 	</body>
 </html>
