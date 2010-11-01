@@ -14,27 +14,29 @@ iframe
 
 h1
 {
-	margin-top: 1em;
+	margin: 10px 0 0 0;
+	font-size: 1.6em;
 	font-weight: bold;
+	text-align: center;
+}
+
+h2, caption
+{
+	margin: 16px 0 6px 0;
+	font-size: 12pt;
+	font-weight: bold;
+	text-align: center;
 }
 
 p
 {
-	margin-top: 10px;
+	margin: 5px;
 }
 
 table
 {
-	width: 260px;
+	width: auto;
 	margin: auto;
-}
-
-caption
-{
-	font-size: 1.3em;
-	text-align: center;
-	font-weight: bold;
-	margin-bottom: 1em;
 }
 
 th
@@ -51,7 +53,7 @@ tr
 td
 {
 	width: auto;
-	//border: 1px solid #000066;*/
+	padding: 2px 5px;
 }
 
 td.checkbox
@@ -89,6 +91,7 @@ div#ovlogo
 	height: 50px;
 	background: #ffffff url('../images/mobility/ov-logo.png') 
 		no-repeat center center;
+	border-bottom: 2px solid #000066;
 }
 
 div#tab
@@ -125,6 +128,18 @@ div.sidebarWindow
 	border-top: 2px solid #000066;
 }
 
+div#ambitionWindow
+{
+	padding: 0 0 10px 0;
+	border-bottom: 2px solid #000066;
+}
+
+div#stationWindow
+{
+	padding: 0 0 10px 0;
+	border-bottom: 2px solid #000066;
+}
+
 /* this one is for centering block elements */
 div.center  
 {
@@ -132,14 +147,6 @@ div.center
 	top: 50%;
 	margin-left: auto;
 	margin-right: auto;	
-	text-align: center;
-}
-
-.ovTitle
-{
-	margin: 10px 0 0 0;
-	font-size: 1.6em;
-	font-weight: bold;
 	text-align: center;
 }
 
@@ -156,13 +163,8 @@ div.center
 	margin: 1em;
 }
 
-.form
-{
-	padding: 1em 0;
-}
-
 .textfield
 {
 	width: 220px;
-	height: 4em;
+	height: 8em;
 }

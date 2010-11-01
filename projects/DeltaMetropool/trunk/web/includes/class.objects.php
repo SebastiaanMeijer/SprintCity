@@ -442,6 +442,25 @@
 			return $db->getValue($result);
 		}
 		
+		public static function getCurrentRoundNameBySessionId($session_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT RoundInfo.name 
+				FROM RoundInfo 
+				INNER JOIN Game 
+				ON Game.current_round_id = RoundInfo.id 
+				INNER JOIN TeamInstance 
+				ON TeamInstance.game_id = Game.id 
+				INNER JOIN ClientSession 
+				ON ClientSession.team_instance_id = TeamInstance.id 
+				WHERE ClientSession.id = :session_id", 
+				array('session_id' => $session_id));
+			if ($db->getValue($result) == "")
+				return 0;
+			return $db->getValue($result);
+		}
+		
 		public static function getRoundInfoIdAfter($roundInfoId)
 		{
 			$db = Database::getDatabase();

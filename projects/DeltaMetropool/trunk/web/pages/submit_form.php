@@ -751,25 +751,21 @@ function SetNextRound($game_id)
 	// set new round
 	if ($next_round_id != '')
 	{
-		// copy RoundInstance POVN from next round to the round after that
-		$round_after_next_round_id = RoundInfo::getRoundInfoIdAfter($next_round_id);
-		if ($round_after_next_round_id != '')
+		// copy RoundInstance POVN from current round to the next round
+		$rounds = RoundInstance::getRoundInstances($game_id, $current_round_id);
+		foreach ($rounds as $key => $value)
 		{
-			$rounds = RoundInstance::getRoundInstances($game_id, $next_round_id);
-			foreach ($rounds as $key => $value)
-			{
-				$query = "
-					UPDATE RoundInstance
-					INNER JOIN Round ON RoundInstance.round_id = Round.id
-					SET RoundInstance.POVN = :povn
-					WHERE Round.round_info_id = :round_after_next_round_id AND 
-						RoundInstance.station_instance_id = :station_instance_id;";
-				$args = array(
-					'povn' => $value->POVN,
-					'round_after_next_round_id' => $round_after_next_round_id,
-					'station_instance_id' => $value->station_instance_id);
-				$db->query($query, $args);
-			}
+			$query = "
+				UPDATE RoundInstance
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				SET RoundInstance.POVN = :povn
+				WHERE Round.round_info_id = :next_round_id AND 
+					RoundInstance.station_instance_id = :station_instance_id;";
+			$args = array(
+				'povn' => $value->POVN,
+				'next_round_id' => $next_round_id,
+				'station_instance_id' => $value->station_instance_id);
+			$db->query($query, $args);
 		}
 		
 		// update round
