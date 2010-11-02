@@ -140,8 +140,7 @@
 			var programTransformArea:int = program.TotalArea();
 			
 			var home_per_area:Number = station.count_home_total / station.area_cultivated_home;
-			var work_per_area:Number = station.count_work_total / station.area_cultivated_work;
-			
+			var work_per_area:Number = station.count_work_total / station.area_cultivated_work;			
 			var transform_area_cultivated_home_delta:Number = 
 				programTransformArea * (transform_area_cultivated_home / totalTransformArea);
 			var transform_area_cultivated_work_delta:Number = 
@@ -163,18 +162,18 @@
 			transform_area_cultivated_mixed -= transform_area_cultivated_mixed_delta;
 			transform_area_undeveloped_urban -= transform_area_undeveloped_urban_delta;
 			transform_area_undeveloped_mixed -= transform_area_undeveloped_mixed_delta;
-						
-			count_home_total = area_cultivated_home * home_per_area;
-			count_home_transform = transform_area_cultivated_home * home_per_area;
-			count_work_total = area_cultivated_work * work_per_area;
-			count_work_transform = transform_area_cultivated_work * work_per_area;
+			
+			count_home_total -= transform_area_cultivated_home_delta * home_per_area;
+			count_home_transform -= transform_area_cultivated_home_delta * home_per_area;
+			count_work_total -= transform_area_cultivated_work_delta * work_per_area;
+			count_work_transform -= transform_area_cultivated_work_delta * work_per_area;
 			
 			area_cultivated_home += program.area_home;
 			area_cultivated_work += program.area_work;
 			area_cultivated_mixed += program.area_leisure;
 			
 			count_home_total += program.area_home * GetHomeDensity(program);
-			count_work_total += program.area_work * GetWorkDensity(program);			
+			count_work_total += program.area_work * GetWorkDensity(program);
 			
 			if (round != null)
 			{
