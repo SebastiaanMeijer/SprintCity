@@ -77,6 +77,9 @@
 			stationInstance.ApplyProgram(Program.Default());
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
+			// init windows
+			InitWindows();
+			
 			// right info
 			OnEditorChange();
 		}
@@ -391,7 +394,6 @@
 			view.home_window.visible = false;
 			view.work_window.visible = false;
 			view.leisure_window.visible = false;
-			InitWindows();
 			
 			// init bar graphs
 			barCenterTransformArea = new AreaBarDrawer(view.transform_graph);
