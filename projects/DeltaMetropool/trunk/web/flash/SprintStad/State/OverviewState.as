@@ -30,8 +30,6 @@
 		private var parent:SprintStad = null;
 		private var selection:StationSelection = new StationSelection(); // still used?
 		
-		private var selectedStation:Station = null;
-		
 		private var stationIndex:int = 0;
 		private var loadCount:int = 0;
 		
@@ -48,7 +46,7 @@
 		private static const MOBILITY_MODE:int = 1;
 		private static const NONE:int = -1;
 		
-		private var currentMode:int = OverviewState.NONE;
+		private var currentMode:int = OverviewState.SPACE_MODE;
 		
 		public function OverviewState(parent:SprintStad) 
 		{
@@ -159,7 +157,6 @@
 			RefreshMobility(station);
 			RefreshLineGraphs(station);
 			RefreshTransformArea(station);
-			
 		}
 		
 		private function FillStationCircles(stations:Stations):void
@@ -339,8 +336,11 @@
 		private function RefreshLineGraphs(station:Station):void
 		{
 			Debug.out("Refreshing Line Graphs, stationID:" + station.id);
-			try{
-			lineGraphDrawer.DrawGraph(station.id);
+			try {
+				if (currentMode == OverviewState.SPACE_MODE)
+					lineGraphDrawer.DrawSpaceGraph(station.id);
+				else if (currentMode == OverviewState.MOBILITY_MODE)
+					lineGraphDrawer.DrawMobilityGraph(station.id);
 			}
 			catch (e:Error)
 			{
@@ -439,7 +439,7 @@
 		private function SetSpaceMode():void
 		{
 			var parent:MovieClip = parent.overview_movie;
-			
+			currentMode = SPACE_MODE;
 			Debug.out("Now entering Space Mode.")
 			try 
 			{
@@ -458,6 +458,8 @@
 				// graph
 				parent.lineGraphContainer.visible = true;
 				
+				RefreshLineGraphs(Data.Get().GetStations().GetStation(stationIndex));
+				
 				// set panels
 				Debug.out("...Entered Space Mode");
 			}
@@ -470,6 +472,7 @@
 		private function SetMobilityMode():void
 		{
 			var parent:MovieClip = parent.overview_movie;
+			currentMode = MOBILITY_MODE;
 			Debug.out("Now entering Mobility mode.")
 			try 
 			{
@@ -487,6 +490,11 @@
 				
 				// set title
 				parent.mobilityTitle.visible = true;
+				
+				// graph
+				parent.lineGraphContainer.visible = true;
+				
+				RefreshLineGraphs(Data.Get().GetStations().GetStation(stationIndex));
 			}
 			catch (e:Error)
 			{

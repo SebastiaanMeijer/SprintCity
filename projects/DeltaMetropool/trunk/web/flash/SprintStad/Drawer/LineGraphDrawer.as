@@ -14,8 +14,8 @@ package SprintStad.Drawer
 	public class LineGraphDrawer 
 	{
 		private var parent:Sprite;
-		private var lineGraphs:Array = new Array();
-		private var currentGraph:LineGraph;
+		private var spaceGraphs:Array = new Array();
+		private var mobilityGraphs:Array = new Array();
 		
 		public function LineGraphDrawer(parent:Sprite) 
 		{
@@ -33,21 +33,27 @@ package SprintStad.Drawer
 			for (var i:int = 0; i < stationCount; i++)
 			{
 				var station:Station = stations.stations[i];
-				lineGraphs[station.id] = new LineGraph(station.id);
+				spaceGraphs[station.id] = new LineGraph(station.id, LineGraph.GRAPH_SPACE);
+				mobilityGraphs[station.id] = new LineGraph(station.id, LineGraph.GRAPH_MOBILITY);
 			}
 		}
 		
-		public function DrawGraph(stationID: int):void
+		private function RemoveAllChildren():void
 		{
-			var lineGraph:LineGraph = lineGraphs[stationID];
-			
-			if (currentGraph != null)
-			{
-				parent.removeChild(currentGraph);
-				currentGraph = lineGraph;
-			}
-			
-			parent.addChild(lineGraph);
+			while (parent.numChildren > 0)
+				parent.removeChildAt(0);
+		}
+		
+		public function DrawSpaceGraph(stationID:int):void
+		{
+			RemoveAllChildren();
+			parent.addChild(spaceGraphs[stationID]);
+		}
+		
+		public function DrawMobilityGraph(stationID:int):void
+		{
+			RemoveAllChildren();
+			parent.addChild(mobilityGraphs[stationID]);
 		}
 	}
 }
