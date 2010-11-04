@@ -9,7 +9,8 @@
 	function printConstants()
 	{
 		$constants_fields = array(
-			'average_citizens_per_home', 'average_workers_per_bvo', 'average_travelers_per_ha_leisure'
+			'average_citizens_per_home', 'average_workers_per_bvo', 
+			'average_travelers_per_ha_leisure', 'average_travelers_per_citizen', 'average_travelers_per_worker'
 		);
 		
 		$db = Database::getDatabase();
