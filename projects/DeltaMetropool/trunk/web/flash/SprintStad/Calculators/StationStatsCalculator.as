@@ -25,7 +25,9 @@
 		public static function GetTravelersStats(stationInstance:StationInstance):int
 		{
 			var station:Station = stationInstance.station;
-			var povn_growth:Number = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
+			var povn_growth:Number = 0;
+			if (station.GetCurrentRound() != null)
+				povn_growth = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
 			var traveler_growth:Number = 0;
 			var travelers:Number = GetInitialTravelersStats(stationInstance);
 			if (povn_growth > 5)
@@ -34,17 +36,16 @@
 				traveler_growth = (povn_growth / 15);
 			else
 				traveler_growth = (povn_growth / 10);
-			
 			return int(Math.round(travelers * (1 + traveler_growth)));
 		}
 		
 		public static function GetInitialTravelersStats(station:StationInstance):Number
 		{
 			var constants:Constants = Data.Get().GetConstants();
-			
-			return station.count_home_total * constants.average_citizens_per_home * constants.average_travelers_per_citizen + 
+			var result:Number = station.count_home_total * constants.average_citizens_per_home * constants.average_travelers_per_citizen + 
 				station.count_work_total * constants.average_workers_per_bvo * constants.average_travelers_per_worker + 
 				station.area_cultivated_mixed * constants.average_travelers_per_ha_leisure;
+			return result;
 		}
 		
 		// Returns new allocatable area + unallocated area of previous round
