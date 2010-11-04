@@ -84,15 +84,16 @@
 			$db->query($query, $args);
 		}
 		
-		// fill in motivation
+		// fill in motivation in next round
+		$next_round_id = RoundInfo::getRoundInfoIdAfter($current_round_id);
 		$query = "
 			UPDATE RoundInfoInstance
 			SET RoundInfoInstance.mobility_report = :motivation
 			WHERE RoundInfoInstance.game_id = :game_id
-				AND RoundInfoInstance.round_info_id = :current_round_id";
+				AND RoundInfoInstance.round_info_id = :next_round_id";
 		$args = array(
 			'motivation' => $_POST['povnMotivation'],
-			'current_round_id' => $current_round_id,
+			'next_round_id' => $next_round_id,
 			'game_id' => $game_id);
 		$db->query($query, $args);
 	}
