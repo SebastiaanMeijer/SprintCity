@@ -6,6 +6,7 @@
 	{
 		public var average_citizens_per_home:Number = 0.0;
 		public var average_workers_per_bvo:Number = 0.0;
+		public var average_travelers_per_ha_leisure:Number = 0.0;
 		
 		public function Constants() 
 		{
@@ -30,6 +31,8 @@
 					average_citizens_per_home = Number(xml);
 				else if (tag == "average_workers_per_bvo")
 					average_workers_per_bvo = Number(xml);
+				else if (tag == "average_travelers_per_ha_leisure")
+					average_travelers_per_ha_leisure = Number(xml);
 			}
 		}		
 	}
