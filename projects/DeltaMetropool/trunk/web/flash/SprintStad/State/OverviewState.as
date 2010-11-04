@@ -88,6 +88,7 @@
 				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
+				DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
 				
 				// buttons
 				view.program_button.buttonMode = true;
@@ -596,7 +597,7 @@
 		{
 			Debug.out(this + " I know " + data);
 			loadCount++;
-			if (loadCount >= 3)
+			if (loadCount >= 4)
 			{
 				loadCount = 0;
 				Init();
