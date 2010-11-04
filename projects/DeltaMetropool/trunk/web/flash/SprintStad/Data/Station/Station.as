@@ -96,6 +96,11 @@
 			return null;
 		}
 		
+		public function GetCurrentRound():Round
+		{
+			return GetRoundById(Data.Get().current_round_id);
+		}
+		
 		public function GetRoundCount():int
 		{
 			return rounds.length;
