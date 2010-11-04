@@ -22,23 +22,30 @@
 			return stationInstance;
 		}
 		
-		public static function GetTravelersStats(station:StationInstance):int
+		public static function GetTravelersStats(stationInstance:StationInstance):int
 		{
-			var constants:Constants = Data.Get().GetConstants();
-			if (station.POVN >= 3000)
-				return int(
-					station.count_home_total * constants.average_citizens_per_home * (250 / 1000) + 
-					station.count_work_total * constants.average_workers_per_bvo * (150 / 100));
-			else if (station.POVN >= 500)
-				return int(
-					station.count_home_total * constants.average_citizens_per_home * (100 / 1000) + 
-					station.count_work_total * constants.average_workers_per_bvo * (50 / 100));
+			var station:Station = stationInstance.station;
+			var povn_growth:Number = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
+			var traveler_growth:Number = 0;
+			var travelers:Number = GetInitialTravelersStats(stationInstance);
+			if (povn_growth > 5)
+				traveler_growth = (povn_growth / 20);
+			else if (povn_growth > 1)
+				traveler_growth = (povn_growth / 15);
 			else
-				return int(
-					station.count_home_total * constants.average_citizens_per_home * (70 / 1000) + 
-					station.count_work_total * constants.average_workers_per_bvo * (30 / 100));
+				traveler_growth = (povn_growth / 10);
+			
+			return int(Math.round(travelers * (1 + traveler_growth)));
 		}
 		
+		public static function GetInitialTravelersStats(station:StationInstance):Number
+		{
+			var constants:Constants = Data.Get().GetConstants();
+			
+			return station.count_home_total * constants.average_citizens_per_home * constants.average_travelers_per_citizen + 
+				station.count_work_total * constants.average_workers_per_bvo * constants.average_travelers_per_worker + 
+				station.area_cultivated_mixed * constants.average_travelers_per_ha_leisure;
+		}
 		
 		// Returns new allocatable area + unallocated area of previous round
 		public static function GetTransformArea(station:Station):int
