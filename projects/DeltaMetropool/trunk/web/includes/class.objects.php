@@ -121,32 +121,57 @@
 				$id);
 		}
 		
-		public static function getInitialCitizenCount($id)
+		public static function getInitialCitizenCount($station_id)
 		{
-			if (isset($id))
+			if (isset($station_id))
 			{
 				$db = Database::getDatabase();
 				$query = "
 					SELECT ROUND(Station.count_home_total * Constants.average_citizens_per_home) AS InitialCitizenCount
 					FROM Constants, Station
 					WHERE Station.id = :station_id;";
-				$args = array('station_id' => $id);
+				$args = array('station_id' => $station_id);
 				$result = $db->query($query, $args);
 				return $db->getValue($result);
 			}
 			return null;
 		}
 		
-		public static function getInitialWorkerCount($id)
+		public static function getInitialWorkerCount($station_id)
 		{
-			if (isset($id))
+			if (isset($station_id))
 			{
 				$db = Database::getDatabase();
 				$query = "
 					SELECT ROUND(Station.count_work_total * Constants.average_workers_per_bvo) AS InitialWorkersCount
 					FROM Constants, Station
 					WHERE Station.id = :station_id;";
-				$args = array('station_id' => $id);
+				$args = array('station_id' => $station_id);
+				$result = $db->query($query, $args);
+				return $db->getValue($result);
+			}
+			return null;
+		}
+		
+		function GetInitialTravelerCount($station_id)
+		{
+
+			if (isset($station_id))
+			{
+				$db = Database::getDatabase();
+				$query = "
+					SELECT
+					ROUND
+					(
+						Station.area_cultivated_mixed * Constants.average_travelers_per_ha_leisure 
+						+
+						Station.count_home_total * Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
+						+
+						Station.count_work_total * Constants.average_workers_per_bvo * Constants.average_travelers_per_worker
+					) AS TravelerCount
+					FROM Constants, Station
+					WHERE Station.id = :station_id;";
+				$args = array('station_id' => $station_id);
 				$result = $db->query($query, $args);
 				return $db->getValue($result);
 			}

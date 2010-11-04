@@ -13,19 +13,15 @@ if (ClientSession::hasSession(session_id()))
 	
 	$povnData = LoadPOVNData(session_id(), $_REQUEST['station']);
 	$travelerData = LoadTravelerData(session_id(), $_REQUEST['station']);
-	$initPovnCount = Station::getInitialPOVNByStationInstanceId(Station::getStationInstanceId($_REQUEST['station']));
-	$initTravelerCount = 0;
-	
-	if(isset($povnData))
-		array_unshift($povnData, $initPovnCount);
-	else
-		$povnData = array($initPovnCount);
-	
-	if(isset($travelerData))
+	$initTravelerCount = Station::GetInitialTravelerCount($_REQUEST['station']);
+
+	if(isset($initTravelerCount))
 		array_unshift($travelerData, $initTravelerCount);
 	else
 		$travelerData = array($initTravelerCount);
 	
+	if (count($povnData) == 0)
+		$povnData = array(0);
 	
 	$gameId = Game::getGameIdOfSession(session_id());
 	
@@ -57,11 +53,14 @@ function LoadPOVNData($session_id, $station_id)
 	if (isset($game_id) && isset($station_id))
 	{
 		$db = Database::getDatabase();
-		$query = 	"SELECT POVN FROM RoundInstance
+		$query = 	"SELECT RoundInstance.POVN FROM RoundInstance
 					INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
 					INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
 					INNER JOIN Game ON TeamInstance.game_id = Game.id
-					WHERE Game.id = :game_id AND StationInstance.station_id = :station_id
+					INNER JOIN Round ON RoundInstance.round_id = Round.id
+					WHERE Game.id = :game_id 
+					AND StationInstance.station_id = :station_id
+					AND Round.round_info_id < Game.current_round_id;
 				";
 		$args = array('game_id' => $game_id, 'station_id' => $station_id);
 		$result = $db->query($query, $args);
@@ -171,7 +170,7 @@ function LoadTravelerData($session_id, $station_id)
 			return $data;
 		}
 		else
-			return NULL;
+			return array();
 	}
 }
 ?>
