@@ -62,11 +62,10 @@
 			view.board.town_field.text = station.town;
 			
 			var textAreaFormat:TextFormat = new TextFormat();
-			textAreaFormat.align = TextFormatAlign.JUSTIFY;
+			textAreaFormat.align = TextFormatAlign.LEFT;
 			textAreaFormat.size = 9;
 			
 			// right info
-			
 			view.description_background.editable = false;
 			view.description_background.setStyle("textFormat", textAreaFormat);
 			view.description_background.text = station.description_background.split("\\n").join("\n");
