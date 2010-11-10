@@ -120,6 +120,9 @@
 					station = stations.GetStation(i);
 					var movie:MovieClip = GetStationMovieClip(station);
 					movie.buttonMode = true;
+					movie.mouseChildren = false;
+					movie.doubleClickEnabled = true;
+					movie.addEventListener(MouseEvent.DOUBLE_CLICK, OnStationDoubleClick);
 					movie.addEventListener(MouseEvent.CLICK, OnStationClick);
 				}
 				
@@ -545,6 +548,7 @@
 			parent.gotoAndPlay(SprintStad.FRAME_STATION_INFO);
 		}
 		
+		
 		private function OnMobilityButton(event:MouseEvent):void
 		{
 			Debug.out("Clicked on mobility button!");
@@ -575,6 +579,48 @@
 				}
 				if (station != null)
 					SelectStation(Data.Get().GetStations().GetStationIndex(station));			
+			}
+			catch (e:Error) 
+			{
+				Debug.out(e.name);
+				Debug.out(e.message);
+			}
+		}
+		
+		private function OnStationDoubleClick(event:MouseEvent):void
+		{
+			Debug.out("DoubleClicked!");
+			
+			try {
+				var object:Object = event.target;
+				var station_name:String = object.name.replace("_" , " ");
+				var station:Station = Data.Get().GetStations().GetStationByName(station_name);
+				
+				while (object != null && station == null)
+				{
+					object = object.parent;
+					if (object != null && object.name != null)
+					{
+						station_name = object.name.replace("_" , " ");
+						station = Data.Get().GetStations().GetStationByName(station_name);
+					}
+				}
+				if (station != null)
+				{
+					if (station.owner.is_player)
+					{
+						if (Data.Get().current_round_id < 7)
+						{
+							DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnCurrentRoundKnown);
+							return;
+						}
+					}
+					if (Data.Get().current_round_id == 7)
+					{
+						DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnCurrentRoundKnown);
+					}
+					
+				}
 			}
 			catch (e:Error) 
 			{
