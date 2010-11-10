@@ -279,10 +279,40 @@ function AC_GetArgs(args, ext, srcParamName, classid, mimeType){
   if (mimeType) ret.embedAttrs["type"] = mimeType;
   return ret;
 }
+
+function getBrowserWidth()
+{
+	if(typeof(window.innerWidth) == 'number')
+	{
+		return window.innerWidth;
+	}
+}
+
+function getBrowserHeight()
+{
+	if(typeof(window.innerHeight) =='number')
+	{
+		return window.innerHeight;
+	}
+}
+
 // -->
 </script>
 </head>
-<body bgcolor="#ffffff">
+
+<?php
+	$bgcolor = "#ffffff";
+	if (ClientSession::hasSession(session_id()))
+	{
+		$color = Team::getTeamColorByTeamInstanceId(ClientSession::getTeamInstanceId(session_id()));
+		$bgcolor = $color;
+	}
+?>
+
+
+
+
+<body bgcolor=<?php echo $bgcolor ?>>
 <!--url's used in the movie-->
 <!--text used in the movie-->
 <!--
@@ -298,6 +328,8 @@ Waardeprofiel
 Waardeprofiel
 -->
 <!-- saved from url=(0013)about:internet -->
+
+
 <script language="JavaScript" type="text/javascript">
 	AC_FL_RunContent(
 		'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0',
@@ -313,7 +345,7 @@ Waardeprofiel
 		'wmode', 'window',
 		'devicefont', 'false',
 		'id', 'SprintStad',
-		'bgcolor', '#ffffff',
+		'bgcolor', '<?php echo $bgcolor ?>',
 		'name', 'SprintStad',
 		'menu', 'false',
 		'allowFullScreen', 'true',
@@ -329,9 +361,10 @@ Waardeprofiel
 	<param name="movie" value="/SprintStad/flash/SprintStad.swf?session=<?php echo session_id(); ?>" />
 	<param name="menu" value="false" />
 	<param name="quality" value="high" />
-	<param name="bgcolor" value="#ffffff" />
+	<param name="bgcolor" value=<?php echo '#'.$bgcolor ?> />
 	<embed src="/SprintStad/flash/SprintStad.swf?session=<?php echo session_id(); ?>" menu="false" quality="high" bgcolor="#ffffff" width="100%" height="100%" name="SprintStad" align="middle" allowScriptAccess="sameDomain" allowFullScreen="true" type="application/x-shockwave-flash" pluginspage="http://www.adobe.com/go/getflashplayer" />
 	</object>
 </noscript>
+</div>
 </body>
 </html>

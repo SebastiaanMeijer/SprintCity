@@ -38,6 +38,17 @@
 					array('id' => $id));
 			return $db->getValue($result) == MOBILITY_TEAM_ID;
 		}
+		
+		public static function getTeamInstanceId($sessionId)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("	SELECT team_instance_id
+									FROM ClientSession
+									WHERE ClientSession.id = :sessionId;",
+								array('sessionId' => $sessionId));
+			
+			return $db->getValue($result);
+		}
 	}
 	
 	class Team extends DBObject
@@ -70,6 +81,16 @@
 			$args = array('game_id' => $gameId);
 			$result = $db->query($query, $args);
 			return DBObject::glob("Team", $result);
+		}
+		
+		public static function getTeamColorByTeamInstanceId($teamInstanceId)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("	SELECT Team.color
+									FROM Team INNER JOIN TeamInstance ON Team.id = TeamInstance.team_id
+									WHERE TeamInstance.id = :teamInstanceId;",
+									array('teamInstanceId' => $teamInstanceId));
+			return $db->getValue($result);
 		}
 	}
 	
