@@ -157,23 +157,25 @@ class LineGraph
 		}
 	}
 	
-	public function SetInputArray($inputArray)
+	public function SetInputArray($inputArray, $min, $max)
 	{
 		if($this->inputArray1 == NULL)
 		{
 			$this->inputArray1 = $inputArray;
-			$this->inputArray1Min = min($inputArray);
-			$this->inputArray1Max = max($inputArray);
+			$this->inputArray1Min = $min;
+			$this->inputArray1Max = $max;
 		}
 		elseif ($this->inputArray2 == NULL)
 		{
 			$this->inputArray2 = $inputArray;
-			$this->inputArray2Min = min($inputArray);
-			$this->inputArray2Max = max($inputArray);
+			$this->inputArray2Min = $min;
+			$this->inputArray2Max = $max;
 		}
 		else
 			echo 'ERROR: max is two inputs';
 	}
+	
+
 	
 	private function DrawStuff()
 	{
