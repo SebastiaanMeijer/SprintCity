@@ -304,7 +304,7 @@ function getBrowserHeight()
 	$bgcolor = "#ffffff";
 	if (ClientSession::hasSession(session_id()))
 	{
-		$color = Team::getTeamColorByTeamInstanceId(ClientSession::getTeamInstanceId(session_id()));
+		$color = Team::getCurrentTeamColor();
 		$bgcolor = $color;
 	}
 ?>
