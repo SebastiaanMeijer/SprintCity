@@ -462,6 +462,19 @@
 			return $db->getValue($result);
 		}
 		
+		public static function getCurrentRoundIdByGameId($game_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT RoundInfo.id 
+				FROM RoundInfo 
+				INNER JOIN Game 
+				ON Game.current_round_id = RoundInfo.id 
+				WHERE Game.id = :game_id", 
+				array('game_id' => $game_id));
+			return $db->getValue($result);
+		}
+		
 		public static function getCurrentRoundIdBySessionId($session_id)
 		{
 			$db = Database::getDatabase();
