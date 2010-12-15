@@ -743,7 +743,7 @@ function DistributeArea($data, $distribute_area)
 function SetNextRound($game_id)
 {
 	$db = Database::getDatabase();
-	$current_round_id = RoundInfo::getCurrentRoundIdBySessionId(session_id());
+	$current_round_id = RoundInfo::getCurrentRoundIdByGameId($game_id);
 	
 	// find id of next round
 	$next_round_id = RoundInfo::getRoundInfoIdAfter($current_round_id);
