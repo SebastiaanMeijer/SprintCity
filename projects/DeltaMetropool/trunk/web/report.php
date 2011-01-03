@@ -30,6 +30,7 @@
 				$allstations = Station::getStations($pager->firstRecord, $pager->perPage);
 				$types = Type::getTypes();
 				$rounds = RoundInfo::getRounds();
+				$game_id = isset($_GET['game']) ? $_GET['game'] : Game::getGameIdOfSession(session_id());
 			?>
 				
 			
@@ -43,7 +44,7 @@
 			<?php
 			foreach ($teams as $key => $value)
 			{
-				$teaminstance = TeamInstance::getTeamInstanceIdByGameAndTeam(Game::getGameIdOfSession(session_id()), $value->id);
+				$teaminstance = TeamInstance::getTeamInstanceIdByGameAndTeam($game_id, $key);
 				?>
 					<tr class="<?php echo $class; ?>">
 					<td><?php echo $key; ?></td>
@@ -105,7 +106,7 @@
 				
 				$simple_current = $initial;
 				$current = $initial;
-				$roundId = RoundInfo::getCurrentRoundIdBySessionId(session_id());
+				$roundId = RoundInfo::getCurrentRoundIdByGameId($game_id);
 				$programs = Program::getStationAppliedPrograms(Station::getStationInstanceId($key), $roundId);
 				$total_special = 0;
 				$total_transformed_area = 0;
@@ -156,11 +157,9 @@
 					
 				}
 				
-			
 				$simple_current[14] += $total_home;
 				$simple_current[15] += $total_work;
 				$simple_current[16] += $total_leisure;
-				
 				
 				?>
 				
@@ -231,21 +230,12 @@
 					}
 				
 				}
-				
-								
 				?>
-				
-				
 				</table>
-				
-				<img src=images/graphs/spacegraph.php?session=<?php echo session_id() ?>&station=<?php echo $station->id ?> />
-				
+				<img src=images/graphs/spacegraph.php?game=<?php echo $game_id; ?>&station=<?php echo $station->id ?> />
 			<?php
 			}
 			?>
-
-			
 		</div>
-					
 	</body>
 </html>

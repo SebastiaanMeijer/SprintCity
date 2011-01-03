@@ -107,7 +107,8 @@ if (ClientSession::hasSession(session_id()))
 		echo 'Er zijn geen games actief.';
 	}
 ?>
-		<a href="admin.php" style="display:block; margin:0 0 5px 5px; width: 95%; text-align: right;">admin</a>
+		<a href="admin.php" style="float: right; display:block; margin:0 5px 5px 5px; width: 45%; text-align: right;">admin</a>
+		<a href="report.php?game=<?php echo $selected_game; ?>" style="float: left; display:block; margin:0 5px 5px 5px; width: 45%; text-align: left;">rapport</a>
 	</div>
 </body>
 </html>
