@@ -3,18 +3,22 @@ require_once('../../includes/master.inc.php');
 require_once('linegraph.php');
 
 // Data
-if (ClientSession::hasSession(session_id()))
-{
+// commented security to allow public reports
+//if (ClientSession::hasSession(session_id()))
+//{
 	$povnData = array(0);
 	$travelerData = array(0);
 
 	$width = isset($_REQUEST['width']) ? $_REQUEST['width'] : 480;
 	$height = isset($_REQUEST['height']) ? $_REQUEST['height'] : 220;
 	
-	$povnData = LoadPOVNData(session_id(), $_REQUEST['station']);
-	$travelerData = LoadTravelerData(session_id(), $_REQUEST['station']);
-	$initTravelerCount = Station::GetInitialTravelerCount($_REQUEST['station']);
-
+	$gameId = isset($_REQUEST['game']) ? $_REQUEST['game'] : Game::getGameIdOfSession(session_id());
+	$stationId = isset($_REQUEST['station']) ? $_REQUEST['station'] : 0;
+	
+	$povnData = LoadPOVNData($gameId, $stationId);
+	$travelerData = LoadTravelerData($gameId, $stationId);
+	$initTravelerCount = Station::GetInitialTravelerCount($stationId);
+	
 	if(isset($initTravelerCount))
 		array_unshift($travelerData, $initTravelerCount);
 	else
@@ -22,8 +26,6 @@ if (ClientSession::hasSession(session_id()))
 	
 	if (count($povnData) == 0)
 		$povnData = array(0);
-	
-	$gameId = Game::getGameIdOfSession(session_id());
 	
 	// Get min/max values
 	$povnMinMax = array_merge(LoadInitPOVNMinMax(), LoadPOVNDataMinMax($gameId));
@@ -53,7 +55,7 @@ if (ClientSession::hasSession(session_id()))
 	
 	// Destroy garbage
 	imagedestroy($image);
-}
+//}
 
 function LoadInitPOVNMinMax()
 {
@@ -255,9 +257,8 @@ function LoadTravelerDataMinMax($game_id)
 	}
 }
 
-function LoadPOVNData($session_id, $station_id)
+function LoadPOVNData($game_id, $station_id)
 {
-	$game_id = Game::getGameIdOfSession($session_id);
 	if (isset($game_id) && isset($station_id))
 	{
 		$db = Database::getDatabase();
@@ -276,9 +277,8 @@ function LoadPOVNData($session_id, $station_id)
 	}
 }
 
-function LoadTravelerData($session_id, $station_id)
+function LoadTravelerData($game_id, $station_id)
 {
-	$game_id = Game::getGameIdOfSession($session_id);
 	if (isset($game_id) && isset($station_id))
 	{
 		$db = Database::getDatabase();
