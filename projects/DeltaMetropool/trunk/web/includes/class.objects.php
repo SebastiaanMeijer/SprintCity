@@ -724,5 +724,24 @@
 			$result = $db->query($query, $args);
 			return DBObject::glob("Program", $result);
 		}
+		
+		public static function areFutureProgramsFilled($programId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Program AS Program1
+				INNER JOIN RoundInstance AS RoundInstance1 ON Program1.id = RoundInstance1.plan_program_id OR Program1.id = RoundInstance1.exec_program_id
+				INNER JOIN Round AS Round1 ON RoundInstance1.round_id = Round1.id
+				INNER JOIN RoundInfo AS RoundInfo1 ON Round1.round_info_id = RoundInfo1.id
+				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo2.number > RoundInfo1.number
+				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Round2.station_id = Round1.station_id
+				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND RoundInstance2.station_instance_id = RoundInstance1.station_instance_id
+				INNER JOIN Program AS Program2 ON RoundInstance2.plan_program_id = Program2.id
+				WHERE Program1.id = :program_id AND (Program2.area_home != 0 OR Program2.area_work != 0 OR Program2.area_leisure != 0);";
+			$args = array('program_id' => $programId);
+			$result = $db->query($query, $args);
+			return mysql_num_rows($result) > 0;
+		}
 	}
 
