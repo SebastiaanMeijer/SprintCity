@@ -218,11 +218,6 @@ function BackStepGame($vars)
 		$previous_round = $key;
 	}
 	
-	// reset exec programs previous round
-	ResetExecPrograms($game->id, $previous_round);
-	// reset plan programs current round
-	ResetPlanPrograms($game->id, $game->current_round_id);
-	
 	// set previous round as current round
 	if ($game->current_round_id != $previous_round)
 	{

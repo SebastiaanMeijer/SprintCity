@@ -4,6 +4,7 @@
 	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -20,6 +21,7 @@
 	import SprintStad.Data.Types.Type;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
+	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Drawer.ProgramEditor;
 	import SprintStad.Drawer.ProgramSlider;
@@ -167,7 +169,23 @@
 			var vars:URLVariables = new URLVariables();
 			vars.data = GetCurrentRound().plan_program.GetXmlString();
 			request.data = vars;
+			loader.addEventListener(Event.COMPLETE, UploadingDone);
+			loader.addEventListener(IOErrorEvent.IO_ERROR , OnUploadError);
 			loader.load(request);
+		}
+		
+		private function UploadingDone(event:Event):void 
+		{
+			if (event.target.data != "")
+			{
+				ErrorDisplay.Get().DisplayError(event.target.data);
+				Debug.out(event.target.data);
+			}
+		}
+		
+		private function OnUploadError(e:IOErrorEvent):void 
+		{
+			ErrorDisplay.Get().DisplayError("error uploading program");
 		}
 		
 		private function InitWindows():void
