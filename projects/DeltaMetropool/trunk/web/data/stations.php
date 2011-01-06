@@ -16,7 +16,7 @@
 		'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 
 		'area_undeveloped_urban', 'area_undeveloped_rural',
 		'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed',
-		'transform_area_undeveloped_urban', 'transform_area_undeveloped_mixed',
+		'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural',
 		'count_home_total', 'count_home_transform',
 		'count_work_total', 'count_work_transform',
 		'team_id'
@@ -33,9 +33,11 @@
 		$db = Database::getDatabase();
 		
 		$station_result = getStations(session_id());
-		
+		$scenario = Scenario::getCurrentScenario();
+
 		echo '<stations>' . "\n";
-		
+		echo "\t" . '<mapx>' . $scenario[key($scenario)]->init_map_position_x . '</mapx>' . "\n";
+		echo "\t" . '<mapy>' . $scenario[key($scenario)]->init_map_position_y . '</mapy>' . "\n";
 		while ($station_row = mysql_fetch_array($station_result))
 		{
 			echo "\t" . '<station>' . "\n";

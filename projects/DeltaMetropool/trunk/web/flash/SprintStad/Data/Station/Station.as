@@ -40,7 +40,7 @@
 		public var transform_area_cultivated_work:int = 0;
 		public var transform_area_cultivated_mixed:int = 0;
 		public var transform_area_undeveloped_urban:int = 0;
-		public var transform_area_undeveloped_mixed:int = 0;
+		public var transform_area_undeveloped_rural:int = 0;
 		public var count_home_total:int = 0;
 		public var count_home_transform:int = 0;
 		public var count_work_total:int = 0;
@@ -117,7 +117,7 @@
 			return transform_area_cultivated_home + 
 				transform_area_cultivated_mixed +
 				transform_area_cultivated_work +
-				transform_area_undeveloped_mixed + 
+				transform_area_undeveloped_rural + 
 				transform_area_undeveloped_urban;
 		}
 		

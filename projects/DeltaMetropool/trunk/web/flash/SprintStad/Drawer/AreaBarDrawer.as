@@ -209,7 +209,7 @@
 			}
 			
 			var baseUrban:int = stationInstance.transform_area_undeveloped_urban;
-			var baseRural:int = stationInstance.transform_area_undeveloped_mixed;
+			var baseRural:int = stationInstance.transform_area_undeveloped_rural;
 			
 			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
 			if(baseUrban > 0)

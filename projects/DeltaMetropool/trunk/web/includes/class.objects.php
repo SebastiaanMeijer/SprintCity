@@ -130,7 +130,7 @@
 				'image', 'town', 'region', 
 				'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
-				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_mixed', 
+				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
 				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform'), 
 				$id);
 		}
@@ -220,6 +220,20 @@
 			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `code` ASC LIMIT " . $fromIndex . " , " . $numberOfRecords);
 		}
 		
+		public static function getStationsOfScenario($scenarioId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Station.* 
+				FROM station 
+				INNER JOIN scenariostation ON station.id = scenariostation.station_id
+				WHERE scenariostation.scenario_id = :scenario_id
+				ORDER BY code;";
+			$args = array('scenario_id' => $scenarioId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
+		}
+		
 		public static function getStationsUsedInGame($gameId)
 		{
 			if (isset($gameId))
@@ -287,6 +301,55 @@
 				return $result;
 			}
 			return null;
+		}
+	}
+	
+	class Scenario extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Scenario', array('id', 'name', 'description', 'init_map_position_x', 'init_map_position_y'), $id);
+		}
+		
+		public static function rowCount()
+		{
+			$db = Database::getDatabase();
+			return $db->getValue("SELECT COUNT(*) FROM scenario");
+		}
+		
+		public static function getScenarios($fromIndex, $numberOfRecords)
+		{
+			return DBObject::glob("Scenario", "SELECT * FROM `scenario` LIMIT " . $fromIndex . " , " . $numberOfRecords);
+		}
+		
+		public static function getCurrentScenario()
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT Scenario.* 
+				FROM Scenario
+				INNER JOIN Game
+				ON Scenario.id = Game.scenario_id
+				INNER JOIN TeamInstance
+				ON Game.id = TeamInstance.game_id
+				INNER JOIN ClientSession
+				ON ClientSession.team_instance_id = TeamInstance.id
+				WHERE ClientSession.id = :session_id", 
+				array('session_id' => session_id()));
+			return DBObject::glob("Scenario", $result);
+		}
+		
+		public static function getScenarioOfGame($game_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT Scenario.* 
+				FROM Scenario
+				INNER JOIN Game
+				ON Scenario.id = Game.scenario_id
+				WHERE Game.id = :game_id", 
+				array('game_id' => $game_id));
+			return DBObject::glob("Scenario", $result);
 		}
 	}
 	

@@ -47,12 +47,13 @@ function NewGame()
 	// add new game record to the Game table
 	$query = "
 		INSERT INTO `Game` 
-			(`name`, `notes`, `starttime`, `active`)
+			(`name`, `notes`, `scenario_id`, `starttime`, `active`)
 		VALUES 
-			(:name, :notes, :starttime, :active);";
+			(:name, :notes, :scenario_id, :starttime, :active);";
 	$args = array(
 		'name' => $_REQUEST['name'], 
 		'notes' => $_REQUEST['notes'], 
+		'scenario_id' => $_REQUEST['scenario'],
 		'starttime' => date( 'Y-m-d H:i:s'), 
 		'active' => 1);
 	$db->query($query, $args);
@@ -60,7 +61,7 @@ function NewGame()
 	// create a game tree containing the team_instances which in turn contain the station_instances
 	// game tree format: $game_tree[team id][index] = station id
 	$game_id = mysql_insert_id($db->db);
-	$stations = Station::getStations(0, Station::rowCount());
+	$stations = Station::getStationsOfScenario($_REQUEST['scenario']);
 	$game_tree = Array();
 	foreach ($stations as $station_key => $station_value) 
 	{

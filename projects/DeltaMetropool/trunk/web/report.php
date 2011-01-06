@@ -92,7 +92,7 @@
 				
 				<?php
 				
-				$initial = array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,$station->transform_area_cultivated_home, $station->transform_area_cultivated_work, $station->transform_area_cultivated_mixed, $station->transform_area_undeveloped_urban, $station->transform_area_undeveloped_mixed);
+				$initial = array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,$station->transform_area_cultivated_home, $station->transform_area_cultivated_work, $station->transform_area_cultivated_mixed, $station->transform_area_undeveloped_urban, $station->transform_area_undeveloped_rural);
 				$masterplan_small = Program::getMasterplan(Station::getStationInstanceId($key));
 				if(isset($masterplan_small[1]))
 					$masterplan = array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,$masterplan_small[1]->area_home, $masterplan_small[1]->area_work, $masterplan_small[1]->area_leisure, 0, 0);
