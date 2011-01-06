@@ -5,13 +5,34 @@
 	
 	$class = new Loop('odd', 'even');
 	$teams = Team::getTeams(0, Team::rowCount());
-	$stations = Station::getStations(0, Station::rowCount());
+	$scenarios = Scenario::getScenarios(0, Scenario::rowCount());
+	$current_scenario = isset($_REQUEST['scenario']) ? $_REQUEST['scenario'] : key(Scenario::getScenarios(0, 1));
+	$stations = Station::getStationsOfScenario($current_scenario);
 ?>
 
 <div class="area">
 	<h2>Nieuw Spel</h2>
-	<form action="pages/submit_form.php" method="POST">
+	
 		<table>
+			<form action="admin.php?view=new_game" method="POST">
+			<tr>
+				<td>Scenario</td>
+				<td>
+					<select name="scenario" onChange="this.form.submit()">
+<?php
+	foreach ($scenarios as $key => $value)
+	{
+		if ($key == $current_scenario)
+			echo "\t\t\t\t\t\t" . '<option value="' . $key . '" selected>' . $value->name . '</option>' . "\n";
+		else
+			echo "\t\t\t\t\t\t" . '<option value="' . $key . '">' . $value->name . '</option>' . "\n";
+	}
+?>
+					</select>
+				</td>
+			</tr>
+			</form>
+			<form action="pages/submit_form.php" method="POST">
 			<tr>
 				<td>Naam</td>
 				<td><input type="text" name="name" maxlength="255"></td>
@@ -21,6 +42,7 @@
 				<td><textarea name="notes" rows="6"></textarea></td>
 			</tr>
 			<tr>
+				
 				<td colspan="2">
 					<table class="data">
 						<tr>
@@ -54,11 +76,11 @@
 				</td>
 			</tr>
 			<tr>
-				<td colspan = "2">
+				<td colspan="2">
+					<input type="hidden" name="scenario" value="<?php echo $current_scenario; ?>"/>
 					<button type="submit" name="Action" value="new_game">Start Spel</button>
 				</td>
 			</tr>
+			</form>
 		</table>
-		
-	</form>
 </div>

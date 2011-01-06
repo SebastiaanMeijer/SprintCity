@@ -24,7 +24,7 @@
 		public var transform_area_cultivated_work:Number = 0;
 		public var transform_area_cultivated_mixed:Number = 0;
 		public var transform_area_undeveloped_urban:Number = 0;
-		public var transform_area_undeveloped_mixed:Number = 0;
+		public var transform_area_undeveloped_rural:Number = 0;
 		public var count_home_total:Number = 0;
 		public var count_home_transform:Number = 0;
 		public var count_work_total:Number = 0;
@@ -52,7 +52,7 @@
 			result.transform_area_cultivated_work = station.transform_area_cultivated_work;
 			result.transform_area_cultivated_mixed = station.transform_area_cultivated_mixed;
 			result.transform_area_undeveloped_urban = station.transform_area_undeveloped_urban;
-			result.transform_area_undeveloped_mixed = station.transform_area_undeveloped_mixed;
+			result.transform_area_undeveloped_rural = station.transform_area_undeveloped_rural;
 			result.count_home_total = station.count_home_total;
 			result.count_home_transform = station.count_home_transform;
 			result.count_work_total = station.count_work_total;
@@ -77,7 +77,7 @@
 			result.transform_area_cultivated_work = station.transform_area_cultivated_work;
 			result.transform_area_cultivated_mixed = station.transform_area_cultivated_mixed;
 			result.transform_area_undeveloped_urban = station.transform_area_undeveloped_urban;
-			result.transform_area_undeveloped_mixed = station.transform_area_undeveloped_mixed;
+			result.transform_area_undeveloped_rural = station.transform_area_undeveloped_rural;
 			result.count_home_total = station.count_home_total;
 			result.count_home_transform = station.count_home_transform;
 			result.count_work_total = station.count_work_total;
@@ -108,7 +108,7 @@
 			result.transform_area_cultivated_work = transform_area_cultivated_work;
 			result.transform_area_cultivated_mixed = transform_area_cultivated_mixed;
 			result.transform_area_undeveloped_urban = transform_area_undeveloped_urban;
-			result.transform_area_undeveloped_mixed = transform_area_undeveloped_mixed;
+			result.transform_area_undeveloped_rural = transform_area_undeveloped_rural;
 			result.count_home_total = count_home_total;
 			result.count_home_transform = count_home_transform;
 			result.count_work_total = count_work_total;
@@ -149,19 +149,19 @@
 				programTransformArea * (transform_area_cultivated_mixed / totalTransformArea);
 			var transform_area_undeveloped_urban_delta:Number = 
 				programTransformArea * (transform_area_undeveloped_urban / totalTransformArea);
-			var transform_area_undeveloped_mixed_delta:Number = 
-				programTransformArea * (transform_area_undeveloped_mixed / totalTransformArea);
+			var transform_area_undeveloped_rural_delta:Number = 
+				programTransformArea * (transform_area_undeveloped_rural / totalTransformArea);
 			
 			area_cultivated_home -= transform_area_cultivated_home_delta;
 			area_cultivated_work -= transform_area_cultivated_work_delta;
 			area_cultivated_mixed -= transform_area_cultivated_mixed_delta;
 			area_undeveloped_urban -= transform_area_undeveloped_urban_delta;
-			area_undeveloped_rural -= transform_area_undeveloped_mixed_delta;
+			area_undeveloped_rural -= transform_area_undeveloped_rural_delta;
 			transform_area_cultivated_home -= transform_area_cultivated_home_delta;
 			transform_area_cultivated_work -= transform_area_cultivated_work_delta;
 			transform_area_cultivated_mixed -= transform_area_cultivated_mixed_delta;
 			transform_area_undeveloped_urban -= transform_area_undeveloped_urban_delta;
-			transform_area_undeveloped_mixed -= transform_area_undeveloped_mixed_delta;
+			transform_area_undeveloped_rural -= transform_area_undeveloped_rural_delta;
 			
 			count_home_total -= transform_area_cultivated_home_delta * home_per_area;
 			count_home_transform -= transform_area_cultivated_home_delta * home_per_area;
@@ -219,7 +219,7 @@
 				transform_area_cultivated_work +
 				transform_area_cultivated_mixed +
 				transform_area_undeveloped_urban +
-				transform_area_undeveloped_mixed;
+				transform_area_undeveloped_rural;
 		}
 	}
 

@@ -64,7 +64,7 @@
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed,
+				station.transform_area_undeveloped_rural,
 				0);
 			// left info
 			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
@@ -140,7 +140,7 @@
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_mixed) + " ha resterend.)";
+				station.transform_area_undeveloped_rural) + " ha resterend.)";
 				
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);

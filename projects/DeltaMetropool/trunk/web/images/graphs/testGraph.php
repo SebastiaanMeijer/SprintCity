@@ -79,7 +79,7 @@ function LoadCitizenData($session_id, $station_id)
 								(
 									(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
 									* 
-									(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_mixed))
+									(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 								)
 							)
 							* 
@@ -133,7 +133,7 @@ function LoadWorkerData($session_id, $station_id)
 								(
 									(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
 									* 
-									(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_mixed))
+									(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 								)
 							)
 							* 

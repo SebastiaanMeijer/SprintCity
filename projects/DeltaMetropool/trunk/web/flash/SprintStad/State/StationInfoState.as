@@ -130,14 +130,14 @@
 				station.transform_area_cultivated_work, 
 				station.transform_area_cultivated_mixed, 
 				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_mixed,
+				station.transform_area_undeveloped_rural,
 				0);			
 			view.current_info.transform_area.text = "(" + ( 
 				station.transform_area_cultivated_home + 
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_mixed) + " ha.)";
+				station.transform_area_undeveloped_rural) + " ha.)";
 			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
 			view.current_info.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);

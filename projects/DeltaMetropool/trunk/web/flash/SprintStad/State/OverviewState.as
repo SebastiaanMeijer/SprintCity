@@ -28,7 +28,7 @@
 	public class OverviewState  implements IState
 	{
 		private var parent:SprintStad = null;
-		private var selection:StationSelection = new StationSelection(); // still used?
+		private var selection:StationSelection = new StationSelection();
 		
 		private var stationIndex:int = 0;
 		private var loadCount:int = 0;
@@ -56,7 +56,11 @@
 		private function Init():void
 		{
 			var stations:Stations = Data.Get().GetStations();
+			// set map position
+			parent.overview_movie.map.x = stations.MapX;
+			parent.overview_movie.map.y = stations.MapY;
 			
+			// setup station circles
 			FillStationCircles(stations);
 			
 			// fill in the demand windows
@@ -80,6 +84,11 @@
 				Debug.out("Activate OverviewState");
 				var view:MovieClip = parent.overview_movie;
 				var station:Station;
+				
+				// set map position
+				var stations:Stations = Data.Get().GetStations();
+				parent.overview_movie.map.x = stations.MapX;
+				parent.overview_movie.map.y = stations.MapY;
 				
 				parent.addChild(SprintStad.LOADER);
 				
@@ -112,9 +121,7 @@
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 				
 				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
-				
 				// station buttons
-				var stations:Stations = Data.Get().GetStations();
 				for (var i:int = 0; i < stations.GetStationCount(); i++)
 				{
 					station = stations.GetStation(i);
@@ -127,11 +134,11 @@
 				}
 				
 				// initial selection
-				parent.overview_movie.addChild(selection);
+				parent.overview_movie.map.addChild(selection);
 				selection.x = -500;
 				selection.y = -500;
-				selection.width = 42;
-				selection.height = 42;
+				selection.width = 9;
+				selection.height = 9;
 			}
 			catch (e:Error)
 			{
@@ -145,7 +152,7 @@
 		{
 			var view:MovieClip = parent.overview_movie;
 			var station:Station = Data.Get().GetStations().GetStation(stationIndex);
-			var stationMovie:MovieClip = MovieClip(view.getChildByName(station.name.replace(" ", "_")));
+			var stationMovie:MovieClip = GetStationMovieClip(station);
 			
 			parent.currentStationIndex = stationIndex;
 			selection.x = stationMovie.x;
@@ -170,7 +177,10 @@
 				var station:Station = stations.GetStation(i);
 				var movie:MovieClip = GetStationMovieClip(station);
 				
+				// set station id on overview station circle movieclip
+				movie['id'] = station.id;
 			
+				// set outline color and filling of station circles
 				var colorTransform:ColorTransform = new ColorTransform();
 				colorTransform.color = parseInt("0x" + station.owner.color, 16);
 				movie.outline.transform.colorTransform = colorTransform;				
@@ -182,7 +192,6 @@
 		
 		private function FillDemandWindows():void
 		{
-			
 			var view:MovieClip = parent.overview_movie;
 			var types:Types = Data.Get().GetTypes();
 			
@@ -205,7 +214,6 @@
 		
 		private function SetButtons(station:Station):void
 		{
-			
 			var view:MovieClip = parent.overview_movie;
 			// set program button
 			if (station.owner.is_player)
@@ -237,23 +245,22 @@
 			}
 		}
 		
-				// Should set the number in the textfield to the 
+		// Should set the number in the textfield to the 
 		// amount of the available transformable area in the current round
 		private function RefreshTransformArea(station:Station)
 		{
 			try 
-			{
-			
+			{			
 				var spacePanel:MovieClip = parent.overview_movie.spacePanelElements;
-			
-			// amount Ha last
+				
+				// amount Ha last
 				if (station != null)
 				{
 					var instance:StationInstance = StationInstance.CreateInitial(station);
 					
 					var transformArea:int  = instance.GetTotalTransformArea();
 					TextField(spacePanel.amountHa2TransformArea).text = transformArea + " ha";	
-						
+					
 					if (Data.Get().current_round_id > 2 && GetPreviousRound().round_info_id > 1)
 					{
 						var plannedArea:int = GetPreviousRound().plan_program.TotalArea();
@@ -270,7 +277,6 @@
 			}
 			catch (e:Error)
 			{
-				
 				Debug.out(e.name);
 				Debug.out(e.getStackTrace());
 			}
@@ -284,10 +290,9 @@
 				pastStationInstance.transform_area_cultivated_work, 
 				pastStationInstance.transform_area_cultivated_mixed, 
 				pastStationInstance.transform_area_undeveloped_urban,
-				pastStationInstance.transform_area_undeveloped_mixed,
+				pastStationInstance.transform_area_undeveloped_rural,
 				0);
 			
-
 			barMasterplan.DrawBar(
 				station.program.area_home, 
 				station.program.area_work, 
@@ -301,7 +306,6 @@
 			if (roundID > 2)
 			{
 				var round:Round = station.GetRoundById(roundID - 1);
-				
 				
 				//Draw the planned bar according to the given program
 				if (round.plan_program != null)
@@ -360,7 +364,7 @@
 			
 			var period:String = "";
 			var roundID:int = Data.Get().current_round_id;
-			Debug.out("We're in round: "+ roundID +" ....!!!");
+			Debug.out("We're in round: "+ roundID);
 			if (roundID > 2)
 			{
 				view.plannedPeriod.visible = true;
@@ -506,11 +510,24 @@
 			}
 		}
 		
-		
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
-			var movie_name:String = station.name.replace(" ", "_");
-			return MovieClip(parent.overview_movie.getChildByName(movie_name));
+			var pattern:RegExp = / /g;
+			var movie_name:String = station.name.replace(pattern, "_");
+			return MovieClip(parent.overview_movie.map.getChildByName(movie_name));
+		}
+		
+		private function GetStationByMovieClipObject(stationCircleClip:Object):Station
+		{
+			// find station id
+			var station_id:Object;
+			while (stationCircleClip != null && station_id == null)
+			{
+				if (stationCircleClip != null && stationCircleClip.id != null)
+					station_id = stationCircleClip.id;
+				stationCircleClip = stationCircleClip.parent;
+			}
+			return Data.Get().GetStations().GetStationById(int(station_id));
 		}
 		
 		private function GetPreviousRound():Round
@@ -551,34 +568,21 @@
 		
 		private function OnMobilityButton(event:MouseEvent):void
 		{
-			Debug.out("Clicked on mobility button!");
 			SetMode(OverviewState.MOBILITY_MODE);
 		}
 		
 		private function OnSpaceButton(event:MouseEvent):void
 		{
-			Debug.out("Clicked on space button!");
 			SetMode(OverviewState.SPACE_MODE);
 		}
 		
 		private function OnStationClick(event:MouseEvent):void
 		{
-			try{
-				var object:Object = event.target;
-				var station_name:String = object.name.replace("_" , " ");
-				var station:Station = Data.Get().GetStations().GetStationByName(station_name);
-				
-				while (object != null && station == null)
-				{
-					object = object.parent;
-					if (object != null && object.name != null)
-					{
-						station_name = object.name.replace("_" , " ");
-						station = Data.Get().GetStations().GetStationByName(station_name);
-					}
-				}
+			try
+			{
+				var station:Station = GetStationByMovieClipObject(event.target);
 				if (station != null)
-					SelectStation(Data.Get().GetStations().GetStationIndex(station));			
+					SelectStation(Data.Get().GetStations().GetStationIndex(station));
 			}
 			catch (e:Error) 
 			{
@@ -589,22 +593,9 @@
 		
 		private function OnStationDoubleClick(event:MouseEvent):void
 		{
-			Debug.out("DoubleClicked!");
-			
-			try {
-				var object:Object = event.target;
-				var station_name:String = object.name.replace("_" , " ");
-				var station:Station = Data.Get().GetStations().GetStationByName(station_name);
-				
-				while (object != null && station == null)
-				{
-					object = object.parent;
-					if (object != null && object.name != null)
-					{
-						station_name = object.name.replace("_" , " ");
-						station = Data.Get().GetStations().GetStationByName(station_name);
-					}
-				}
+			try
+			{
+				var station:Station = GetStationByMovieClipObject(event.target);
 				if (station != null)
 				{
 					if (station.owner.is_player)

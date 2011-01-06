@@ -22,12 +22,11 @@
 			<tr>
 				<th>ID</th>
 				<th>Naam</th>
-				<th>Opmerkingen</th>
+				<th>Scenario</th>
 				<th>Start</th>
 				<th>Ronde</th>
-				<th>Programma's</th>
 				<th>Actief</th>
-				<th>Voortgang</th>
+				<th width="75">Voortgang</th>
 			</tr>
 <?php	
 	foreach ($objects as $key => $value) 
@@ -35,14 +34,14 @@
 		$round_info = new RoundInfo($value->current_round_id);
 		$total_programs = StationInstance::rowCountByGame($key);
 		$committed_programs = RoundInstance::getCommittedRounds($key, $value->current_round_id);
+		$scenario = Scenario::getScenarioOfGame($value->id);
 ?>
 			<tr class="<?php echo $class; ?>">
 				<td><?php echo $key; ?></td>
 				<td><?php echo $value->name; ?></td>
-				<td><?php echo $value->notes; ?></td>
+				<td><?php echo $scenario[key($scenario)]->name; ?></td>
 				<td><?php echo $value->starttime; ?></td>
 				<td><?php echo $round_info->name; ?></td>
-				<td><?php echo $committed_programs . "/" . $total_programs; ?></td>
 				<td>
 					<button type="submit" name="Action" value="game_toggle_active,<?php echo $key;?>"><?php echo $value->active == 1 ? '&#215;' : '&#160;&#160;'; ?></button>
 				</td>

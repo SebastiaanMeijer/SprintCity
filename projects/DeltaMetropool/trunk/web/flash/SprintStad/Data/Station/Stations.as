@@ -8,6 +8,9 @@
 	{	
 		public var stations:Array = new Array();
 		
+		public var MapX:Number = 0;
+		public var MapY:Number = 0;
+		
 		public var MaxPOVN:Number = 0;
 		public var MaxPWN:Number = 0;
 		public var MaxIWD:Number = 0;
@@ -116,6 +119,8 @@
 			var station:Station = new Station();
 			var stationXml:XML = null;
 			var index:int = 0;
+			this.MapX = Number(xmlData.mapx);
+			this.MapY = Number(xmlData.mapy);
 			stationXml = xmlData.station[index];
 			while (stationXml != null)
 			{
