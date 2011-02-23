@@ -144,7 +144,7 @@ div table {
 
 table.data {
 	border: 1px solid #bbbbbb;
-	margin: 8px;
+	margin: 8px auto;
 }
 
 table.data td {
