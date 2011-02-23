@@ -23,7 +23,8 @@
 		public var color:String = "0x000000";
 		public var image:String = "";
 		public var imageData:BitmapData;
-		public var density:Number = 0;
+		public var area_density:Number = 0;
+		public var people_density:Number = 0;
 		public var colorClip:MovieClip = new Placeholder();
 		
 		private var demands:Array = new Array();

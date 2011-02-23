@@ -29,11 +29,11 @@
 		public var count_home_transform:Number = 0;
 		public var count_work_total:Number = 0;
 		public var count_work_transform:Number = 0;
+		public var count_worker_total:Number = 0;
+		public var count_worker_transform:Number = 0;
 		
 		public function StationInstance() 
-		{
-			
-		}
+		{}
 		
 		public static function CreateInitial(station:Station):StationInstance
 		{
@@ -57,6 +57,8 @@
 			result.count_home_transform = station.count_home_transform;
 			result.count_work_total = station.count_work_total;
 			result.count_work_transform = station.count_work_transform;
+			result.count_worker_total = station.count_worker_total;
+			result.count_worker_transform = station.count_worker_transform;
 			return result;
 		}
 		
@@ -82,6 +84,8 @@
 			result.count_home_transform = station.count_home_transform;
 			result.count_work_total = station.count_work_total;
 			result.count_work_transform = station.count_work_transform;
+			result.count_worker_total = station.count_worker_total;
+			result.count_worker_transform = station.count_worker_transform;
 			for (var i:int = 2; i < Data.Get().current_round_id; i++)
 			{
 				var round:Round = station.GetRoundById(i)
@@ -113,6 +117,8 @@
 			result.count_home_transform = count_home_transform;
 			result.count_work_total = count_work_total;
 			result.count_work_transform = count_work_transform;
+			result.count_worker_total = count_worker_total;
+			result.count_worker_transform = count_worker_transform;
 			return result;
 		}
 		
@@ -139,17 +145,18 @@
 			var totalTransformArea:Number = GetTotalTransformArea();
 			var programTransformArea:int = program.TotalArea();
 			
-			var home_per_area:Number = station.count_home_total / station.area_cultivated_home;
-			var work_per_area:Number = station.count_work_total / station.area_cultivated_work;			
-			var transform_area_cultivated_home_delta:Number = 
+			var home_per_area:Number = GetAverageHomeDensity();
+			var work_per_area:Number = GetAverageWorkDensity();
+			var worker_per_area:Number = GetAverageWorkerDensity();
+			var transform_area_cultivated_home_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_cultivated_home / totalTransformArea);
-			var transform_area_cultivated_work_delta:Number = 
+			var transform_area_cultivated_work_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_cultivated_work / totalTransformArea);
-			var transform_area_cultivated_mixed_delta:Number = 
+			var transform_area_cultivated_mixed_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_cultivated_mixed / totalTransformArea);
-			var transform_area_undeveloped_urban_delta:Number = 
+			var transform_area_undeveloped_urban_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_undeveloped_urban / totalTransformArea);
-			var transform_area_undeveloped_rural_delta:Number = 
+			var transform_area_undeveloped_rural_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_undeveloped_rural / totalTransformArea);
 			
 			area_cultivated_home -= transform_area_cultivated_home_delta;
@@ -167,13 +174,16 @@
 			count_home_transform -= transform_area_cultivated_home_delta * home_per_area;
 			count_work_total -= transform_area_cultivated_work_delta * work_per_area;
 			count_work_transform -= transform_area_cultivated_work_delta * work_per_area;
+			count_worker_total -= (transform_area_cultivated_work_delta + transform_area_cultivated_mixed_delta) * worker_per_area;
+			count_worker_transform -= (transform_area_cultivated_work_delta + transform_area_cultivated_mixed_delta) * worker_per_area;;
 			
 			area_cultivated_home += program.area_home;
 			area_cultivated_work += program.area_work;
 			area_cultivated_mixed += program.area_leisure;
 			
 			count_home_total += program.area_home * GetHomeDensity(program);
-			count_work_total += program.area_work * GetWorkDensity(program);
+			count_work_total += program.area_work * GetWorkAreaDensity(program);
+			count_worker_total += program.area_work * GetWorkPeopleDensity(program) + program.area_leisure * GetLeisurePeopleDensity(program);
 			
 			if (round != null)
 			{
@@ -181,36 +191,83 @@
 				PWN = round.PWN;
 			}
 			
-			IWD = (count_home_total * constants.average_citizens_per_home +
-				count_work_total * constants.average_workers_per_bvo) / 
-				(area_cultivated_home + area_cultivated_work);
-			//Debug.out("IWD: " + IWD);
 			var citizens:Number = count_home_total * constants.average_citizens_per_home;
-			var workers:Number = count_work_total * constants.average_workers_per_bvo;
-			MNG = Math.min(citizens * 5, workers) / Math.max(citizens * 5, workers) * 100;
-			//Debug.out("MNG: " + MNG);
+			Debug.out(station.name);
+			IWD = (citizens + count_worker_total) /  (area_cultivated_home + area_cultivated_work + area_cultivated_mixed);
+			Debug.out("IWD: " + IWD + "(" + station.IWD + ") -> (" + citizens + " + " + count_worker_total + ") / (" + area_cultivated_home + " + " + area_cultivated_work + " + " + area_cultivated_mixed + ")");
+			MNG = Math.min(citizens * 5, count_worker_total) / Math.max(citizens * 5, count_worker_total) * 100;
+			Debug.out("MNG: " + MNG + "(" + station.MNG + ")");
 		}
 		
 		private function GetHomeDensity(program:Program):Number
 		{
 			if (program.type_home.type.search("average_") > -1)
-				return station.count_home_total / area_cultivated_home;
+				return GetAverageHomeDensity();
 			else
-				return program.type_home.density;
+				return program.type_home.area_density;
 		}
 		
-		private function GetWorkDensity(program:Program):Number
+		private function GetAverageHomeDensity():Number
+		{
+			if (area_cultivated_home > 0)
+				return station.count_home_total / area_cultivated_home;
+			else
+				return Data.Get().GetTypes().GetTypesOfCategory("average_home")[0].area_density;
+		}
+		
+		private function GetWorkAreaDensity(program:Program):Number
 		{
 			if (program.type_work.type.search("average_") > -1)
 				return station.count_work_total / area_cultivated_work;
 			else
-				return program.type_work.density;
+				return program.type_work.area_density;
+		}
+		
+		private function GetAverageWorkDensity():Number
+		{
+			if (area_cultivated_work > 0)
+				return station.count_work_total / area_cultivated_work;
+			else
+				return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].area_density;
+		}
+		
+		private function GetAverageWorkerDensity():Number
+		{
+			if (area_cultivated_work > 0)
+				return station.count_worker_total / (station.area_cultivated_work + station.area_cultivated_mixed);
+			else
+				return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].people_density;
+		}
+		
+		private function GetWorkPeopleDensity(program:Program):Number
+		{
+			if (program.type_work.type.search("average_") > -1)
+				return station.count_worker_total / (area_cultivated_work + area_cultivated_mixed);
+			else
+				return program.type_work.people_density;
+		}
+		
+		private function GetLeisurePeopleDensity(program:Program):Number
+		{
+			if (program.type_leisure.type.search("average_") > -1)
+				return station.count_worker_total / (area_cultivated_work + area_cultivated_mixed);
+			else
+				return program.type_leisure.people_density;
 		}
 		
 		public function SetRound(round:Round):void
 		{
 			this.POVN = round.POVN;
 			this.PWN = round.PWN;
+		}
+		
+		public function GetTotalArea():Number
+		{
+			return area_cultivated_home +
+				area_cultivated_work +
+				area_cultivated_mixed +
+				area_undeveloped_urban +
+				area_undeveloped_rural;
 		}
 		
 		public function GetTotalTransformArea():Number
@@ -221,6 +278,19 @@
 				transform_area_undeveloped_urban +
 				transform_area_undeveloped_rural;
 		}
+		
+		public function ToString():String
+		{
+			var result:String = ""
+			result += "------------------------\n";
+			result += (station != null ? station.name : "null") + " in round " + (round != null ? round.name : "null") + "\n";
+			result += "POVN:" + POVN + " PWN:" + PWN + " IWD:" + IWD + " MNG:" + MNG + "\n";
+			result += "area: (h:" + area_cultivated_home + " w:" + area_cultivated_work + " l:" + area_cultivated_mixed + " u:" + area_undeveloped_urban + " r:" + area_undeveloped_rural + ")\n";
+			result += "transform: (h:" + transform_area_cultivated_home + " w:" + transform_area_cultivated_work + " l:" + transform_area_cultivated_mixed + " u:" + transform_area_undeveloped_urban + " r:" + transform_area_undeveloped_rural + ")\n";
+			result += "houses: (total:" + count_home_total + " tranform:" + count_home_transform + ")\n";
+			result += "bvo work: (total:" + count_work_total + " transform:" + count_work_transform + ")\n";
+			result += "workers: (total:" + count_worker_total + " transform:" + count_worker_transform + ")";
+			return result;
+		}
 	}
-
 }

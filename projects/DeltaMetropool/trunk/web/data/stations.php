@@ -9,17 +9,18 @@
 	function printStations()
 	{
 		$station_fields = array(
-		'id', 'code', 'name', 
-		'description_facts', 'description_background', 'description_future', 
-		'image', 'town', 'region', 
-		'POVN', 'PWN', 'IWD', 'MNG',
-		'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 
-		'area_undeveloped_urban', 'area_undeveloped_rural',
-		'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed',
-		'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural',
-		'count_home_total', 'count_home_transform',
-		'count_work_total', 'count_work_transform',
-		'team_id'
+			'id', 'code', 'name', 
+			'description_facts', 'description_background', 'description_future', 
+			'image', 'town', 'region', 
+			'POVN', 'PWN', 'IWD', 'MNG',
+			'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 
+			'area_undeveloped_urban', 'area_undeveloped_rural',
+			'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed',
+			'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural',
+			'count_home_total', 'count_home_transform',
+			'count_work_total', 'count_work_transform',
+			'count_worker_total', 'count_worker_transform', 
+			'team_id'
 		);
 		
 		$round_fields = array(

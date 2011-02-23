@@ -45,6 +45,8 @@
 		public var count_home_transform:int = 0;
 		public var count_work_total:int = 0;
 		public var count_work_transform:int = 0;
+		public var count_worker_total:int = 0;
+		public var count_worker_transform:int = 0;
 		
 		public var rounds:Array = new Array();
 		
@@ -72,7 +74,6 @@
 				if (round.plan_program.TotalArea() > 0)
 					allocated = round.exec_program.TotalArea() / round.plan_program.TotalArea();
 			}
-
 			areaBar.drawStationCircle(allocated);
 		}
 		
@@ -192,6 +193,20 @@
 				Debug.out("   " + round.plan_program);
 				Debug.out("   " + round.exec_program);
 			}
+		}
+		
+		public function ToString():String
+		{
+			var result:String = ""
+			result += "------------------------\n";
+			result += name + " of team " + team_id + "\n";
+			result += "POVN:" + POVN + " PWN:" + PWN + " IWD:" + IWD + " MNG:" + MNG + "\n";
+			result += "area: (h:" + area_cultivated_home + " w:" + area_cultivated_work + " l:" + area_cultivated_mixed + " u:" + area_undeveloped_urban + " r:" + area_undeveloped_rural + ")\n";
+			result += "transform: (h:" + transform_area_cultivated_home + " w:" + transform_area_cultivated_work + " l:" + transform_area_cultivated_mixed + " u:" + transform_area_undeveloped_urban + " r:" + transform_area_undeveloped_rural + ")\n";
+			result += "houses: (total:" + count_home_total + " tranform:" + count_home_transform + ")\n";
+			result += "bvo work: (total:" + count_work_total + " transform:" + count_work_transform + ")\n";
+			result += "workers: (total:" + count_worker_total + " transform:" + count_worker_transform + ")";
+			return result;
 		}
 	}
 }

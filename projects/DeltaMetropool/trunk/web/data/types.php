@@ -9,7 +9,7 @@
 	function printTypes()
 	{
 		$type_fields = array(
-			'id', 'name', 'type', 'description', 'color', 'image', 'density'
+			'id', 'name', 'type', 'description', 'color', 'image', 'area_density', 'people_density'
 		);
 		
 		$demand_fields = array(

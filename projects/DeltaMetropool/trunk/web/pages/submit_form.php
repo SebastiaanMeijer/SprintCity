@@ -506,7 +506,7 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 		SELECT 
 			Program.id AS id, 
 			Program.area_home AS area, 
-			ABS(Station.count_home_total / Station.area_cultivated_home - Types.density) AS density_delta, 
+			ABS(Station.count_home_total / Station.area_cultivated_home - Types.area_density) AS density_delta, 
 			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta 
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
@@ -556,7 +556,7 @@ function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 		SELECT 
 			Program.id AS id, 
 			Program.area_work AS area, 
-			ABS(Station.count_work_total / Station.area_cultivated_work - Types.density) AS density_delta, 
+			ABS(Station.count_work_total / Station.area_cultivated_work - Types.area_density) AS density_delta, 
 			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
