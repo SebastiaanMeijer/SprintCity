@@ -1,7 +1,9 @@
 package SprintStad.Data.Graph 
 {
+	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.net.URLRequest;
 	import SprintStad;
 	import SprintStad.Debug.Debug;
@@ -12,6 +14,8 @@ package SprintStad.Data.Graph
 		private var graphWidth:int = 480;
 		private var graphHeight:int = 220;
 		private var graphType:String = GRAPH_SPACE;
+		
+		private var loader:Loader;
 		
 		public static const GRAPH_SPACE = "spacegraph";
 		public static const GRAPH_MOBILITY = "mobilitygraph";
@@ -25,12 +29,18 @@ package SprintStad.Data.Graph
 		
 		private function LoadImage():void
 		{
-			var loader:Loader = new Loader();
+			this.loader = new Loader();
 			var url:URLRequest = new URLRequest(SprintStad.DOMAIN + 
 				"images/graphs/" + graphType + ".php?station=" + this.stationID + "&width=" + 
 				this.graphWidth + "&height=" + this.graphHeight)
 			Debug.out("Load image: " + url.url);
-			loader.load(url);
+			this.loader.load(url);
+			this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
+		}
+		
+		public function OnLoadComplete(event:Event):void 
+		{
+			Bitmap(this.loader.content).smoothing = true;
 			this.addChild(loader);
 		}
 	}

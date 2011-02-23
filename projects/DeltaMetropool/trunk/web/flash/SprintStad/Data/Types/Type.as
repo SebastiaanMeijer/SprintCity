@@ -104,6 +104,7 @@
 		
 		public function OnLoadComplete(event:Event):void 
 		{
+			Bitmap(this.loader.content).smoothing = true;
 			imageData = new BitmapData(this.loader.width, this.loader.height);
 			imageData.draw(this.loader);
 		}

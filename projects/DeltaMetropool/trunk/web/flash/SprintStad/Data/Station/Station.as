@@ -1,5 +1,6 @@
 ﻿package SprintStad.Data.Station 
 {
+	import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -141,6 +142,7 @@
 		
 		public function OnLoadComplete(event:Event):void 
 		{
+			Bitmap(this.loader.content).smoothing = true;
 			imageData.addChild(this.loader);
 			imageData.width = SprintStad.WIDTH;
 			imageData.height = SprintStad.HEIGHT;
