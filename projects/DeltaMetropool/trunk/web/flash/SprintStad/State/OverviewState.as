@@ -137,8 +137,8 @@
 				parent.overview_movie.map.addChild(selection);
 				selection.x = -500;
 				selection.y = -500;
-				selection.width = 9;
-				selection.height = 9;
+				selection.width = 8.5;
+				selection.height = 8.5;
 			}
 			catch (e:Error)
 			{

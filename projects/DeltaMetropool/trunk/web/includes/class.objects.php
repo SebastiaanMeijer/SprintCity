@@ -131,7 +131,7 @@
 				'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
-				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform'), 
+				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform', 'count_worker_total', 'count_worker_transform'), 
 				$id);
 		}
 		
@@ -702,7 +702,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Type', array('id', 'name', 'description', 'color', 'image', 'density', 'povn'), $id);
+			parent::__construct('Type', array('id', 'name', 'description', 'color', 'image', 'area_density', 'people_density', 'povn'), $id);
 		}
 		
 		public static function getTypes()

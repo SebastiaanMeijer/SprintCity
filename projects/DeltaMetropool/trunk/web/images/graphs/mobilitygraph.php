@@ -162,19 +162,6 @@ function LoadTravelerDataMinMax($game_id)
 					(
 						(
 							(
-								Station.area_cultivated_mixed - 
-								(
-									(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-									* 
-									(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-								)
-							) 
-							* 
-							Constants.average_travelers_per_ha_leisure 
-						)
-						+
-						(
-							(
 								(
 									(
 										Station.area_cultivated_home - 
@@ -188,7 +175,7 @@ function LoadTravelerDataMinMax($game_id)
 									(count_home_total / area_cultivated_home)
 								) 
 								+ 
-								SUM(Program.area_home * TypesHome.density)
+								SUM(Program.area_home * TypesHome.area_density)
 							) 
 							* 
 							Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
@@ -206,13 +193,34 @@ function LoadTravelerDataMinMax($game_id)
 										)
 									)
 									* 
-									(count_work_total / area_cultivated_work)
+									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
 								) 
 								+ 
-								SUM(Program.area_work * TypesWork.density)
+								SUM(Program.area_work * TypesWork.people_density)
+							)
+							*
+							Constants.average_travelers_per_worker
+						)
+						+
+						(
+							(
+								(
+									(
+										Station.area_cultivated_mixed - 
+										(
+											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+											* 
+											(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										)
+									)
+									* 
+									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+								) 
+								+ 
+								SUM(Program.area_leisure * TypesLeisure.people_density)
 							) 
-							* 
-							Constants.average_workers_per_bvo * Constants.average_travelers_per_worker
+							*
+							Constants.average_travelers_per_worker
 						)
 					)
 					*
@@ -232,6 +240,7 @@ function LoadTravelerDataMinMax($game_id)
 				INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
 				INNER JOIN Types AS TypesHome ON Program.type_home = TypesHome.id
 				INNER JOIN Types AS TypesWork ON Program.type_work = TypesWork.id
+				INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
 				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
@@ -289,19 +298,6 @@ function LoadTravelerData($game_id, $station_id)
 				(
 					(
 						(
-							Station.area_cultivated_mixed - 
-							(
-								(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-								* 
-								(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-							)
-						) 
-						* 
-						Constants.average_travelers_per_ha_leisure 
-					)
-					+
-					(
-						(
 							(
 								(
 									Station.area_cultivated_home - 
@@ -315,7 +311,7 @@ function LoadTravelerData($game_id, $station_id)
 								(count_home_total / area_cultivated_home)
 							) 
 							+ 
-							SUM(Program.area_home * TypesHome.density)
+							SUM(Program.area_home * TypesHome.area_density)
 						) 
 						* 
 						Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
@@ -333,13 +329,34 @@ function LoadTravelerData($game_id, $station_id)
 									)
 								)
 								* 
-								(count_work_total / area_cultivated_work)
+								(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
 							) 
 							+ 
-							SUM(Program.area_work * TypesWork.density)
+							SUM(Program.area_work * TypesWork.people_density)
+						)
+						*
+						Constants.average_travelers_per_worker
+					)
+					+
+					(
+						(
+							(
+								(
+									Station.area_cultivated_mixed - 
+									(
+										(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+										* 
+										(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+									)
+								)
+								* 
+								(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+							) 
+							+ 
+							SUM(Program.area_leisure * TypesLeisure.people_density)
 						) 
-						* 
-						Constants.average_workers_per_bvo * Constants.average_travelers_per_worker
+						*
+						Constants.average_travelers_per_worker
 					)
 				)
 				*
@@ -359,6 +376,7 @@ function LoadTravelerData($game_id, $station_id)
 			INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
 			INNER JOIN Types AS TypesHome ON Program.type_home = TypesHome.id
 			INNER JOIN Types AS TypesWork ON Program.type_work = TypesWork.id
+			INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 			INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
 			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id

@@ -43,7 +43,7 @@
 		{
 			var constants:Constants = Data.Get().GetConstants();
 			var result:Number = station.count_home_total * constants.average_citizens_per_home * constants.average_travelers_per_citizen + 
-				station.count_work_total * constants.average_workers_per_bvo * constants.average_travelers_per_worker + 
+				station.count_worker_total * constants.average_travelers_per_worker + 
 				station.area_cultivated_mixed * constants.average_travelers_per_ha_leisure;
 			return result;
 		}

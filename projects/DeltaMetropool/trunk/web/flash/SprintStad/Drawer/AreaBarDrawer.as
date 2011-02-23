@@ -29,14 +29,14 @@
 			DrawBar(0, 0, 0, 0, 0, 0);
 		}
 		
-		public function DrawBar(home:int, work:int, leisure:int, urban:int, rural:int, empty:int)
+		public function DrawBar(home:Number, work:Number, leisure:Number, urban:Number, rural:Number, empty:Number)
 		{
 			bar.visible = true;
 			clearBar();
 			
 			var areas:Array = new Array(
 				home, work, leisure, urban, rural, empty);
-			var total_area:int = home + work + leisure + urban + rural + empty;
+			var total_area:Number = home + work + leisure + urban + rural + empty;
 			
 			
 			for (var i:int = 0; i < colors.length; i++)
@@ -117,31 +117,32 @@
 			for (var i:int = 0; i < round_id; i++)
 			{
 				var round:Round = station.GetRoundById(i);
+				var index:int;
 				if (round != null)
 				{
-						if (round.exec_program.area_home > 0)
-						{
-							var index:int = types.getIndex(round.exec_program.type_home);
-							allocated[index] += round.exec_program.area_home;
-							if (round.exec_program.type_home.type != "average_home")
-								specialHome += round.exec_program.area_home;
-						}
-						if ( round.exec_program.area_work > 0)
-						{
-							index = types.getIndex(round.exec_program.type_work);
-							allocated[index] += round.exec_program.area_work;
-							if (round.exec_program.type_work.type != "average_work")
-								specialWork += round.exec_program.area_work;
-						}
-						if ( round.exec_program.area_leisure > 0)
-						{
-							index = types.getIndex(round.exec_program.type_leisure);
-							allocated[index] += round.exec_program.area_leisure;
-							if (round.exec_program.type_leisure.type != "average_leisure")
-								specialLeisure += round.exec_program.area_leisure;
-						}
-						if(round.round_info_id + 1 <= round_id)
-							stationInstance.ApplyRound(round);
+					if (round.exec_program.area_home > 0)
+					{
+						index = types.getIndex(round.exec_program.type_home);
+						allocated[index] += round.exec_program.area_home;
+						if (round.exec_program.type_home.type != "average_home")
+							specialHome += round.exec_program.area_home;
+					}
+					if ( round.exec_program.area_work > 0)
+					{
+						index = types.getIndex(round.exec_program.type_work);
+						allocated[index] += round.exec_program.area_work;
+						if (round.exec_program.type_work.type != "average_work")
+							specialWork += round.exec_program.area_work;
+					}
+					if ( round.exec_program.area_leisure > 0)
+					{
+						index = types.getIndex(round.exec_program.type_leisure);
+						allocated[index] += round.exec_program.area_leisure;
+						if (round.exec_program.type_leisure.type != "average_leisure")
+							specialLeisure += round.exec_program.area_leisure;
+					}
+					if(round.round_info_id + 1 <= round_id)
+						stationInstance.ApplyRound(round);
 				}
 			}
 			
@@ -175,7 +176,6 @@
 			
 			bar.visible = true;
 			
-						
 			//Go through all the categories in the right order
 			var categories:Array = new Array("average_home", "home", "average_work", "work", "average_leisure", "leisure");
 			
@@ -201,9 +201,8 @@
 					
 					if (allocated[type.id - 1] > 0)
 					{
-						sum = sum + Math.ceil(allocated[type.id - 1]);
-						appendClip(type, total_area, Math.ceil(allocated[type.id - 1]));
-						
+						sum = sum + allocated[type.id - 1];
+						appendClip(type, total_area, allocated[type.id - 1]);
 					}
 				}
 			}
@@ -211,17 +210,13 @@
 			var baseUrban:int = stationInstance.transform_area_undeveloped_urban;
 			var baseRural:int = stationInstance.transform_area_undeveloped_rural;
 			
-			//TODO: Netter maker dan hardcoded Urban en Rural toevoegen.
 			if(baseUrban > 0)
 				appendClipByMovieClip(new ColorUrban(), total_area, baseUrban);
 			if(baseRural > 0)
 				appendClipByMovieClip(new ColorRural(), total_area, baseRural);
-			
-				
-			
 		}
 
-		public function appendClip(type:Type, totalArea:int, clipArea:int)
+		public function appendClip(type:Type, totalArea:Number, clipArea:Number)
 		{
 			var barWidth:Number = clipArea / totalArea * 100;
 			var newColorClip:MovieClip = new MovieClip();
@@ -240,9 +235,11 @@
 			bar.addChild(newColorClip);
 		}
 		
-		public function appendClipByMovieClip(newColorClip:MovieClip, totalArea:int, clipArea:int)
+		public function appendClipByMovieClip(newColorClip:MovieClip, totalArea:Number, clipArea:Number)
 		{
-			var barWidth:Number = clipArea / totalArea * 100;
+			var barWidth:Number = 0
+			if (totalArea != 0)
+				barWidth = clipArea / totalArea * 100;
 			newColorClip.x = this.startX;
 			newColorClip.y = 0;
 			newColorClip.width = barWidth;

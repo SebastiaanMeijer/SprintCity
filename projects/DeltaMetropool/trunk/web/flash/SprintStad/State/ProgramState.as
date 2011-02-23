@@ -120,31 +120,20 @@
 				station.area_undeveloped_urban,
 				station.area_undeveloped_rural,
 				0);
-			clip.area.text = "(" + Math.round(
-				station.area_cultivated_home +
-				station.area_cultivated_work +
-				station.area_cultivated_mixed + 
-				station.area_undeveloped_urban + 
-				station.area_undeveloped_rural) + " ha.)";
-		
-				if (title == "TOEKOMST")
-				{
-					transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), CreateProgram());
-				}
-				else
-				{
-					transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), null);
-				}
-			clip.transform_area.text = "(" + Math.round( 
-				station.transform_area_cultivated_home + 
-				station.transform_area_cultivated_work + 
-				station.transform_area_cultivated_mixed +  
-				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_rural) + " ha resterend.)";
-				
+			clip.area.text = "(" + Math.round(station.GetTotalArea()) + " ha.)";
+			
+			transform_area_bar.DrawBar(
+				station.transform_area_cultivated_home,
+				station.transform_area_cultivated_work,
+				station.transform_area_cultivated_mixed,
+				station.transform_area_undeveloped_urban,
+				station.transform_area_undeveloped_rural,
+				0);
+			clip.transform_area.text = "(" + Math.round( station.GetTotalTransformArea()) + " ha resterend.)";
+			
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
-			clip.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
+			clip.amount_workers.text = Math.round(station.count_worker_total);
 			clip.amount_houses.text = Math.round(station.count_home_total);
 			clip.bvo_work.text = Math.round(station.count_work_total);
 		}

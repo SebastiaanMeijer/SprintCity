@@ -135,16 +135,17 @@
 				Debug.out(event.target.data);
 			}
 			
+			var callback:Function;
 			try
 			{
-				for each (var callback:Function in jobs[currentJob])
+				for each (callback in jobs[currentJob])
 				{
 					callback.call(this, currentJob);
 				}
 			}
 			catch (e:Error)
 			{
-				Debug.out("error in dataloader callback functions, LoadingDone() on Job:" + currentJob);
+				Debug.out("error in dataloader callback function: " + callback + ", LoadingDone() on Job:" + currentJob);
 			}			
 			jobs[currentJob] = new Array();			
 			NextJob();
