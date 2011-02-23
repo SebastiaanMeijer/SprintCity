@@ -68,11 +68,11 @@
 			// right info
 			view.description_background.editable = false;
 			view.description_background.setStyle("textFormat", textAreaFormat);
-			view.description_background.text = station.description_background.split("\\n").join("\n");
+			view.description_background.text = station.description_background.split("[n]").join("\n");
 			
 			view.description_future.editable = false;
 			view.description_future.setStyle("textFormat", textAreaFormat);
-			view.description_future.text = station.description_future.split("\\n").join("\n");
+			view.description_future.text = station.description_future.split("[n]").join("\n");
 			
 			// background
 			view.sheet.addChild(station.imageData);
