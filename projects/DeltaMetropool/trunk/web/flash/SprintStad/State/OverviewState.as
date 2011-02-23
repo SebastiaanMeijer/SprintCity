@@ -30,7 +30,6 @@
 		private var parent:SprintStad = null;
 		private var selection:StationSelection = new StationSelection();
 		
-		private var stationIndex:int = 0;
 		private var loadCount:int = 0;
 		
 		private var barInitial:AreaBarDrawer;
@@ -385,7 +384,7 @@
 			var roundNameStart:String = "";
 			var roundNameFinish:String = "";
 			
-			for each (var round:Round in Data.Get().GetStations().GetStation(stationIndex).rounds)
+			for each (var round:Round in Data.Get().GetStations().GetStation(parent.currentStationIndex).rounds)
 			{
 				if (round.round_info_id == roundID)
 					roundNameFinish = round.name;
@@ -408,8 +407,6 @@
 		// Displays the right mode button and mode title
 		private function SetMode(mode:int):void
 		{
-			var parent:MovieClip = parent.overview_movie;
-			
 			HideModeElements();
 			
 			Debug.out("setmode");
@@ -425,48 +422,48 @@
 		
 		private function HideModeElements():void
 		{
-			var parent:MovieClip = parent.overview_movie;
-			parent.spacePanelElements.visible = false;
-			parent.mobilityPanelElements.visible = false;
-			parent.mobilityDevelopment.visible = false;
+			var parentMovie:MovieClip = parent.overview_movie;
+			parentMovie.spacePanelElements.visible = false;
+			parentMovie.mobilityPanelElements.visible = false;
+			parentMovie.mobilityDevelopment.visible = false;
 			
-			parent.space_button.visible = false;
-			parent.mobility_button.visible = false;
+			parentMovie.space_button.visible = false;
+			parentMovie.mobility_button.visible = false;
 			
-			parent.spaceTitle.visible = false;
-			parent.mobilityTitle.visible = false;
+			parentMovie.spaceTitle.visible = false;
+			parentMovie.mobilityTitle.visible = false;
 			
-			parent.lineGraphContainer.visible = false;
+			parentMovie.lineGraphContainer.visible = false;
 			
-			parent.space_button.removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
-			parent.mobility_button.removeEventListener(MouseEvent.CLICK, OnMobilityButton);
+			parentMovie.space_button.removeEventListener(MouseEvent.CLICK, OnSpaceButton); // test
+			parentMovie.mobility_button.removeEventListener(MouseEvent.CLICK, OnMobilityButton);
 			
 			Debug.out("Hid mode elements");
 		}
 		
 		private function SetSpaceMode():void
 		{
-			var parent:MovieClip = parent.overview_movie;
+			var parentMovie:MovieClip = parent.overview_movie;
 			currentMode = SPACE_MODE;
 			Debug.out("Now entering Space Mode.")
 			try 
 			{
 				// set panel
-				parent.spacePanelElements.visible = true;
+				parentMovie.spacePanelElements.visible = true;
 				
 				// set button
-				parent.mobility_button.visible = true;
+				parentMovie.mobility_button.visible = true;
 				
 				// set eventlistener
-				parent.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
+				parentMovie.mobility_button.addEventListener(MouseEvent.CLICK, OnMobilityButton);
 				
 				// set title
-				parent.spaceTitle.visible = true;
+				parentMovie.spaceTitle.visible = true;
 				
 				// graph
-				parent.lineGraphContainer.visible = true;
+				parentMovie.lineGraphContainer.visible = true;
 				
-				RefreshLineGraphs(Data.Get().GetStations().GetStation(stationIndex));
+				RefreshLineGraphs(Data.Get().GetStations().GetStation(parent.currentStationIndex));
 				
 				// set panels
 				Debug.out("...Entered Space Mode");
@@ -479,30 +476,30 @@
 
 		private function SetMobilityMode():void
 		{
-			var parent:MovieClip = parent.overview_movie;
+			var parentMovie:MovieClip = parent.overview_movie;
 			currentMode = MOBILITY_MODE;
 			Debug.out("Now entering Mobility mode.")
 			try 
 			{
 				// set panel
-				parent.mobilityPanelElements.visible = true;
+				parentMovie.mobilityPanelElements.visible = true;
 				
 				// set description
-				parent.mobilityDevelopment.visible = true;
+				parentMovie.mobilityDevelopment.visible = true;
 				
 				// set button
-				parent.space_button.visible = true;
+				parentMovie.space_button.visible = true;
 				
 				// set eventlistener
-				parent.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
+				parentMovie.space_button.addEventListener(MouseEvent.CLICK, OnSpaceButton);
 				
 				// set title
-				parent.mobilityTitle.visible = true;
+				parentMovie.mobilityTitle.visible = true;
 				
 				// graph
-				parent.lineGraphContainer.visible = true;
+				parentMovie.lineGraphContainer.visible = true;
 				
-				RefreshLineGraphs(Data.Get().GetStations().GetStation(stationIndex));
+				RefreshLineGraphs(Data.Get().GetStations().GetStation(parent.currentStationIndex));
 			}
 			catch (e:Error)
 			{
