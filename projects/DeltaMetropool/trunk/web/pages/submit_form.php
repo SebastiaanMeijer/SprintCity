@@ -387,7 +387,8 @@ function CalculateFinalPrograms($game_id)
 		SELECT Demand.type_id AS type, SUM(Demand.amount) AS demand
 		FROM Demand 
 		INNER JOIN RoundInfo ON Demand.round_info_id = RoundInfo.id 
-		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id 
+		INNER JOIN Scenario ON Demand.scenario_id = Scenario.id 
+		INNER JOIN Game ON RoundInfo.id <= Game.current_round_id AND Scenario.id = Game.scenario_id 
 		WHERE Game.id = :game_id 
 		GROUP BY Demand.type_id;";
 	$args = array('game_id' => $game_id);

@@ -61,11 +61,14 @@
 	function getDemands($type_id)
 	{
 		$db = Database::getDatabase();
+		$game_id = Game::getGameIdOfSession(session_id());
 		$query = "
 			SELECT * 
-			FROM Demand
-			WHERE type_id=:type_id";
-		$args = array('type_id' => $type_id);
+			FROM Demand 
+			INNER JOIN Scenario ON Demand.scenario_id = Scenario.id 
+			INNER JOIN Game ON Scenario.id = Game.scenario_id 
+			WHERE Game.id=:game_id && Demand.type_id=:type_id";
+		$args = array('game_id' => $game_id, 'type_id' => $type_id);
 		return $db->query($query, $args);
 	}
 ?>
