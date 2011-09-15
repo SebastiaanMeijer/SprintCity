@@ -137,7 +137,7 @@
             {
                 if($k == $this->idColumnName)
                     $this->id = $v;
-                elseif(array_key_exists($k, $this->columns))
+                if(array_key_exists($k, $this->columns))
                     $this->columns[$k] = $v;
             }
         }
