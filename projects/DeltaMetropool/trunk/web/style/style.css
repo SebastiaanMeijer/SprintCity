@@ -12,6 +12,16 @@ a:hover {
 	background-color: #cccccc;
 }
 
+a.button {
+	padding: 2px 4px;
+	background-color: #f0f0f0;
+	border: 1px solid #a7a7a7;
+}
+
+a.button:hover {
+	background-color: #cccccc;
+}
+
 input {
 	border: 1px solid #a7a7a7;
 }
@@ -151,8 +161,27 @@ table.data td {
 	border-left: 1px solid #bbbbbb;
 }
 
+td {
+	height: 24px;
+}
+
 tr.even {
 	background-color: #e0e0e0;
+}
+
+tr.error {
+	background-color: #ffd0d0;
+	border: 2px solid #ff0000;
+}
+
+tr.warning {
+	background-color: #ffffe0;
+	border: 2px solid #ffff00;
+}
+
+tr.success {
+	background-color: #d0ffd0;
+	border: 2px solid #00ff00;
 }
 
 ul.pager {

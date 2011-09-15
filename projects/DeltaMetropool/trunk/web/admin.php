@@ -24,14 +24,13 @@
 	<div id="bd">
 		<div id="yui-main">
 			<div class="yui-b">
-				<?php
-					if (isset($_GET['view']) && 
-						file_exists('pages/' . $_GET['view'] . '.php')) 
-						include('pages/' . $_GET['view'] . '.php');
-					else 
-						include('pages/games.php');
-				?>
-				
+<?php
+	if (isset($_GET['view']) && 
+		file_exists('pages/' . $_GET['view'] . '.php')) 
+		include('pages/' . $_GET['view'] . '.php');
+	else 
+		include('pages/games.php');
+?>			
 			</div>
 		</div>
 		<div class="yui-b">
@@ -47,7 +46,7 @@
 			<div class="menu-header">Data</div>
 			<div class="menu-body">
 				<ul>
-					<li><a href="admin.php?view=stations">Stations</a></li>
+					<li><a href="admin.php?view=stations">Station</a></li>
 					<li><a href="admin.php?view=rounds">Ronden</a></li>
 					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
 					<li><a href="admin.php?view=build_options">Bouw opties</a></li>

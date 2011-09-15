@@ -60,7 +60,6 @@
 		
 		public static function getTeamsInGame($gameId)
 		{
-			
 			$db = Database::getDatabase();
 			$query = "
 				SELECT Team.id, Team.name, Team.description, Team.cpu, Team.created
@@ -133,6 +132,32 @@
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
 				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform', 'count_worker_total', 'count_worker_transform'), 
 				$id);
+		}
+		
+		public static function getDefaultStation()
+		{
+			$station = new Station();
+			$station->POVN = 0;
+			$station->PWN = 0;
+			$station->IWD = 0;
+			$station->MNG = 0;
+			$station->area_cultivated_home = 0;
+			$station->area_cultivated_work = 0;
+			$station->area_cultivated_mixed = 0;
+			$station->area_undeveloped_urban = 0;
+			$station->area_undeveloped_rural = 0;
+			$station->transform_area_cultivated_home = 0;
+			$station->transform_area_cultivated_work = 0;
+			$station->transform_area_cultivated_mixed = 0;
+			$station->transform_area_undeveloped_urban = 0;
+			$station->transform_area_undeveloped_rural = 0;
+			$station->count_home_total = 0;
+			$station->count_home_transform = 0;
+			$station->count_work_total = 0;
+			$station->count_work_transform = 0;
+			$station->count_worker_total = 0;
+			$station->count_worker_transform = 0;
+			return $station;
 		}
 		
 		public static function getInitialCitizenCount($station_id)
@@ -215,9 +240,70 @@
 			return $db->getValue("SELECT COUNT(*) FROM station");
 		}
 		
+		public static function isStationCodeUnique($code, $id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT COUNT(*)
+				FROM Station
+				WHERE name = :code AND id != :id";
+			$args = array('code' => $code, 'id' => $id);
+			$result = $db->query($query, $args);
+			return $db->getValue($result) == 0;
+		}
+		
+		public static function isStationNameUnique($name, $id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT COUNT(*)
+				FROM Station
+				WHERE name = :name AND id != :id";
+			$args = array('name' => $name, 'id' => $id);
+			$result = $db->query($query, $args);
+			return $db->getValue($result) == 0;
+		}
+		
+		public static function getAllStations()
+		{
+			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `name` ASC");
+		}
+		
 		public static function getStations($fromIndex, $numberOfRecords)
 		{
-			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `code` ASC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Station
+				ORDER BY code ASC LIMIT :from_index, :number_of_records;";
+			$args = array('from_index' => $fromIndex, 'number_of_records' => $numberOfRecords);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
+		}
+		
+		public static function getStationById($id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Station
+				WHERE Station.id = :station_id;";
+			$args = array('station_id' => $id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
+		}
+		
+		public static function getStationByCode($code)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Station
+				WHERE Station.code = :station_code
+				LIMIT 0, 1;";
+			$args = array('station_code' => $code);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
 		}
 		
 		public static function getStationsOfScenario($scenarioId)
@@ -400,7 +486,25 @@
 		
 		public static function getRoundsByStation($station_id)
 		{
-			return DBObject::glob("Round", "SELECT * FROM `round` WHERE station_id = " . $station_id);
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Round
+				WHERE station_id = :stationId;";
+			$args = array('stationId' => $station_id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Round", $result);
+		}
+		
+		public static function getUsedRoundInfos()
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInfo.*
+				FROM RoundInfo
+				INNER JOIN Round ON RoundInfo.id = Round.round_info_id
+				GROUP BY RoundInfo.id";
+			return DBObject::glob("RoundInfo", $query);
 		}
 	}
 	
