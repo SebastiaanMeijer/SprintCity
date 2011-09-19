@@ -11,7 +11,7 @@
 		$station_fields = array(
 			'id', 'code', 'name', 
 			'description_facts', 'description_background', 'description_future', 
-			'image', 'town', 'region', 
+			'town', 'region', 
 			'POVN', 'PWN', 'IWD', 'MNG',
 			'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 
 			'area_undeveloped_urban', 'area_undeveloped_rural',
@@ -39,6 +39,7 @@
 		echo '<stations>' . "\n";
 		echo "\t" . '<mapx>' . $scenario[key($scenario)]->init_map_position_x . '</mapx>' . "\n";
 		echo "\t" . '<mapy>' . $scenario[key($scenario)]->init_map_position_y . '</mapy>' . "\n";
+		echo "\t" . '<mapscale>' . $scenario[key($scenario)]->init_map_scale . '</mapscale>' . "\n";
 		while ($station_row = mysql_fetch_array($station_result))
 		{
 			echo "\t" . '<station>' . "\n";

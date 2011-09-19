@@ -10,6 +10,7 @@
 		
 		public var MapX:Number = 0;
 		public var MapY:Number = 0;
+		public var ScaleFactor:Number = 0;
 		
 		public var MaxPOVN:Number = 0;
 		public var MaxPWN:Number = 0;
@@ -121,6 +122,7 @@
 			var index:int = 0;
 			this.MapX = Number(xmlData.mapx);
 			this.MapY = Number(xmlData.mapy);
+			this.ScaleFactor = Number(xmlData.mapscale);
 			stationXml = xmlData.station[index];
 			while (stationXml != null)
 			{
