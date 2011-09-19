@@ -18,6 +18,8 @@
 	import SprintStad.Drawer.AreaBarDrawer;
 	public class Station
 	{	
+		public static var image:String = "/SprintStad/images/stations/";
+		
 		public var id:int = 0;
 		public var team_id:int = 0;
 		public var code:String = "";
@@ -25,7 +27,6 @@
 		public var description_facts:String = "";
 		public var description_background:String = "";
 		public var description_future:String = "";
-		public var image:String = "";
 		public var town:String = "";
 		public var region:String = "";
 		public var POVN:Number = 0;
@@ -130,7 +131,7 @@
 			{
 				this.owner = Data.Get().GetTeams().GetTeamById(team_id);
 				this.loader = new Loader();
-				this.loader.load(new URLRequest(image));
+				this.loader.load(new URLRequest(image + this.code + ".png"));
 				this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, OnLoadComplete);
 				this.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR , OnLoadError);
 			}
@@ -150,7 +151,7 @@
 
 		function OnLoadError(e:IOErrorEvent):void 
 		{
-			ErrorDisplay.Get().DisplayError("error loading: " + image);
+			ErrorDisplay.Get().DisplayError("error loading: " + image + this.code +".png");
 		}
 		
 		public function ParseXML(xmlData:XML):void

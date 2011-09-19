@@ -394,7 +394,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Scenario', array('id', 'name', 'description', 'init_map_position_x', 'init_map_position_y'), $id);
+			parent::__construct('Scenario', array('id', 'name', 'description', 'init_map_position_x', 'init_map_position_y', 'init_map_scale'), $id);
 		}
 		
 		public static function rowCount()

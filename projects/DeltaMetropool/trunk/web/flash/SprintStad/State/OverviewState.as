@@ -1,11 +1,14 @@
 ﻿package SprintStad.State 
 {
 	import fl.motion.Color;
+	import fl.motion.MatrixTransformer;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
@@ -58,7 +61,14 @@
 			// set map position
 			parent.overview_movie.map.x = stations.MapX;
 			parent.overview_movie.map.y = stations.MapY;
-			
+			// Scale according to scenario
+			var relPosX:Number = parent.overview_movie.map.x / parent.overview_movie.map.width;
+			var relPosY:Number = parent.overview_movie.map.y / parent.overview_movie.map.height;
+			parent.overview_movie.map.scaleX *= stations.ScaleFactor;
+			parent.overview_movie.map.scaleY *= stations.ScaleFactor;
+			parent.overview_movie.map.x = relPosX * parent.overview_movie.map.width + (.5 * parent.stage.stageWidth * (1-stations.ScaleFactor));
+			parent.overview_movie.map.y = relPosY * parent.overview_movie.map.height + (.5 * parent.stage.stageHeight * (1-stations.ScaleFactor));
+
 			// setup station circles
 			FillStationCircles(stations);
 			
@@ -82,12 +92,11 @@
 			{
 				Debug.out("Activate OverviewState");
 				var view:MovieClip = parent.overview_movie;
+				var map:MovieClip = view.map;
 				var station:Station;
 				
 				// set map position
 				var stations:Stations = Data.Get().GetStations();
-				parent.overview_movie.map.x = stations.MapX;
-				parent.overview_movie.map.y = stations.MapY;
 				
 				parent.addChild(SprintStad.LOADER);
 				
@@ -509,8 +518,7 @@
 		
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
-			var pattern:RegExp = / /g;
-			var movie_name:String = station.name.replace(pattern, "_");
+			var movie_name:String = station.code;
 			return MovieClip(parent.overview_movie.map.getChildByName(movie_name));
 		}
 		
