@@ -46,10 +46,8 @@
 			<div class="menu-header">Data</div>
 			<div class="menu-body">
 				<ul>
-					<li><a href="admin.php?view=stations">Station</a></li>
-					<li><a href="admin.php?view=rounds">Ronden</a></li>
-					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
-					<li><a href="admin.php?view=build_options">Bouw opties</a></li>
+					<li><a href="admin.php?view=station">Station</a></li>
+					<li><a href="admin.php?view=scenario">Scenario</a></li>
 					<li><a href="admin.php?view=constants">Constanten</a></li>
 				</ul>
 			</div>

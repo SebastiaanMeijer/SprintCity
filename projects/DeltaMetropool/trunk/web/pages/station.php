@@ -11,16 +11,16 @@ if (isset($_GET['action']))
 	switch($_GET['action'])
 	{
 		case "edit":
-			include 'pages/stations/edit.php';
+			include 'pages/station/edit.php';
 			break;
 		default:
-			include 'pages/stations/list.php';
+			include 'pages/station/list.php';
 			break;
 	}
 }
 else
 {
-	include 'pages/stations/list.php';
+	include 'pages/station/list.php';
 }
 ?>
 					</table>
