@@ -3,7 +3,7 @@
 	if(!$Auth->loggedIn()) redirect('../login.php');
 ?>
 				<div class="area">
-					<h2>Stations</h2>
+					<h2>Station</h2>
 					<table>
 <?php 
 if (isset($_GET['action']))
