@@ -311,10 +311,10 @@
 			$db = Database::getDatabase();
 			$query = "
 				SELECT Station.* 
-				FROM station 
-				INNER JOIN scenariostation ON station.id = scenariostation.station_id
-				WHERE scenariostation.scenario_id = :scenario_id
-				ORDER BY code;";
+				FROM Station 
+				INNER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
+				WHERE ScenarioStation.scenario_id = :scenario_id
+				ORDER BY ScenarioStation.order;";
 			$args = array('scenario_id' => $scenarioId);
 			$result = $db->query($query, $args);
 			return DBObject::glob("Station", $result);
@@ -397,6 +397,18 @@
 			parent::__construct('Scenario', array('id', 'name', 'description', 'init_map_position_x', 'init_map_position_y', 'init_map_scale'), $id);
 		}
 		
+		public static function getScenarioById($id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Scenario
+				WHERE Scenario.id = :scenario_id;";
+			$args = array('scenario_id' => $id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Scenario", $result);
+		}
+		
 		public static function rowCount()
 		{
 			$db = Database::getDatabase();
@@ -406,6 +418,11 @@
 		public static function getScenarios($fromIndex, $numberOfRecords)
 		{
 			return DBObject::glob("Scenario", "SELECT * FROM `scenario` LIMIT " . $fromIndex . " , " . $numberOfRecords);
+		}
+		
+		public static function getAllScenarios()
+		{
+			return DBObject::glob("Scenario", "SELECT * FROM `scenario`");
 		}
 		
 		public static function getCurrentScenario()
@@ -505,6 +522,34 @@
 				INNER JOIN Round ON RoundInfo.id = Round.round_info_id
 				GROUP BY RoundInfo.id";
 			return DBObject::glob("RoundInfo", $query);
+		}
+	}
+	
+	class Demand extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Demand', 
+				array('id', 'scenario_id', 'round_info_id', 'type_id', 'amount'), $id);
+		}
+		
+		public static function getDemandDescriptionForScenario($scenario_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Types.id, Types.name, Types.color, 
+					GROUP_CONCAT(Demand.round_info_id ORDER BY Demand.round_info_id), 
+					GROUP_CONCAT(Demand.amount ORDER BY Demand.round_info_id)
+				FROM Demand 
+				INNER JOIN Types ON Demand.type_id = Types.id
+				INNER JOIN RoundInfo ON Demand.round_info_id = RoundInfo.id
+				WHERE Demand.scenario_id = :scenarioId
+				GROUP BY Types.id
+				ORDER BY RoundInfo.number;";
+			
+			$args = array('scenarioId' => $scenario_id);
+			$result = $db->query($query, $args);
+			return $result;
 		}
 	}
 	
@@ -812,6 +857,16 @@
 		public static function getTypes()
 		{
 			return DBObject::glob("Type", "SELECT * FROM types");
+		}
+		
+		public static function getSpecificTypes()
+		{
+			return DBObject::glob("Type", "SELECT * FROM types WHERE type = 'home' OR type = 'work' OR type = 'leisure'");
+		}
+		
+		public static function getAverageTypes()
+		{
+			return DBObject::glob("Type", "SELECT * FROM types WHERE type = 'average_home' OR type = 'average_work' OR type = 'average_leisure'");
 		}
 	}
 	
