@@ -170,7 +170,7 @@
 			switch($value['tag'])
 			{
 				case "input":
-					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value=' . $station->{$value['name']} . '>' . "\n";
+					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . $station->{$value['name']} . '">' . "\n";
 				break;
 				case "textarea":
 					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<textarea name="' . $value['name'] . '" rows="' . $value['rows'] . '" style="width:350px;">' . $station->{$value['name']} . '</textarea>' . "\n";
