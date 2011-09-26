@@ -165,9 +165,19 @@ td {
 	height: 24px;
 }
 
+ul.data li {
+	height: 24px;
+	cursor: hand; 
+	cursor: pointer;
+	border: 1px solid #bbbbbb;
+	background-color:#e0e0e0;
+	text-align:center;
+}
+
 tr.even {
 	background-color: #e0e0e0;
 }
+
 
 tr.error {
 	background-color: #ffd0d0;
@@ -184,24 +194,3 @@ tr.success {
 	border: 2px solid #00ff00;
 }
 
-ul.pager {
-	border: 1px solid #bbbbbb;
-	padding: 5px;
-	margin-left: 9px;
-	margin-right: 10px;
-}
-
-ul.pager li {
-	display: inline;
-	list-style-type: none;
-	padding-right: 20px;
-}
-
-ul.pager li.selected {
-	font-weight: bold;
-	text-decoration: underline overline;
-}
-
-ul.pager li.disabled {
-	color: #bbbbbb;
-}

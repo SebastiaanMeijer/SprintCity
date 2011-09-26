@@ -320,6 +320,19 @@
 			return DBObject::glob("Station", $result);
 		}
 		
+		public static function getStationsNotOfScenario($scenarioId)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Station.*
+				FROM Station
+				INNER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
+				WHERE ScenarioStation.scenario_id != :scenario_id";
+			$args = array('scenario_id' => $scenarioId);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Station", $result);
+		}
+		
 		public static function getStationsUsedInGame($gameId)
 		{
 			if (isset($gameId))

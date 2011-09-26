@@ -7,6 +7,7 @@
 	$scenarioId = GetScenarioId();
 	$scenario = null;
 	$stations = null;
+	$otherStations = null;
 	$demand = null;
 	$usedRoundInfos = Round::getUsedRoundInfos();
 	$types = Type::getSpecificTypes();
@@ -34,13 +35,13 @@
 	
 	function InitData()
 	{
-		global $scenarioId, $scenario, $stations, $demand, $types, $usedRoundInfos;
+		global $scenarioId, $scenario, $stations, $otherStations, $demand, $types, $usedRoundInfos;
 		if (isset($_POST['FormAction']))
 		{
+			$stations = array();
 			if (!is_null($scenarioId))
 			{
-				$scenario = new Scenario($scenarioId);
-				$stations = Station::getStationsOfScenario($scenarioId);
+				$scenario = new Scenario($scenarioId);	
 				$demand = GetDemandData($scenarioId);
 			}
 			else
@@ -49,10 +50,19 @@
 				$stations = array();
 				$demand = GetEmptyDemandData();
 			}
-			$scenario->load($_POST);
 			
-			if (ValidateForm())
+			$scenario->load($_POST);
+
+			//Will need to get all the stations and save the data correctly.
+/*			foreach($_POST['stations'] as $code)
 			{
+				array_push($stations, Station::getStationByCode($code));
+			}
+*/		
+			if (ValidateForm())
+			{		
+
+				
 				// TODO: save data here
 				//$stationId = $station->save();
 				//foreach ($rounds as $round)
@@ -62,6 +72,7 @@
 				//}
 				DisplayMessage('success', 'Success', array('De wijzigingen zijn opgeslagen.'));
 			}
+			$otherStations = Station::getStationsNotOfScenario($scenarioId);
 		}
 		else 
 		{
@@ -69,13 +80,15 @@
 			if (!is_null($scenarioId))
 			{
 				$scenario = new Scenario($scenarioId);
-				$stations = Station::getStationsOfScenario($scenarioId);
+				$stations = Station::getStationsOfScenario($scenarioId);			
+				$otherStations = Station::getStationsNotOfScenario($scenarioId);
 				$demand = GetDemandData($scenarioId);
 			}
 			else
 			{
 				$scenario = new Scenario();
 				$stations = array();
+				$otherStations = Station::getAllStations();
 				$demand = GetEmptyDemandData();
 			}
 		}
@@ -186,7 +199,7 @@
 		}
 		echo "\t\t\t\t\t\t" . '</td></tr>';
 	}
-
+	
 	function GenerateDemandForm($demand)
 	{
 		global $class, $usedRoundInfos;
@@ -215,7 +228,7 @@
 ?>
 						<tr>
 							<td>
-								<form action="<?php echo $submitAction ?>" method="POST">
+								<form id="scenarioform" name="scenarioform" onsubmit="formatStations()" method="POST">
 								<table class="data">
 									<tr>
 										<th colspan="3">Algemeen</th>
@@ -243,17 +256,97 @@
 										<td><input type="text" name="init_map_scale" maxLenght="5" value="<?php echo $scenario->init_map_scale; ?>"></td>
 										<td></td>
 									</tr>
-								<table>
+								</table>					
 								
+								<script>
+									$(function() {
+										$( "#stationlist" ).sortable();
+										$( "#stationlist" ).disableSelection();
+									});
+									
+									function removeStation(element)
+									{
+										var select = document.getElementById("newstation");
+										var list = document.getElementById("stationlist");
+										var newoption = document.createElement('option');
+										newoption.value = element.id;
+										newoption.innerHTML = element.innerHTML;
+										select.add(newoption);
+										list.removeChild(element);
+									}
+									
+									function addStation(selectedIndex)
+									{
+										var select = document.getElementById("newstation");
+										var list = document.getElementById("stationlist");
+										var code = select.options[select.selectedIndex].value;
+										var name = select.options[select.selectedIndex].text;
+										var newelement = document.createElement('li');
+										newelement.innerHTML = name;
+										newelement.id = code;
+										newelement.setAttribute('ondblclick', "removeStation(this)");
+										select.remove(select.selectedIndex);
+										list.insertBefore(newelement, list.lastChild);
+									}
+									
+									//Make sure the stations are returned in the correct order.
+									function formatStations()
+									{
+										var stationlist = document.getElementById("stationlist");
+										var scenarioform = document.getElementById("scenarioform");
+										for(var i = 0; i < stationlist.children.length; i++)
+										{
+											var inputfield = document.createElement('input');
+											inputfield.type = "hidden";
+											inputfield.name = "stations[]";
+											inputfield.value = stationlist.children[i].id;
+											scenarioform.appendChild(inputfield);
+										}
+										document.scenarioform.submit();
+									}
+								</script>
+
 								<table class="data">
 									<tr>
-										<th colspan="3">Stationnen</th>
+										<th colspan="2">Stations</th>
 									</tr>
-								<table>
+									<tr>
+										<td colspan="2">
+											Sleep de stations om de volgorde te wijzigen. <br>
+											Dubbelklik op een station om te verwijderen.
+										</td>
+									</tr>
+									<tr>
+										<td colspan ="2">
+											<ul class="data" id='stationlist' >
+												<?php
+													foreach($stations as $station)
+													{
+														echo "<li id=".$station->code." name=".$station->code." ondblclick=\"removeStation(this)\">" . $station->name . "</li>";
+													}
+												?>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<select id="newstation">
+												<?php
+													foreach($otherStations as $station)
+													{
+														echo "<option value=" . $station->code . ">" . $station->name . "</option>";
+													}
+												?>
+											</select>
+										</td>											
+										<td>
+											<button  type="button" onclick="addStation(newstation.selectedIndex)">Voeg toe</button>
+										</td>
+								</table>
 
-<?php
-	GenerateDemandForm($demand);
-?>
+								<?php
+									GenerateDemandForm($demand);
+								?>
 								<button type="submit" name="FormAction" value="Save">Opslaan</button>
 								</form>
 							</td>
