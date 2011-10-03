@@ -38,7 +38,6 @@
 		public function OnLoadingDone(data:int)
 		{
 			Debug.out(this + " I know " + data);
-
 			parent.currentStationIndex = Data.Get().GetStations().GetStationCount() - 1;
 			parent.currentStationIndex = 
 				Data.Get().GetStations().GetNextStationOfTeam(
