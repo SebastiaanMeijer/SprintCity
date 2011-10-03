@@ -409,7 +409,7 @@
 				FROM Station
 				LEFT OUTER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
 				LEFT OUTER JOIN Scenario ON ScenarioStation.scenario_id = Scenario.id
-				LEFT OUTER JOIN Game ON Game.scenario_id = Scenario.id
+				RIGHT OUTER JOIN Game ON Game.scenario_id = Scenario.id
 				WHERE Station.id = :station_id",
 				array('station_id' => $station_id));
 			return ($db->getValue($result) != 0);
