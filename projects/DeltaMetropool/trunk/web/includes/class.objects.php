@@ -125,9 +125,7 @@
 		{
 			parent::__construct('Station', array(
 				'id', 'code', 'name', 
-				'description_facts', 'description_background', 'description_future', 
-				'image', 'town', 'region', 
-				'POVN', 'PWN', 'IWD', 'MNG', 
+				'description_facts', 'description_background', 'description_future', 'town', 'region', 'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
 				'count_home_total', 'count_home_transform', 'count_work_total', 'count_work_transform', 'count_worker_total', 'count_worker_transform'), 
@@ -402,6 +400,20 @@
 			}
 			return null;
 		}
+		
+		public static function isStationInUse($station_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+				SELECT COUNT(*)
+				FROM Station
+				LEFT OUTER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
+				LEFT OUTER JOIN Scenario ON ScenarioStation.scenario_id = Scenario.id
+				LEFT OUTER JOIN Game ON Game.scenario_id = Scenario.id
+				WHERE Station.id = :station_id",
+				array('station_id' => $station_id));
+			return ($db->getValue($result) != 0);
+		}
 	}
 	
 	class Scenario extends DBObject
@@ -467,6 +479,18 @@
 				WHERE Game.id = :game_id", 
 				array('game_id' => $game_id));
 			return DBObject::glob("Scenario", $result);
+		}
+		public static function isScenarioInUse($scenario_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db -> query("
+				SELECT COUNT(*)
+				FROM GAME
+				LEFT OUTER JOIN Scenario
+				ON Game.scenario_id = Scenario.id
+				WHERE Game.scenario_id = :scenario_id",
+				array('scenario_id' => $scenario_id));
+			return $db->getValue($result) != 0;
 		}
 		
 		public static function isScenarioNameUnique($name, $id)

@@ -1,16 +1,19 @@
 <?php
 	require_once 'includes/master.inc.php';
 	require_once 'pages/station/form.php';
+	
 	if(!$Auth->loggedIn()) redirect('../login.php');
 	
 	$class = new Loop('odd', 'even');
 	
+	$disabled = "";
 	$stationId = GetStationId();
 	$station = null;
 	$rounds = null;
 	$usedRoundInfos = Round::getUsedRoundInfos();
 	InitData();
 	$submitAction = GetSubmitAction();
+	
 	
 	function GetStationId()
 	{
@@ -33,7 +36,12 @@
 	
 	function InitData()
 	{
-		global $stationId, $station, $rounds, $usedRoundInfos;
+		global $disabled, $stationId, $station, $rounds, $usedRoundInfos;
+		$inUse = Station::isStationInUse($stationId);
+		FormInit($inUse);
+		if($inUse)
+			$disabled = "DISABLED";
+			
 		if (isset($_POST['FormAction']))
 		{
 			if (!is_null($stationId))
@@ -52,12 +60,14 @@
 				}
 			}
 			$station->load($_POST);
-			
-			foreach ($rounds as $key => $value)
+			if(!$inUse)
 			{
-				$rounds[$key]->new_transform_area = $_POST['new_transform_area,' . $value->round_info_id];
-				$rounds[$key]->POVN = $_POST['POVN,' . $value->round_info_id];
-				$rounds[$key]->PWN = $_POST['PWN,' . $value->round_info_id];
+				foreach ($rounds as $key => $value)
+				{
+					$rounds[$key]->new_transform_area = $_POST['new_transform_area,' . $value->round_info_id];
+					$rounds[$key]->POVN = $_POST['POVN,' . $value->round_info_id];
+					$rounds[$key]->PWN = $_POST['PWN,' . $value->round_info_id];
+				}
 			}
 			if (ValidateForm())
 			{
@@ -170,7 +180,7 @@
 			switch($value['tag'])
 			{
 				case "input":
-					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . $station->{$value['name']} . '">' . "\n";
+					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . $station->{$value['name']} . '" '. $value['disabled'] . '>' . "\n";
 				break;
 				case "textarea":
 					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<textarea name="' . $value['name'] . '" rows="' . $value['rows'] . '" style="width:350px;">' . $station->{$value['name']} . '</textarea>' . "\n";
@@ -184,7 +194,7 @@
 	
 	function GenerateEmptyRoundsForm()
 	{
-		global $class, $usedRoundInfos;
+		global $class, $usedRoundInfos, $disabled;
 ?>
 								<table class="data">
 									<tr>
@@ -201,21 +211,21 @@
 										<td>Beschikbaar transformatiegebied</td>
 		<?php
 		foreach ($usedRoundInfos as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->id . '" size="8" value="0"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->id . '" size="8" value="0" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td>POVN</td>
 		<?php
 		foreach ($usedRoundInfos as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="POVN,' . $value->id . '" size="8" value="0"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="POVN,' . $value->id . '" size="8" value="0" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td>PWN</td>
 		<?php
 		foreach ($usedRoundInfos as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="PWN,' . $value->id . '" size="8" value="0"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="PWN,' . $value->id . '" size="8" value="0" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 								</table>
@@ -224,7 +234,8 @@
 	
 	function GenerateRoundsForm($rounds)
 	{
-		global $class, $usedRoundInfos;
+		global $class, $usedRoundInfos, $disabled;
+		echo $disabled
 ?>
 								<table class="data">
 									<tr>
@@ -241,21 +252,21 @@
 										<td>Beschikbaar transformatiegebied</td>
 		<?php
 		foreach ($rounds as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->round_info_id . '" value="' . $value->new_transform_area . '" size="8"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->round_info_id . '" value="' . $value->new_transform_area . '" size="8" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td>POVN</td>
 		<?php
 		foreach ($rounds as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="POVN,' . $value->round_info_id . '" value="' . $value->POVN . '" size="8"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="POVN,' . $value->round_info_id . '" value="' . $value->POVN . '" size="8" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td>PWN</td>
 		<?php
 		foreach ($rounds as $key => $value)
-			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="PWN,' . $value->round_info_id . '" value="' . $value->PWN . '" size="8"></td>' . "\n";
+			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="PWN,' . $value->round_info_id . '" value="' . $value->PWN . '" size="8" '.$disabled.'></td>' . "\n";
 		?>
 									</tr>
 								</table>
