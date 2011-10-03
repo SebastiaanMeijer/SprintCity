@@ -35,10 +35,10 @@
 	
 	function InitData()
 	{
-		global $scenarioId, $scenario, $stations, $otherStations, $demand, $types, $usedRoundInfos;
+		global $scenarioId, $scenario, $stations, $otherStations, $demand, $types, $usedRoundInfos, $scenarioInUse;
+		$scenarioInUse = Scenario::isScenarioInUse($scenarioId);
 		if (isset($_POST['FormAction']))
-		{
-			
+		{		
 			$stations = array();
 			if (!is_null($scenarioId))
 			{
@@ -56,6 +56,10 @@
 					$stations[] = array_pop(Station::getStationByCode($code));
 				}
 			}
+			else
+			{
+				$stations = Station::getStationsOfScenario($scenarioId);
+			}
 			$demand = GetEmptyDemandData();
 			if (ValidateForm())
 			{		
@@ -65,7 +69,6 @@
 				ScenarioStation::setStationsForScenario($scenario->id, $stations);
 				DisplayMessage('success', 'Success', array('De wijzigingen zijn opgeslagen.'));
 			}
-	
 			$otherStations = Station::getStationsNotOfScenario($scenarioId);
 		}
 		else 
@@ -90,7 +93,10 @@
 	
 	function SaveDemand($scenarioId)
 	{
-		global $usedRoundInfos, $types;
+		global $usedRoundInfos, $types, $scenarioInUse;
+		if($scenarioInUse)
+			return;
+		
 		$demandTable = Demand::getDemandForScenario($scenarioId);
 		
 		//Make new entries if they aren't in the database yet
@@ -138,7 +144,7 @@
 	
 	function GetEmptyDemandData()
 	{
-		global $types, $usedRoundInfos;
+		global $types, $usedRoundInfos, $scenarioInUse;
 		$demand = array();
 		foreach ($types as $type_key => $type)
 		{
@@ -152,7 +158,7 @@
 			{
 				$key = implode(",", array('type', $type_key, $roundInfo_key));
 				$demand[$index][3][] = $roundInfo_key;
-				if(isset($_POST['FormAction']))
+				if(isset($_POST['FormAction']) && !$scenarioInUse)
 					$demand[$index][4][] = $_POST[$key];
 				else
 					$demand[$index][4][] = 0;
@@ -173,7 +179,7 @@
 	
 	function ValidateForm()
 	{
-		global $scenario, $stations, $demand, $types, $usedRoundInfos;
+		global $scenario, $stations, $demand, $types, $usedRoundInfos, $scenarioInUse;
 		$errors = array();
 		$warnings = array();
 		
@@ -191,7 +197,7 @@
 		if(is_null($scenario->init_map_scale) || $scenario->init_map_scale == "")
 			$errors[] = "Er is geen initiele kaart schaal ingevoerd.";
 		
-		if(empty($stations))
+		if(!$scenarioInUse && empty($stations))
 			$errors[] = "Er zijn geen stations toegevoegd aan het scenario";
 		
 	
@@ -222,7 +228,13 @@
 	
 	function GenerateDemandForm($demand)
 	{
-		global $class, $usedRoundInfos;
+		global $class, $usedRoundInfos, $scenarioInUse;
+		$inputAppend = "";
+		if($scenarioInUse)
+		{
+			$inputAppend = "DISABLED";
+		}
+		
 		echo "\t\t\t\t\t\t\t\t" . '<table class="data">' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '<tr>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<th colspan="' . (sizeof($usedRoundInfos) + 1) . '">Marktvraag</th>' . "\n";
@@ -240,7 +252,7 @@
 			echo "\t\t\t\t\t\t\t\t\t\t\t" . $type[1] . "\n";
 			echo "\t\t\t\t\t\t\t\t\t\t" . '</td>' . "\n";
 			for ($i = 0; $i < sizeof($type[3]); $i++)
-				echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="type,' . $type[0] . ',' . $type[3][$i] . '" size="8" value="' . $type[4][$i] . '"></td>' . "\n";
+				echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="type,' . $type[0] . ',' . $type[3][$i] . '" size="8" value="' . $type[4][$i] . '" '. $inputAppend . '></td>' . "\n";
 			echo "\t\t\t\t\t\t\t\t\t" . '</tr>' . "\n";
 		}
 		echo "\t\t\t\t\t\t\t\t" . '</table>' . "\n";
@@ -279,7 +291,7 @@
 								</table>					
 								
 								<script>
-									$(function() {
+									$(function() {							
 										$( "#stationlist" ).sortable();
 										$( "#stationlist" ).disableSelection();
 									});
@@ -332,18 +344,37 @@
 									</tr>
 									<tr>
 										<td colspan="2">
-											Sleep de stations om de volgorde te wijzigen. <br>
-											Dubbelklik op een station om te verwijderen.
+											<?php
+												if($scenarioInUse)
+												{
+													echo "Dit scenario is al ingezet voor een spel.<br>U kunt de stations en marktvraag niet meer wijzigen.";
+												}
+												else
+												{
+													echo "Sleep de stations om de volgorde te wijzigen. <br> Dubbelklik op een station om te verwijderen.";
+												}
+											?>
 										</td>
 									</tr>
 									<tr>
 										<td colspan ="2">
-											<ul class="data" id='stationlist' >
-												<?php
+											<?php
+												if($scenarioInUse)
+												{
+													echo "<ul class=\"data\">";
+													foreach($stations as $station)
+													{
+														echo "<li id=".$station->code." name=".$station->code . ">" . $station->name . "</li>";
+													}
+												}
+												else
+												{
+													echo "<ul class=\"data\" id='stationlist' >";
 													foreach($stations as $station)
 													{
 														echo "<li id=".$station->code." name=".$station->code." ondblclick=\"removeStation(this)\">" . $station->name . "</li>";
 													}
+												}
 												?>
 											</ul>
 										</td>
@@ -360,7 +391,12 @@
 											</select>
 										</td>											
 										<td>
-											<button  type="button" onclick="addStation(newstation.selectedIndex)">Voeg toe</button>
+											<?php
+												if(!$scenarioInUse)
+												{
+													echo "<button  type=\"button\" onclick=\"addStation(newstation.selectedIndex)\">Voeg toe</button>";
+												}
+											?>
 										</td>
 								</table>
 
