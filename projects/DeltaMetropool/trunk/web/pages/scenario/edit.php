@@ -38,40 +38,34 @@
 		global $scenarioId, $scenario, $stations, $otherStations, $demand, $types, $usedRoundInfos;
 		if (isset($_POST['FormAction']))
 		{
+			
 			$stations = array();
 			if (!is_null($scenarioId))
 			{
-				$scenario = new Scenario($scenarioId);	
-				$demand = GetDemandData($scenarioId);
+				$scenario = new Scenario($scenarioId);
 			}
 			else
 			{
 				$scenario = new Scenario();
-				$stations = array();
-				$demand = GetEmptyDemandData();
 			}
-			
 			$scenario->load($_POST);
-
-			//Will need to get all the stations and save the data correctly.
-/*			foreach($_POST['stations'] as $code)
+			if(isset($_POST['stations']))
 			{
-				array_push($stations, Station::getStationByCode($code));
+				foreach($_POST['stations'] as $code)
+				{
+					$stations[] = array_pop(Station::getStationByCode($code));
+				}
 			}
-*/		
+			$demand = GetEmptyDemandData();
 			if (ValidateForm())
 			{		
-
-				
-				// TODO: save data here
-				//$stationId = $station->save();
-				//foreach ($rounds as $round)
-				//{
-				//	$round->station_id = $stationId;
-				//	$round->save();
-				//}
+				//Form validated - Save all the things!
+				$scenario->save();
+				SaveDemand($scenario->id);
+				ScenarioStation::setStationsForScenario($scenario->id, $stations);
 				DisplayMessage('success', 'Success', array('De wijzigingen zijn opgeslagen.'));
 			}
+	
 			$otherStations = Station::getStationsNotOfScenario($scenarioId);
 		}
 		else 
@@ -90,6 +84,41 @@
 				$stations = array();
 				$otherStations = Station::getAllStations();
 				$demand = GetEmptyDemandData();
+			}
+		}
+	}
+	
+	function SaveDemand($scenarioId)
+	{
+		global $usedRoundInfos, $types;
+		$demandTable = Demand::getDemandForScenario($scenarioId);
+		
+		//Make new entries if they aren't in the database yet
+		if(empty($demandTable))
+		{
+			foreach ($types as $type_key => $type)
+			{
+				foreach ($usedRoundInfos as $roundInfo_key => $roundInfo)
+				{
+					$new_demand = new Demand();
+					$new_demand->scenario_id = $scenarioId;
+					$new_demand->round_info_id = $roundInfo_key;
+					$new_demand->type_id = $type_key;
+					$demandTable[] = $new_demand;
+				}
+			}
+		}
+
+		//Set values
+		foreach($demandTable as $demandrow)
+		{
+			$type_id = $demandrow->type_id;
+			$round_info_id = $demandrow->round_info_id;
+			$key = implode(",", array('type', $type_id, $round_info_id));
+			if($demandrow->amount != $_POST[$key])
+			{
+				$demandrow->amount = $_POST[$key];
+				$demandrow->save();
 			}
 		}
 	}
@@ -121,8 +150,12 @@
 			$demand[$index][4] = array();
 			foreach ($usedRoundInfos as $roundInfo_key => $roundInfo)
 			{
+				$key = implode(",", array('type', $type_key, $roundInfo_key));
 				$demand[$index][3][] = $roundInfo_key;
-				$demand[$index][4][] = 0;
+				if(isset($_POST['FormAction']))
+					$demand[$index][4][] = $_POST[$key];
+				else
+					$demand[$index][4][] = 0;
 			}
 		}
 		return $demand;
@@ -140,39 +173,28 @@
 	
 	function ValidateForm()
 	{
-		// TODO: validate form data
-		/*
-		global $station, $rounds;
+		global $scenario, $stations, $demand, $types, $usedRoundInfos;
 		$errors = array();
 		$warnings = array();
 		
-		// validate code
-		if (is_null($station->code) || $station->code == "")
-			$errors[] = "Er is geen station code ingevuld.";
-		else if (!Station::isStationCodeUnique($station->code, $station->id))
-			$errors[] = "De opgegeven station code bestaat al.";
+		if (is_null($scenario->name) || $scenario->name == "")
+			$errors[] = "Er is geen scenario naam ingevuld.";
+		else if(!Scenario::isScenarioNameUnique($scenario->name, $scenario->id))
+			$errors[] = "De opgegeven scenario naam bestaat al.";
 		
-		// validate name
-		if (is_null($station->name) || $station->name == "")
-			$errors[] = "Er is geen station naam ingevuld.";
-		else if (!Station::isStationNameUnique($station->name, $station->id))
-			$errors[] = "De opgegeven station naam bestaat al.";	
+		if(is_null($scenario->description) || $scenario->description == "")
+			$warnings[] = "Er is geen omschrijving ingevuld.";
 		
-		// validate transform areas
-		$totalTransformInRounds = 0;
-		foreach ($rounds as $key => $value)
-			$totalTransformInRounds += $value->new_transform_area;
-		$totalTransformInStation = 
-			$station->transform_area_cultivated_home + 
-			$station->transform_area_cultivated_work + 
-			$station->transform_area_cultivated_mixed + 
-			$station->transform_area_undeveloped_urban + 
-			$station->transform_area_undeveloped_rural;
-		if ($totalTransformInRounds > $totalTransformInStation)
-			$errors[] = "In de rondes wordt meer transformatie gebied vrijgegeven dan er aanwezig is om het station (rondes totaal: " . $totalTransformInRounds . " ha, station totaal: " . $totalTransformInStation . " ha)";
-		else if ($totalTransformInRounds < $totalTransformInStation)
-			$warnings[] = "In de rondes wordt minder transformatie gebied vrijgegeven dan er aanwezig is om het station (rondes totaal: " . $totalTransformInRounds . " ha, station totaal: " . $totalTransformInStation . " ha). Niet al het transformatie gebied kan hierdoor in het spel bebouwd worden.";
+		if(is_null($scenario->init_map_position_x) || is_null($scenario->init_map_position_y) ||  $scenario->init_map_position_x == "" || $scenario->init_map_position_y == "")
+			$errors[] = "De initiele kaartpositie is niet (volledig) ingevoerd.";
 		
+		if(is_null($scenario->init_map_scale) || $scenario->init_map_scale == "")
+			$errors[] = "Er is geen initiele kaart schaal ingevoerd.";
+		
+		if(empty($stations))
+			$errors[] = "Er zijn geen stations toegevoegd aan het scenario";
+		
+	
 		// output errors
 		if (sizeof($errors) > 0)
 			DisplayMessage('error', 'Foutmelding', $errors);
@@ -182,8 +204,6 @@
 			DisplayMessage('warning', 'Waarschuwing', $warnings);
 		
 		return sizeof($errors) == 0;
-		*/
-		return true;
 	}
 	
 	function DisplayMessage($type, $header, $messages)

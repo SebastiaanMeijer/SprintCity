@@ -326,8 +326,9 @@
 			$query = "
 				SELECT Station.*
 				FROM Station
-				INNER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
-				WHERE ScenarioStation.scenario_id != :scenario_id";
+				WHERE Station.id NOT IN (SELECT station_id FROM
+												  ScenarioStation
+												  WHERE scenario_id = :scenario_id)";
 			$args = array('scenario_id' => $scenarioId);
 			$result = $db->query($query, $args);
 			return DBObject::glob("Station", $result);
@@ -467,6 +468,47 @@
 				array('game_id' => $game_id));
 			return DBObject::glob("Scenario", $result);
 		}
+		
+		public static function isScenarioNameUnique($name, $id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT COUNT(*)
+				FROM Scenario
+				WHERE name = :name AND id != :id";
+			$args = array('name' => $name, 'id' => $id);
+			$result = $db->query($query, $args);
+			return $db->getValue($result) == 0;
+		}
+	}
+	
+	class ScenarioStation extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('ScenarioStation', array('id', 'order', 'scenario_id', 'station_id'), $id);
+		}
+		
+		public static function setStationsForScenario($scenario_id, $stations)
+		{
+			$db = Database::getDatabase();
+			//Remove old station order
+			$delete = $db->query(" 
+			DELETE 
+			FROM ScenarioStation
+			WHERE scenario_id = :scenario_id",
+			array('scenario_id' => $scenario_id));
+			
+			$i = 1;
+			foreach($stations as $station)
+			{
+				$insert = $db->query("
+				INSERT INTO ScenarioStation (`order`, `scenario_id`, `station_id`)
+				VALUES (:i, :scenario_id, :station_id)",
+				array('i' => $i, 'scenario_id' => $scenario_id, 'station_id' => $station->id));
+				$i++;
+			}
+		}
 	}
 	
 	class Game extends DBObject
@@ -544,6 +586,19 @@
 		{
 			parent::__construct('Demand', 
 				array('id', 'scenario_id', 'round_info_id', 'type_id', 'amount'), $id);
+		}
+		
+		public static function getDemandForScenario($scenario_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM demand
+				WHERE scenario_id = :scenario_id
+				";
+			$args = array('scenario_id' => $scenario_id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Demand", $result);
 		}
 		
 		public static function getDemandDescriptionForScenario($scenario_id)

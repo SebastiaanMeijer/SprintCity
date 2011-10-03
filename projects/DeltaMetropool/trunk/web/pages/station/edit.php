@@ -271,7 +271,7 @@
 									</tr>
 <?php
 	GenerateForm($form_fields_stats, $station);
-	$image = "./images/station/" . $station->code . ".png";
+	$image = "./images/stations/" . $station->code . ".png";
 ?>
 									<tr class="<?php echo $class; ?>">
 										<td>Achtergrond kaart</td>
