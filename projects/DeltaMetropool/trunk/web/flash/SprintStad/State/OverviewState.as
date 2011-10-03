@@ -179,7 +179,7 @@
 		}
 		
 		private function FillStationCircles(stations:Stations):void
-		{
+		{	
 			for (var i:int = 0; i < stations.GetStationCount(); i++)
 			{
 				var station:Station = stations.GetStation(i);
@@ -194,6 +194,7 @@
 				movie.outline.transform.colorTransform = colorTransform;				
 				station.RefreshAreaBar();
 				movie.graph.addChild(station.areaBar.GetClip());
+				movie.alpha = 1;
 			}
 		}
 		
