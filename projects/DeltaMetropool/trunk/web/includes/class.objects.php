@@ -414,6 +414,20 @@
 				array('station_id' => $station_id));
 			return ($db->getValue($result) != 0);
 		}
+		
+		public static function getGamesByStation($station_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+				SELECT Game.id, Game.name
+				FROM Station
+				LEFT OUTER JOIN ScenarioStation ON Station.id = ScenarioStation.station_id
+				LEFT OUTER JOIN Scenario ON ScenarioStation.scenario_id = Scenario.id
+				RIGHT OUTER JOIN Game ON Game.scenario_id = Scenario.id
+				WHERE Station.id = :station_id",
+				array('station_id' => $station_id));
+			return $result;
+		}
 	}
 	
 	class Scenario extends DBObject
@@ -569,6 +583,26 @@
 				WHERE ClientSession.id = :session_id", 
 				array('session_id' => $session_id));
 			return $db->getValue($result);
+		}
+		
+		public static function deleteGameById($id)
+		{
+			$db = Database::getDatabase();
+			$db->query("DELETE ValueInstance, TeamInstance
+			FROM TeamInstance, ValueInstance
+			WHERE TeamInstance.id = ValueInstance.team_instance_id AND TeamInstance.game_id = :id",
+			array('id' => $id));
+			
+			$db->query("DELETE
+			FROM RoundInfoInstance
+			WHERE RoundInfoInstance.game_id = :id",
+			array('id' => $id));
+			
+			$db->query("
+			DELETE 
+			FROM Game
+			WHERE Game.id = :id",
+			array('id' => $id));
 		}
 	}
 	
