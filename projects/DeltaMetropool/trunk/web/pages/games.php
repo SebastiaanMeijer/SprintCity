@@ -27,6 +27,7 @@
 				<th>Ronde</th>
 				<th>Actief</th>
 				<th width="75">Voortgang</th>
+				<th></th>
 			</tr>
 <?php	
 	foreach ($objects as $key => $value) 
@@ -57,6 +58,8 @@
 		}
 ?>
 				</td>
+				<td>
+					<button type="submit" onclick="return confirm('Weet u zeker dat u dit spel wilt verwijderen?');" name="Action" value="delete_game,<?php echo $key; ?>">Verwijder</button>				
 			</tr>
 <?php
 	}

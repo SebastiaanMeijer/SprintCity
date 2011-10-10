@@ -274,7 +274,21 @@
 	}
 ?>
 						<tr>
-							<td>
+							
+								<?php
+									if($disabled != "")
+									{
+										$games = Station::getGamesByStation($station->id);
+										
+										echo "<td>Dit station is momenteel in gebruik in een Game. Verwijder de volgende game(s) om het station te mogen wijzigen:<br><br>";
+										while ($row = mysql_fetch_array($games))
+										{
+											echo $row["id"]." ".$row["name"]."<br>";
+										}
+										echo "</td>";
+									}
+								?>
+									
 								<form action="<?php echo $submitAction ?>" method="POST">
 								<table class="data">
 									<tr>

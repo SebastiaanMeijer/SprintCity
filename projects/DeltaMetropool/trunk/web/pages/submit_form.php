@@ -36,7 +36,16 @@ switch( $vars[0] )
 		EditConstants();
 		header("Location: ../admin.php?view=constants");
 		break;
+	case "delete_game":
+		DeleteGame($vars);
+		header("Location: ../admin.php?view=games&page=" . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1));
+		break;
 	default:
+}
+
+function DeleteGame($vars)
+{
+	Game::deleteGameById($vars[1]);
 }
 
 function NewGame()
