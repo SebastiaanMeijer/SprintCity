@@ -165,13 +165,20 @@ td {
 	height: 24px;
 }
 
+ul.data {
+	margin: 0px;
+	padding: 0px;
+}
+
 ul.data li {
+	margin-bottom: -1px;
 	height: 24px;
-	cursor: hand; 
-	cursor: pointer;
+	line-height: 24px;
+	cursor: move; 
 	border: 1px solid #bbbbbb;
-	background-color:#e0e0e0;
-	text-align:center;
+	background-color: #e0e0e0;
+	text-align: center;
+	list-style: none;
 }
 
 tr.even {
@@ -194,3 +201,24 @@ tr.success {
 	border: 2px solid #00ff00;
 }
 
+ul.pager {
+	border: 1px solid #bbbbbb;
+	padding: 5px;
+	margin-left: 9px;
+	margin-right: 10px;
+}
+
+ul.pager li {
+	display: inline;
+	list-style-type: none;
+	padding-right: 20px;
+}
+
+ul.pager li.selected {
+	font-weight: bold;
+	text-decoration: underline overline;
+}
+
+ul.pager li.disabled {
+	color: #bbbbbb;
+}

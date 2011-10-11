@@ -263,17 +263,15 @@
 								<form id="scenarioform" name="scenarioform" onsubmit="formatStations()" method="POST">
 								<table class="data">
 									<tr>
-										<th colspan="3">Algemeen</th>
+										<th colspan="2">Algemeen</th>
 									</tr>
 									<tr class="<?php echo $class; ?>">
 										<td>Naam</td>
 										<td><input type="text" name="name" maxLength="255" style="width: 350px;" value="<?php echo $scenario->name; ?>"></td>
-										<td></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
 										<td>Omschrijving</td>
 										<td><textarea name="description" rows="12" style="width:350px;"><?php echo $scenario->description; ?></textarea></td>
-										<td></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
 										<td>Kaart positie</td>
@@ -281,17 +279,15 @@
 											X <input type="text" name="init_map_position_x" maxLenght="5" value="<?php echo $scenario->init_map_position_x; ?>">
 											Y <input type="text" name="init_map_position_y" maxLenght="5" value="<?php echo $scenario->init_map_position_y; ?>">
 										</td>
-										<td></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
 										<td>Kaart schaal</td>
 										<td><input type="text" name="init_map_scale" maxLenght="5" value="<?php echo $scenario->init_map_scale; ?>"></td>
-										<td></td>
 									</tr>
-								</table>					
+								</table>
 								
 								<script>
-									$(function() {							
+									$(function() {
 										$( "#stationlist" ).sortable();
 										$( "#stationlist" ).disableSelection();
 									});
@@ -340,10 +336,10 @@
 
 								<table class="data">
 									<tr>
-										<th colspan="2">Stations</th>
+										<th>Stations</th>
 									</tr>
 									<tr>
-										<td colspan="2">
+										<td>
 											<?php
 												if($scenarioInUse)
 												{
@@ -357,7 +353,7 @@
 										</td>
 									</tr>
 									<tr>
-										<td colspan ="2">
+										<td>
 											<?php
 												if($scenarioInUse)
 												{
@@ -389,8 +385,6 @@
 													}
 												?>
 											</select>
-										</td>											
-										<td>
 											<?php
 												if(!$scenarioInUse)
 												{
