@@ -48,7 +48,7 @@ ol li {
 }
 ul li {
 	/*giving UL's LIs generated disc markers*/
-	list-style: none;
+	list-style: disc outside;
 }
 dl dd {
 	/*giving UL's LIs generated numbers*/
