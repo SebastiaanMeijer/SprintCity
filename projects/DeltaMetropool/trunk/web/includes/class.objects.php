@@ -124,7 +124,7 @@
 		public function __construct($id = null)
 		{
 			parent::__construct('Station', array(
-				'id', 'code', 'name', 
+				'id', 'code', 'name', 'variant', 
 				'description_facts', 'description_background', 'description_future', 'town', 'region', 'POVN', 'PWN', 'IWD', 'MNG', 
 				'area_cultivated_home', 'area_cultivated_work', 'area_cultivated_mixed', 'area_undeveloped_urban', 'area_undeveloped_rural',
 				'transform_area_cultivated_home', 'transform_area_cultivated_work', 'transform_area_cultivated_mixed', 'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural', 
@@ -264,7 +264,7 @@
 		
 		public static function getAllStations()
 		{
-			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `name` ASC");
+			return DBObject::glob("Station", "SELECT * FROM  `station` ORDER BY `name`, `variant` ASC");
 		}
 		
 		public static function getStations($fromIndex, $numberOfRecords)
@@ -588,9 +588,9 @@
 		public static function deleteGameById($id)
 		{
 			$db = Database::getDatabase();
-			$db->query("DELETE ValueInstance, TeamInstance
-			FROM TeamInstance, ValueInstance
-			WHERE TeamInstance.id = ValueInstance.team_instance_id AND TeamInstance.game_id = :id",
+			$db->query("DELETE TeamInstance
+			FROM TeamInstance
+			WHERE TeamInstance.game_id = :id",
 			array('id' => $id));
 			
 			$db->query("DELETE

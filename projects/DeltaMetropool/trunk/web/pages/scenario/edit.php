@@ -77,7 +77,7 @@
 			if (!is_null($scenarioId))
 			{
 				$scenario = new Scenario($scenarioId);
-				$stations = Station::getStationsOfScenario($scenarioId);			
+				$stations = Station::getStationsOfScenario($scenarioId);
 				$otherStations = Station::getStationsNotOfScenario($scenarioId);
 				$demand = GetDemandData($scenarioId);
 			}
@@ -360,7 +360,10 @@
 													echo "<ul class=\"data\">";
 													foreach($stations as $station)
 													{
-														echo "<li id=".$station->code." name=".$station->code . ">" . $station->name . "</li>";
+														$variant = '';
+														if (!is_null($station->variant))
+															$variant = '[' . $station->variant . ']';
+														echo "<li id=".$station->code." name=".$station->code . ">" . $station->name . $variant . "</li>";
 													}
 												}
 												else
@@ -368,7 +371,10 @@
 													echo "<ul class=\"data\" id='stationlist' >";
 													foreach($stations as $station)
 													{
-														echo "<li id=".$station->code." name=".$station->code." ondblclick=\"removeStation(this)\">" . $station->name . "</li>";
+														$variant = '';
+														if (!is_null($station->variant))
+															$variant = '[' . $station->variant . ']';
+														echo "<li id=".$station->code." name=".$station->code." ondblclick=\"removeStation(this)\">" . $station->name . $variant . "</li>";
 													}
 												}
 												?>
@@ -381,7 +387,10 @@
 												<?php
 													foreach($otherStations as $station)
 													{
-														echo "<option value=" . $station->code . ">" . $station->name . "</option>";
+														$variant = '';
+														if (!is_null($station->variant))
+															$variant = '[' . $station->variant . ']';
+														echo "<option value=" . $station->code . ">" . $station->name . $variant . "</option>";
 													}
 												?>
 											</select>
