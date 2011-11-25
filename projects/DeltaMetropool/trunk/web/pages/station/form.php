@@ -39,6 +39,16 @@ function FormInit($inUse)
 		2 => array
 		(
 			"tag" => "input",
+			"name" => "variant",
+			"label" => "Variant",
+			"description" => "Alleen zichtbaar hier in de back-end. Hiermee kan er onderscheid gemaakt worden tussen gelijke stations met afwijkende eigenschappen.",
+			"type" => "text",
+			"maxlength" => 255,
+			"disabled" => ""
+		),
+		3 => array
+		(
+			"tag" => "input",
 			"name" => "town",
 			"label" => "Gemeente",
 			"description" => "",
@@ -46,7 +56,7 @@ function FormInit($inUse)
 			"maxlength" => 255,
 			"disabled" => ""
 		), 
-		3 => array
+		4 => array
 		(
 			"tag" => "input",
 			"name" => "region",
@@ -56,7 +66,7 @@ function FormInit($inUse)
 			"maxlength" => 255,
 			"disabled" => ""
 		), 
-		4 => array
+		5 => array
 		(
 			"tag" => "textarea",
 			"name" => "description_background",
@@ -65,7 +75,7 @@ function FormInit($inUse)
 			"rows" => 12,
 			"disabled" => ""
 		),
-		5 => array
+		6 => array
 		(
 			"tag" => "textarea",
 			"name" => "description_future",
