@@ -1,5 +1,7 @@
-AlmerePoort
-Soestduinen
-LeidschendamNoord
-BleiZo 
-EindhovenAirport
+AlmerePoort = Almpo
+BleiZo = Blzt
+EindhovenAirport = Ehva
+Leiden Nooar = Ldn
+LeidschendamNoord = Lsd
+Schiedam Kethel = Sdk
+Soestduinen = Stdu
