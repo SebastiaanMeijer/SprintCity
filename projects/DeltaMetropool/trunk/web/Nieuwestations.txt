@@ -1,7 +1,7 @@
 AlmerePoort = Almpo
 BleiZo = Blzt
 EindhovenAirport = Ehva
-Leiden Nooar = Ldn
+Leiden Noord = Ldn
 LeidschendamNoord = Lsd
 Schiedam Kethel = Sdk
 Soestduinen = Stdu
