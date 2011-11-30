@@ -280,11 +280,15 @@
 									{
 										$games = Station::getGamesByStation($station->id);
 										
-										echo "<td>Dit station is momenteel in gebruik in een Game. Verwijder de volgende game(s) om het station te mogen wijzigen:<br><br>";
+										echo "<td>Dit station is momenteel in gebruik in een spel. Verwijder de volgende spel(len) om het station te mogen wijzigen:<br><br>";
+										echo "<ul>";
 										while ($row = mysql_fetch_array($games))
 										{
+											echo "<li>";
 											echo $row["id"]." ".$row["name"]."<br>";
+											echo "</li>";
 										}
+										echo "</ul>";
 										echo "</td>";
 									}
 								?>
