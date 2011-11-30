@@ -588,6 +588,17 @@
 		public static function deleteGameById($id)
 		{
 			$db = Database::getDatabase();
+			
+			$db->query("DELETE Program
+			FROM Program, RoundInstance
+			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			WHERE TeamInstance.game_id = :id AND 
+				(Program.id = RoundInstance.plan_program_id OR 
+				Program.id = RoundInstance.exec_program_id OR
+				Program.id = StationInstance.program_id)",
+			array('id' => $id));
+			
 			$db->query("DELETE TeamInstance
 			FROM TeamInstance
 			WHERE TeamInstance.game_id = :id",
