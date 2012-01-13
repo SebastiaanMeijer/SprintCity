@@ -131,7 +131,7 @@ function LoadPOVNDataMinMax($game_id)
 				INNER JOIN Game ON TeamInstance.game_id = Game.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id
 				WHERE Game.id = :game_id 
-				AND Round.round_info_id < Game.current_round_id
+				AND Round.round_info_id <= Game.current_round_id
 			) AS t1 LIMIT 0,1;";
 		$args = array('game_id' => $game_id);
 		$result = $db->query($query, $args);
@@ -278,7 +278,7 @@ function LoadPOVNData($game_id, $station_id)
 					INNER JOIN Round ON RoundInstance.round_id = Round.id
 					WHERE Game.id = :game_id 
 					AND StationInstance.station_id = :station_id
-					AND Round.round_info_id < Game.current_round_id;
+					AND Round.round_info_id <= Game.current_round_id;
 				";
 		$args = array('game_id' => $game_id, 'station_id' => $station_id);
 		$result = $db->query($query, $args);
