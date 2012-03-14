@@ -28,6 +28,8 @@
 			var povn_growth:Number = 0;
 			if (station.GetCurrentRound() != null)
 				povn_growth = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
+			else
+				povn_growth = (station.GetLatestRound().POVN - station.POVN) / station.POVN;
 			var traveler_growth:Number = 0;
 			var travelers:Number = GetInitialTravelersStats(stationInstance);
 			if (povn_growth > 5)

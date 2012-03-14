@@ -105,6 +105,17 @@
 			return GetRoundById(Data.Get().current_round_id);
 		}
 		
+		public function GetLatestRound():Round
+		{
+			var result:Round = rounds[0];
+			for (var i:int = 0; i < rounds.length; i++)
+			{
+				if (rounds[i].number > result.number)
+					result = rounds[i];
+			}
+			return result;
+		}
+		
 		public function GetRoundCount():int
 		{
 			return rounds.length;
