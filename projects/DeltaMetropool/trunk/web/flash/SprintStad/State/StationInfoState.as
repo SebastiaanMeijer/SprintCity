@@ -141,7 +141,7 @@
 			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
 			view.current_info.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
-			view.current_info.amount_workers.text = int(station.count_work_total * Data.Get().GetConstants().average_workers_per_bvo);
+			view.current_info.amount_workers.text = Math.round(station.count_worker_total);
 			view.current_info.amount_houses.text = station.count_home_total;
 			view.current_info.bvo_work.text = station.count_work_total;
 		}
