@@ -131,7 +131,7 @@ function LoadPOVNDataMinMax($game_id)
 				INNER JOIN Game ON TeamInstance.game_id = Game.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id
 				WHERE Game.id = :game_id 
-				AND Round.round_info_id <= Game.current_round_id
+				AND Round.round_info_id < Game.current_round_id
 			) AS t1 LIMIT 0,1;";
 		$args = array('game_id' => $game_id);
 		$result = $db->query($query, $args);
@@ -243,10 +243,10 @@ function LoadTravelerDataMinMax($game_id)
 				INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
-				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
+				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
 				WHERE Game.id = :game_id
 				GROUP BY Station.id, RoundInfo2.id
 				ORDER BY RoundInfo2.id
@@ -278,7 +278,7 @@ function LoadPOVNData($game_id, $station_id)
 					INNER JOIN Round ON RoundInstance.round_id = Round.id
 					WHERE Game.id = :game_id 
 					AND StationInstance.station_id = :station_id
-					AND Round.round_info_id <= Game.current_round_id;
+					AND Round.round_info_id < Game.current_round_id;
 				";
 		$args = array('game_id' => $game_id, 'station_id' => $station_id);
 		$result = $db->query($query, $args);
@@ -379,10 +379,10 @@ function LoadTravelerData($game_id, $station_id)
 			INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 			INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
-			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
+			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
 			INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 			INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
+			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
 			WHERE Game.id = :game_id AND Station.id = :station_id
 			GROUP BY Station.id, RoundInfo2.id
 			ORDER BY RoundInfo2.id;";
