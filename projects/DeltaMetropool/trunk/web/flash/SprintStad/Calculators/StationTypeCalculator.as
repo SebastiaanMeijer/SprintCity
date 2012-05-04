@@ -21,6 +21,7 @@
 			for (var i:int = 0; i < stationTypes.GetStationTypeCount(); i++)
 			{
 				var type:StationType = stationTypes.GetStationType(i);
+				Debug.out(station.station.name + " - POVN: " + station.POVN + " PWN: " + station.PWN + " IWD: " + station.IWD + " MNG: " + station.MNG);
 				var POVN:Number = CalculateSimilarity(station.POVN, type.POVN, Math.max(type.POVN, data.GetStations().MaxPOVN));
 				var PWN:Number = CalculateSimilarity(station.PWN, type.PWN, Math.max(type.PWN, data.GetStations().MaxPWN));
 				var IWD:Number = CalculateSimilarity(station.IWD, type.IWD, Math.max(type.IWD, data.GetStations().MaxIWD));

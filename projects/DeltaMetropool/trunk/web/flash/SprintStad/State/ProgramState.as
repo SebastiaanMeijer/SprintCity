@@ -67,7 +67,9 @@
 				station.transform_area_undeveloped_rural,
 				0);
 			// left info
-			DrawStationInfo(StationInstance.Create(station), view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
+			var stationInstance:StationInstance = 
+				StationStatsCalculator.GetStationAfterProgram(station, Program.Default());
+			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			// right info
 			OnEditorChange();
 			// update editor
