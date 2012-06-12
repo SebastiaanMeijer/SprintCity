@@ -16,6 +16,7 @@
 	import SprintStad.Calculators.StationTypeCalculator;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Program.Program;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Station.StationInstance;
@@ -55,7 +56,8 @@
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
-			var stationInstance:StationInstance = StationInstance.Create(station);
+			var stationInstance:StationInstance = 
+				StationStatsCalculator.GetStationAfterProgram(station, Program.Default());
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
