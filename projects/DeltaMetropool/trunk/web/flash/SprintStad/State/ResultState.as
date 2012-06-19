@@ -147,7 +147,15 @@
 			if(title == "2030")
 				transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), null);
 			else
-				transform_area_bar.drawStationCurrentBar(StationInstance.CreateInitial(station.station).station, null);
+			{
+				transform_area_bar.DrawBar(
+					station.transform_area_cultivated_home, 
+					station.transform_area_cultivated_work, 
+					station.transform_area_cultivated_mixed,  
+					station.transform_area_undeveloped_urban,
+					station.transform_area_undeveloped_rural,
+					0);
+			}
 
 			clip.transform_area.text = "(" + Math.round( 
 				station.transform_area_cultivated_home + 
@@ -160,7 +168,7 @@
 			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
 			clip.amount_workers.text = Math.round(station.count_worker_total);
 			clip.amount_houses.text = Math.round(station.count_home_total);
-			clip.bvo_work.text = Math.round(station.count_worker_total);
+			clip.bvo_work.text = Math.round(station.count_work_total);
 		}
 		
 		private function GetCurrentRound():Round
