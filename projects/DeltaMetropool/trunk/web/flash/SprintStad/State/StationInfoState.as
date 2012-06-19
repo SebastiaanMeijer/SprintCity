@@ -56,8 +56,8 @@
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
-			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(station, Program.Default());
+			var stationInstance:StationInstance = StationInstance.CreateInitial(station);
+			stationInstance.ApplyProgram(Program.Default());
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
