@@ -98,11 +98,6 @@
 				allocated[k] = 0;
 			}
 			
-			var specialHome:int = 0;
-			var specialWork:int = 0;
-			var specialLeisure:int = 0;
-			
-			
 			var total_area:int = stationInstance.GetTotalTransformArea();
 			
 			var round_id:int = 1;
@@ -124,22 +119,16 @@
 					{
 						index = types.getIndex(round.exec_program.type_home);
 						allocated[index] += round.exec_program.area_home;
-						if (round.exec_program.type_home.type != "average_home")
-							specialHome += round.exec_program.area_home;
 					}
 					if ( round.exec_program.area_work > 0)
 					{
 						index = types.getIndex(round.exec_program.type_work);
 						allocated[index] += round.exec_program.area_work;
-						if (round.exec_program.type_work.type != "average_work")
-							specialWork += round.exec_program.area_work;
 					}
 					if ( round.exec_program.area_leisure > 0)
 					{
 						index = types.getIndex(round.exec_program.type_leisure);
 						allocated[index] += round.exec_program.area_leisure;
-						if (round.exec_program.type_leisure.type != "average_leisure")
-							specialLeisure += round.exec_program.area_leisure;
 					}
 					if(round.round_info_id + 1 <= round_id)
 						stationInstance.ApplyRound(round);
@@ -154,22 +143,16 @@
 				{
 					index = types.getIndex(futureProgram.type_home);
 					allocated[index] += futureProgram.area_home;
-					if (futureProgram.type_home.type != "average_home")
-						specialHome += futureProgram.area_home;
 				}
 				if ( futureProgram.area_work > 0)
 				{
 					index = types.getIndex(futureProgram.type_work);
 					allocated[index] += futureProgram.area_work;
-					if (futureProgram.type_work.type != "average_work")
-						specialWork += futureProgram.area_work;
 				}
 				if ( futureProgram.area_leisure > 0)
 				{
 					index = types.getIndex(futureProgram.type_leisure);
 					allocated[index] += futureProgram.area_leisure;
-					if (futureProgram.type_leisure.type != "average_leisure")
-						specialLeisure += futureProgram.area_leisure;
 				}
 				stationInstance.ApplyProgram(futureProgram);	
 			}
