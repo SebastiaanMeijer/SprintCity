@@ -56,8 +56,7 @@
 		{
 			//draw stuff
 			var view:MovieClip = parent.station_info_movie;
-			var stationInstance:StationInstance = StationInstance.CreateInitial(station);
-			stationInstance.ApplyProgram(Program.Default());
+			var stationInstance:StationInstance = StationStatsCalculator.GetStationAfterProgram(station, Program.Default());
 			// station sign
 			view.board.name_field.text = station.name;
 			view.board.region_field.text = station.region;
@@ -80,7 +79,7 @@
 			view.sheet.addChild(station.imageData);
 			
 			//left info
-			view.current_info.title.text = "";
+			view.current_info.title.text = "HUIDIG";
 			var top:Array = StationTypeCalculator.GetStationTypeTop(stationInstance);
 			var bitmap:Bitmap;
 			
@@ -115,37 +114,38 @@
 			view.current_info.station_type_3_image.addEventListener(MouseEvent.MOUSE_OUT, MouseOutType);
 			
 			barTotalArea.DrawBar(
-				station.area_cultivated_home,
-				station.area_cultivated_work,
-				station.area_cultivated_mixed, 
-				station.area_undeveloped_urban,
-				station.area_undeveloped_rural,
+				stationInstance.area_cultivated_home,
+				stationInstance.area_cultivated_work,
+				stationInstance.area_cultivated_mixed, 
+				stationInstance.area_undeveloped_urban,
+				stationInstance.area_undeveloped_rural,
 				0);			
-			view.current_info.area.text = "(" + (
-				station.area_cultivated_home +
-				station.area_cultivated_work +
-				station.area_cultivated_mixed + 
-				station.area_undeveloped_urban + 
-				station.area_undeveloped_rural) + " ha.)";			
-			barTransformArea.DrawBar(
-				station.transform_area_cultivated_home, 
-				station.transform_area_cultivated_work, 
-				station.transform_area_cultivated_mixed, 
-				station.transform_area_undeveloped_urban,
-				station.transform_area_undeveloped_rural,
-				0);			
-			view.current_info.transform_area.text = "(" + ( 
-				station.transform_area_cultivated_home + 
-				station.transform_area_cultivated_work + 
-				station.transform_area_cultivated_mixed +  
-				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_rural) + " ha.)";
+			view.current_info.area.text = "(" + Math.round(
+				stationInstance.area_cultivated_home +
+				stationInstance.area_cultivated_work +
+				stationInstance.area_cultivated_mixed + 
+				stationInstance.area_undeveloped_urban + 
+				stationInstance.area_undeveloped_rural) + " ha.)";
+			barTransformArea.drawStationCurrentBar(station, station.GetRoundById(Data.Get().current_round_id), null);
+			//barTransformArea.DrawBar(
+			//	stationInstance.transform_area_cultivated_home, 
+			//	stationInstance.transform_area_cultivated_work, 
+			//	stationInstance.transform_area_cultivated_mixed, 
+			//	stationInstance.transform_area_undeveloped_urban,
+			//	stationInstance.transform_area_undeveloped_rural,
+			//	0);			
+			view.current_info.transform_area.text = "(" + Math.round( 
+				stationInstance.transform_area_cultivated_home + 
+				stationInstance.transform_area_cultivated_work + 
+				stationInstance.transform_area_cultivated_mixed +  
+				stationInstance.transform_area_undeveloped_urban +
+				stationInstance.transform_area_undeveloped_rural) + " ha resterend.)";
 			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
-			view.current_info.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
-			view.current_info.amount_workers.text = Math.round(station.count_worker_total);
-			view.current_info.amount_houses.text = station.count_home_total;
-			view.current_info.bvo_work.text = station.count_work_total;
+			view.current_info.amount_citizens.text = Math.round(stationInstance.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
+			view.current_info.amount_workers.text = Math.round(stationInstance.count_worker_total);
+			view.current_info.amount_houses.text = Math.round(stationInstance.count_home_total);
+			view.current_info.bvo_work.text = Math.round(stationInstance.count_work_total);
 		}
 		
 		private function MouseOverType(event:MouseEvent):void
