@@ -64,7 +64,7 @@ $(document).ready(function() {
 
 function initMockStations(stations) {
 	stations.push(new Station("Den Haag CS", 10, 120, 123));
-	stations.push(new Station("Den Haag HS", 30, 140, 140));
+	stations.push(new Station("Den Haag HS", 30, 140, 10));
 	stations.push(new Station("Den Haag Moerwijk", 20, 50, 60));
 	stations.push(new Station("Rijswijk", 40, 60, 90));
 	stations.push(new Station("Delft", 12, 200, 180));
@@ -78,23 +78,20 @@ function initMockStations(stations) {
 function drawStationsGraph(stations) {
 	var blockContainerWidth = (GRAPH_WIDTH) / stations.length;
 	var capPath = new Path();
+	var capOverPath = new Path();
+	var capUnderPath = new Path();
+
+	capOverPath.strokeColor = blockColorLight;
+	capUnderPath.strokeColor = blockColorLight;
 	capPath.strokeColor = pinkColor;
 
-	/* determine the largest block */
-	var champHeight = 0;
-	for (var i = 0; i < stations.length; i++) {
-		if (stations[i].currentIU > champHeight) {
-			champHeight = stations[i].currentIU;
-		}
+	capOverPath.strokeJoin = 'round';
+	capUnderPath.strokeJoin = 'round';
 
-		if (stations[i].prevIU > champHeight) {
-			champHeight = stations[i].prevIU;
-		}
+	var capPaths = new Group([capPath, capOverPath, capUnderPath]);
 
-		if (stations[i].progIU > champHeight) {
-			champHeight = stations[i].progIU;
-		}
-	}
+	/* determine the largest point in graph */
+	var champHeight = getChampHeight(stations);
 
 	for (var i = 0; i < stations.length; i++) {
 		/* currentIU block */
@@ -105,6 +102,8 @@ function drawStationsGraph(stations) {
 		var prevIUHeight = (stations[i].prevIU / champHeight) * GRAPH_HEIGHT;
 		var progIUHeight = (stations[i].progIU / champHeight) * GRAPH_HEIGHT;
 		var cap100Height = (stations[i].cap100 / champHeight) * GRAPH_HEIGHT;
+		var capOverHeight = (stations[i].capOver / champHeight) * GRAPH_HEIGHT;
+		var capUnderHeight = (stations[i].capUnder / champHeight) * GRAPH_HEIGHT;
 
 		var rect = new Rectangle(new Point(x, y), new Point(x + width, y - currentIUHeight));
 		var prevRect = new Rectangle(new Point(x, y), new Point(x + width, y - prevIUHeight));
@@ -122,18 +121,72 @@ function drawStationsGraph(stations) {
 		/* progIU block */
 		progBlock.fillColor = blockColorLight;
 		progBlock.position.x += GRAPH_BLOCK_OFFSET;
-		
+
 		/* Capacity path */
-		var cap100Point = new Point(x + (GRAPH_BLOCK_WIDTH/2), y - cap100Height);
+		var cap100Point = new Point(x + (GRAPH_BLOCK_WIDTH / 2), y - cap100Height);
 		var cap100Circle = new Path.Circle(cap100Point, 5);
 		cap100Circle.fillColor = pinkColor;
 		cap100Circle.strokeColor = 'white';
 		cap100Circle.strokeWidth = 3;
 		capPath.add(cap100Point);
 
-	};
-	
-	project.activeLayer.insertChild(-1, capPath); //put capPath in the front layer
+		/* Over capacity path */
+		var capOverPoint = new Point(x + (GRAPH_BLOCK_WIDTH / 2), y - capOverHeight);
+		capOverPath.add(capOverPoint);
 
+
+		/* Under capacity path */
+		var capUnderPoint = new Point(x + (GRAPH_BLOCK_WIDTH / 2), y - capUnderHeight);
+		capUnderPath.add(capUnderPoint);
+		
+				//last one, add text
+		if (i == (stations.length - 1)) {
+			addTextNextToPoint(capOverPoint, '125%', 'red');
+			addTextNextToPoint(cap100Point, '100%', 'green');
+			addTextNextToPoint(capUnderPoint, '75%', 'blue');
+		}
+
+
+	};
+	project.activeLayer.insertChild(-1, capPaths);
+	//put capPath in the front layer
+
+}
+
+function addTextNextToPoint(point, text, color) {
+	var capOverTextPoint = point.clone();
+	capOverTextPoint.x += 30;
+	capOverTextPoint.y += 8;
+	console.log(capOverTextPoint);
+	var capOverText = new PointText(capOverTextPoint);
+	capOverText.justification = 'center';
+	capOverText.characterStyle = {
+		fillColor : color,
+		fontSize : 10,
+		font : 'arial'
+	};
+	capOverText.content = text;
+}
+
+function getChampHeight(stations) {
+	var champHeight = 0;
+	for (var i = 0; i < stations.length; i++) {
+		if (stations[i].currentIU > champHeight) {
+			champHeight = stations[i].currentIU;
+		}
+
+		if (stations[i].prevIU > champHeight) {
+			champHeight = stations[i].prevIU;
+		}
+
+		if (stations[i].progIU > champHeight) {
+			champHeight = stations[i].progIU;
+		}
+
+		if (stations[i].capOver > champHeight) {
+			champHeight = stations[i].capOver;
+		}
+	}
+	return champHeight;
 }
 
