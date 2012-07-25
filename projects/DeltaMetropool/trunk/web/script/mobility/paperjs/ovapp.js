@@ -71,7 +71,7 @@ function initMockStations(stations) {
 	stations.push(new Station("Delft zuid", 14, 20, 40));
 	stations.push(new Station("Schiedam Kethel", 14, 40, 50));
 	stations.push(new Station("Schiedam Centraal", 40, 210, 170));
-	stations.push(new Station("Rotterdam Centraal", 70, 200, 200));
+	stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
 
 }
 
@@ -140,9 +140,9 @@ function drawStationsGraph(stations) {
 
 		//last one, add text
 		if (i == (stations.length - 1)) {
-			addTextNextToPoint(capOverPoint, '125%', 'red');
-			addTextNextToPoint(cap100Point, '100%', 'green');
-			addTextNextToPoint(capUnderPoint, '75%', 'blue');
+			addTextNextToPoint(capOverPoint, '125,00%', 'red');
+			addTextNextToPoint(cap100Point, '100,00%', 'green');
+			addTextNextToPoint(capUnderPoint, '75,00%', 'blue');
 		}
 
 	};
@@ -153,7 +153,7 @@ function drawStationsGraph(stations) {
 
 function addTextNextToPoint(point, text, color) {
 	var capOverTextPoint = point.clone();
-	capOverTextPoint.x += 30;
+	capOverTextPoint.x += 35;
 	capOverTextPoint.y += 8;
 	console.log(capOverTextPoint);
 	var capOverText = new PointText(capOverTextPoint);
