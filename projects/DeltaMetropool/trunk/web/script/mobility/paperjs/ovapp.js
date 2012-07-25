@@ -9,9 +9,9 @@ function Station(name, networkValue, currentIU, cap100) {
 	this.name = name;
 	this.networkValue = networkValue;
 
-	this.prevIU = 0;
+	this.prevIU = 50;
 	this.currentIU = currentIU;
-	this.progIU = 0;
+	this.progIU = 100;
 
 	this.cap100 = cap100;
 	this.capOver = this.cap100 * 1.25;
@@ -45,6 +45,11 @@ var APP_INDENT = 87;
 var GRAPH_WIDTH = OVAPP_WIDTH - APP_INDENT;
 var GRAPH_HEIGHT = 193;
 var GRAPH_BLOCK_WIDTH = 7;
+var GRAPH_BLOCK_MARGIN = 3;
+var GRAPH_BLOCK_OFFSET = GRAPH_BLOCK_WIDTH + GRAPH_BLOCK_MARGIN;
+
+var blockColor = new HsbColor(240, .14, .84);
+var blockColorLight = new HsbColor(240, .03, .91);
 
 /* ========================================================= */
 /* Execute from here */
@@ -77,19 +82,45 @@ function drawStationsGraph(stations) {
 		if (stations[i].currentIU > champHeight) {
 			champHeight = stations[i].currentIU;
 		}
+		
+		if(stations[i].prevIU > champHeight) {
+			champHeight = stations[i].prevIU;
+		}
+		
+		if(stations[i].progIU > champHeight) {
+			champHeight = stations[i].progIU;
+		}
 	}
 
 	for (var i = 0; i < stations.length; i++) {
+		/* currentIU block */
 		var x = APP_INDENT + GRAPH_BLOCK_WIDTH * 2 + blockContainerWidth * i;
 		var y = GRAPH_HEIGHT;
 		var width = GRAPH_BLOCK_WIDTH;
-		var height = (stations[i].currentIU / champHeight) * GRAPH_HEIGHT;
+		var currentIUHeight = (stations[i].currentIU / champHeight) * GRAPH_HEIGHT;
+		var prevIUHeight = (stations[i].prevIU / champHeight) * GRAPH_HEIGHT;
+		var progIUHeight = (stations[i].progIU / champHeight) * GRAPH_HEIGHT;
 
-		var rect = new Rectangle(new Point(x, y), new Point(x + width, y - height));
-
+		var rect = new Rectangle(new Point(x, y), new Point(x + width, y - currentIUHeight));
+		var prevRect = new Rectangle(new Point(x, y), new Point(x + width, y - prevIUHeight));
+		var progRect = new Rectangle(new Point(x, y), new Point(x + width, y - progIUHeight));
+		
 		var block = new Path.Rectangle(rect);
-		block.fillColor = new HsbColor(240, .14, .84);
-		console.log(block);
+		var prevBlock = new Path.Rectangle(prevRect);
+		var progBlock = new Path.Rectangle(progRect);
+		block.fillColor = blockColor;
+		
+		prevBlock.fillColor = blockColorLight;
+		prevBlock.position.x -= GRAPH_BLOCK_OFFSET;		
+		
+		progBlock.fillColor = blockColorLight;
+		progBlock.position.x += GRAPH_BLOCK_OFFSET;
+		
+		/* prevIU block */
+		
+		
+		/* progIU block */
+		
 	};
 
 }
