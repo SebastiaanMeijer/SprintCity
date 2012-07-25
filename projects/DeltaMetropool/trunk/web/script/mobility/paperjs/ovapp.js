@@ -134,18 +134,16 @@ function drawStationsGraph(stations) {
 		var capOverPoint = new Point(x + (GRAPH_BLOCK_WIDTH / 2), y - capOverHeight);
 		capOverPath.add(capOverPoint);
 
-
 		/* Under capacity path */
 		var capUnderPoint = new Point(x + (GRAPH_BLOCK_WIDTH / 2), y - capUnderHeight);
 		capUnderPath.add(capUnderPoint);
-		
-				//last one, add text
+
+		//last one, add text
 		if (i == (stations.length - 1)) {
 			addTextNextToPoint(capOverPoint, '125%', 'red');
 			addTextNextToPoint(cap100Point, '100%', 'green');
 			addTextNextToPoint(capUnderPoint, '75%', 'blue');
 		}
-
 
 	};
 	project.activeLayer.insertChild(-1, capPaths);
