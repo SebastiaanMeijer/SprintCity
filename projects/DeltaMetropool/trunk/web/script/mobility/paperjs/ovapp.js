@@ -50,6 +50,7 @@ var GRAPH_BLOCK_OFFSET = GRAPH_BLOCK_WIDTH + GRAPH_BLOCK_MARGIN;
 
 var blockColor = new HsbColor(240, .14, .84);
 var blockColorLight = new HsbColor(240, .03, .91);
+var pinkColor = new HsbColor(327, .98, .86);
 
 /* ========================================================= */
 /* Execute from here */
@@ -62,19 +63,22 @@ $(document).ready(function() {
 });
 
 function initMockStations(stations) {
-	stations.push(new Station("Den Haag CS", 10, 120, 153));
-	stations.push(new Station("Den Haag HS", 30, 140, 100));
+	stations.push(new Station("Den Haag CS", 10, 120, 123));
+	stations.push(new Station("Den Haag HS", 30, 140, 140));
 	stations.push(new Station("Den Haag Moerwijk", 20, 50, 60));
 	stations.push(new Station("Rijswijk", 40, 60, 90));
-	stations.push(new Station("Delft", 12, 200, 120));
+	stations.push(new Station("Delft", 12, 200, 180));
 	stations.push(new Station("Delft zuid", 14, 20, 40));
 	stations.push(new Station("Schiedam Kethel", 14, 40, 50));
 	stations.push(new Station("Schiedam Centraal", 40, 210, 170));
-	stations.push(new Station("Rotterdam Centraal", 70, 200, 500));
+	stations.push(new Station("Rotterdam Centraal", 70, 200, 200));
+
 }
 
 function drawStationsGraph(stations) {
 	var blockContainerWidth = (GRAPH_WIDTH) / stations.length;
+	var capPath = new Path();
+	capPath.strokeColor = pinkColor;
 
 	/* determine the largest block */
 	var champHeight = 0;
@@ -82,12 +86,12 @@ function drawStationsGraph(stations) {
 		if (stations[i].currentIU > champHeight) {
 			champHeight = stations[i].currentIU;
 		}
-		
-		if(stations[i].prevIU > champHeight) {
+
+		if (stations[i].prevIU > champHeight) {
 			champHeight = stations[i].prevIU;
 		}
-		
-		if(stations[i].progIU > champHeight) {
+
+		if (stations[i].progIU > champHeight) {
 			champHeight = stations[i].progIU;
 		}
 	}
@@ -100,28 +104,36 @@ function drawStationsGraph(stations) {
 		var currentIUHeight = (stations[i].currentIU / champHeight) * GRAPH_HEIGHT;
 		var prevIUHeight = (stations[i].prevIU / champHeight) * GRAPH_HEIGHT;
 		var progIUHeight = (stations[i].progIU / champHeight) * GRAPH_HEIGHT;
+		var cap100Height = (stations[i].cap100 / champHeight) * GRAPH_HEIGHT;
 
 		var rect = new Rectangle(new Point(x, y), new Point(x + width, y - currentIUHeight));
 		var prevRect = new Rectangle(new Point(x, y), new Point(x + width, y - prevIUHeight));
 		var progRect = new Rectangle(new Point(x, y), new Point(x + width, y - progIUHeight));
-		
+
 		var block = new Path.Rectangle(rect);
 		var prevBlock = new Path.Rectangle(prevRect);
 		var progBlock = new Path.Rectangle(progRect);
 		block.fillColor = blockColor;
-		
+
+		/* prevIU block */
 		prevBlock.fillColor = blockColorLight;
-		prevBlock.position.x -= GRAPH_BLOCK_OFFSET;		
-		
+		prevBlock.position.x -= GRAPH_BLOCK_OFFSET;
+
+		/* progIU block */
 		progBlock.fillColor = blockColorLight;
 		progBlock.position.x += GRAPH_BLOCK_OFFSET;
 		
-		/* prevIU block */
-		
-		
-		/* progIU block */
-		
+		/* Capacity path */
+		var cap100Point = new Point(x + (GRAPH_BLOCK_WIDTH/2), y - cap100Height);
+		var cap100Circle = new Path.Circle(cap100Point, 5);
+		cap100Circle.fillColor = pinkColor;
+		cap100Circle.strokeColor = 'white';
+		cap100Circle.strokeWidth = 3;
+		capPath.add(cap100Point);
+
 	};
+	
+	project.activeLayer.insertChild(-1, capPath); //put capPath in the front layer
 
 }
 
