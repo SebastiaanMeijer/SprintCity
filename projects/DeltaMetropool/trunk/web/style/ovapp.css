@@ -1,0 +1,28 @@
+#grafiek {
+}
+
+#station-tags {
+	float: right;
+	margin-right: 20px;
+	width: 810px;
+	height: 36px;
+	padding-top: 10px;
+}
+
+#station-tags .station-tag {
+	float: left;
+	padding: .1em;
+	margin: 0 2px;
+	height: 2.5em;
+	border: 1px solid gray;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	
+	
+}
+
+#trajecten-container {
+	clear: both;
+	width: 100%;
+	height: 322px;
+}
