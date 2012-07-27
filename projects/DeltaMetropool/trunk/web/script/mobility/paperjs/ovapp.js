@@ -5,15 +5,13 @@
 // console.log(data);
 // });
 
-
-
-
 /* ========================================================= */
 /* Constants */
 
-var OVAPP_WIDTH = $("#ovapp").width();
-var APP_INDENT = 87;
-var GRAPH_WIDTH = OVAPP_WIDTH - APP_INDENT;
+var CANVAS_WIDTH = $("#graphCanvas").width();
+var CANVAS_HEIGHT = $("#graphCanvas").height();
+var APP_INDENT = 100;
+var GRAPH_WIDTH = CANVAS_WIDTH - APP_INDENT;
 var GRAPH_HEIGHT = 193;
 var GRAPH_BLOCK_WIDTH = 7;
 var GRAPH_BLOCK_MARGIN = 3;
@@ -23,19 +21,26 @@ var blockColor = new HsbColor(240, .14, .84);
 var blockColorLight = new HsbColor(240, .03, .91);
 var pinkColor = new HsbColor(327, .98, .86);
 
+/* Final variables */
+var blockContainerWidth = (GRAPH_WIDTH) / stations.length;
+
+var firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
+
 /* ========================================================= */
 /* Execute from here */
 
 $(document).ready(function() {
 
 	drawStationsGraph(stations);
-	
+	drawStationNetworkValue(stations);
+	drawStationTags(stations);
+	drawStationNames(stations);
+
+	// var line = new Path.Line(new Point(APP_INDENT, 0), new Point(APP_INDENT, CANVAS_HEIGHT));
+	// line.strokeColor = 'black';
 });
 
-
-
 function drawStationsGraph(stations) {
-	var blockContainerWidth = (GRAPH_WIDTH) / stations.length;
 	var capPath = new Path();
 	var capOverPath = new Path();
 	var capUnderPath = new Path();
@@ -54,7 +59,7 @@ function drawStationsGraph(stations) {
 
 	for (var i = 0; i < stations.length; i++) {
 		/* currentIU block */
-		var x = APP_INDENT + GRAPH_BLOCK_WIDTH * 2 + blockContainerWidth * i;
+		var x = APP_INDENT  + blockContainerWidth * i;
 		var y = GRAPH_HEIGHT;
 		var width = GRAPH_BLOCK_WIDTH;
 		var currentIUHeight = (stations[i].currentIU / champHeight) * GRAPH_HEIGHT;
@@ -114,7 +119,7 @@ function addTextNextToPoint(point, text, color) {
 	var capOverTextPoint = point.clone();
 	capOverTextPoint.x += 35;
 	capOverTextPoint.y += 8;
-	
+
 	var capOverText = new PointText(capOverTextPoint);
 	capOverText.justification = 'center';
 	capOverText.characterStyle = {
@@ -124,6 +129,71 @@ function addTextNextToPoint(point, text, color) {
 	};
 	capOverText.content = text;
 }
+
+function drawStationNetworkValue(stations) {
+	for (var i = 0; i < stations.length; i++) {
+		var textPoint = getCenteredStationPoint(i, 16);
+
+		var networkValueText = new PointText(textPoint);
+		networkValueText.justification = 'center';
+		networkValueText.characterStyle = {
+			fontSize : 11,
+			fillColor : 'black'
+		};
+		networkValueText.content = stations[i].networkValue;
+	};
+}
+
+function drawStationTags(stations) {
+	var rectWidth = GRAPH_WIDTH / stations.length - GRAPH_BLOCK_MARGIN * 4;
+	var rectHeight = rectWidth * 0.5;
+	var rectSize = new Size(rectWidth, 4);
+
+	for (var i = 0; i < stations.length; i++) {
+		var tagPoint = getCenteredStationPoint(i, 20, rectSize);
+		var tagRectangle = new Rectangle(tagPoint, rectSize);
+		var tagCornerSize = new Size(2, 2);
+		var path = new Path.RoundRectangle(tagRectangle, tagCornerSize);
+
+		/* determine color */
+		if (stations[i].currentIU > stations[i].capOver) {
+			path.fillColor = '#ea4d4d';
+			// path.strokeColor = '#cb0000';
+		} else if (stations[i].currentIU < stations[i].capUnder) {
+			path.fillColor = '#5bb4ff';
+			// path.strokeColor = '#008aff';
+		} else {
+			path.fillColor = '#33d130';
+			// path.strokeColor = '#04aa00';
+		}
+		project.activeLayer.insertChild(0, path);
+
+	};
+}
+
+function drawStationNames(stations) {
+	for (var i = 0; i < stations.length; i++) {
+		var textPoint = getCenteredStationPoint(i, 36);
+
+		var text = new PointText(textPoint);
+		text.justification = 'center';
+		text.characterStyle = {
+			fontSize : 11,
+			fillColor : '#333333'
+		};
+
+		var stationName = stations[i].name;
+		if(stationName.length > 13) {
+			stationName = stationName.substring(0,10) + "\n" + stationName.substring(10);
+		}
+		
+		
+		text.content = stationName;
+	};
+}
+
+/* ========================================================= */
+/* help functions */
 
 function getChampHeight(stations) {
 	var champHeight = 0;
@@ -147,3 +217,14 @@ function getChampHeight(stations) {
 	return champHeight;
 }
 
+function getCenteredStationPoint(i, margin, rectSize) {
+	var x = firstGraphBlockCenter + blockContainerWidth * i;
+	if (rectSize != null) {
+		x -= rectSize.width / 2;
+	}
+	var marginFromGraph = margin;
+	var y = GRAPH_HEIGHT + marginFromGraph;
+	var point = new Point(x, y);
+
+	return point;
+}

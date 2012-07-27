@@ -37,7 +37,8 @@
 	/* ========================================================= */
 	/* Initialization */
 
-	var stations = new Array(); //global variable within the ovapp scope
+	var stations = new Array();
+	//global variable within the ovapp scope
 
 	initMockStations(stations);
 
@@ -45,17 +46,13 @@
 		stations.push(new Station("Den Haag CS", 10, 120, 123));
 		stations.push(new Station("Den Haag HS", 30, 140, 10));
 		stations.push(new Station("Den Haag Moerwijk", 20, 50, 60));
-		stations.push(new Station("Rijswijk", 40, 60, 90));
+		stations.push(new Station("Rijswijk", 4220, 60, 90));
 		stations.push(new Station("Delft", 12, 200, 180));
-		stations.push(new Station("Delft zuid", 14, 20, 40));
+		stations.push(new Station("Delft zuid", 134, 20, 40));
 		stations.push(new Station("Schiedam Kethel", 14, 40, 50));
-		stations.push(new Station("Schiedam Centraal", 40, 210, 170));
+		stations.push(new Station("Schiedam Centraal", 40, 10, 170));
 		stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
-				stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
-						stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
-								stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
-										stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
-												stations.push(new Station("Rotterdam Centraal", 70, 200, 50));
+
 
 	}
 </script>
@@ -63,28 +60,7 @@
 <!-- HTML STUFF -->
 
 <div id="grafiek">
-	<canvas id="graphCanvas" width=886 height=193></canvas>
-</div>
-<div id="station-tags">
-	<script type="text/javascript">
-		for (var i=0; i < stations.length; i++) {
-			var stationColor = "green";
-			if (stations[i].currentIU > stations[i].capOver) {
-				stationColor = "red";
-			}			
-			else if (stations[i].currentIU < stations[i].capUnder) {
-				stationColor = "blue";
-			}
-			var stationStr = "<div class='station-tag " + stationColor + "'>" + stations[i].name + "</div>";
-			
-		  $("#station-tags").append(stationStr);
-		};
-		
-		var stationTagsWidth = $("#station-tags").width();
-		var widthPerStation = stationTagsWidth / stations.length;
-		$(".station-tag").css({width: widthPerStation - 8});
-		
-	</script>
+	<canvas id="graphCanvas" width=886 height=250></canvas>
 </div>
 <div id="trajecten-container">
 	<div class="traject">
