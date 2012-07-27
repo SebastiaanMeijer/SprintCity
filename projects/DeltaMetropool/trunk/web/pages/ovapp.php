@@ -116,7 +116,7 @@
 	function fixDistancesBetweenStations() {
 		var canvasSize = 786;
 		//magic number, i know, but its canvas size minus indent
-		var xDistance = canvasSize / stations.length - 16; 
+		var xDistance = Math.round(canvasSize / stations.length) - 16; 
 		$('.gray-box').css('margin-right', xDistance);
 	}
 </script>
