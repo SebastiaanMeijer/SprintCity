@@ -15,10 +15,10 @@
 			
 		}
 		
-		public static function GetStationAfterProgram(station:Station, program:Program):StationInstance
+		public static function GetStationAfterProgram(station:Station, program:Program, new_transform_area:int):StationInstance
 		{
 			var stationInstance:StationInstance = StationInstance.Create(station);
-			stationInstance.ApplyProgram(program);
+			stationInstance.ApplyProgram(program, new_transform_area);
 			return stationInstance;
 		}
 		

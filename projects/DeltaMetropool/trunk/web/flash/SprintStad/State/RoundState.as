@@ -76,7 +76,7 @@
 			
 			// left info
 			stationInstance = StationInstance.Create(station);
-			stationInstance.ApplyProgram(Program.Default());
+			stationInstance.ApplyProgram(Program.Default(), 0);
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
 			// init windows
@@ -307,8 +307,14 @@
 		{
 			var program:Program = CreateProgram();
 			var tempStationInstance:StationInstance = stationInstance.Copy();
-			tempStationInstance.ApplyStaticRoundInfo(parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id));
-			tempStationInstance.ApplyProgram(program);
+			var round:Round = parent.GetCurrentStation().GetRoundById(Data.Get().current_round_id);
+			tempStationInstance.ApplyStaticRoundInfo(round);
+			var new_transform_area:int = 0;
+			if (round != null)
+			{
+				new_transform_area = round.new_transform_area;
+			}
+			tempStationInstance.ApplyProgram(program, new_transform_area);
 			DrawStationInfo(tempStationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		

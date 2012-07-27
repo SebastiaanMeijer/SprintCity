@@ -154,7 +154,12 @@
 					index = types.getIndex(futureProgram.type_leisure);
 					allocated[index] += futureProgram.area_leisure;
 				}
-				stationInstance.ApplyProgram(futureProgram);	
+				var new_transform_area:int = 0;
+				if (currentRound != null)
+				{
+					new_transform_area = currentRound.new_transform_area;
+				}
+				stationInstance.ApplyProgram(futureProgram, new_transform_area);	
 			}
 			
 			bar.visible = true;
