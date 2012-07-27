@@ -22,7 +22,7 @@ var blockColorLight = new HsbColor(240, .03, .91);
 var pinkColor = new HsbColor(327, .98, .86);
 
 /* Final variables */
-var blockContainerWidth = (GRAPH_WIDTH) / stations.length;
+var blockContainerWidth = Math.round((GRAPH_WIDTH) / stations.length);
 
 var firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
 
