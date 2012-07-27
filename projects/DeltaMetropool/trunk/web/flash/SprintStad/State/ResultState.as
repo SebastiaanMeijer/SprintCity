@@ -84,7 +84,7 @@
 			
 			// left info
 			pastStationInstance = StationInstance.CreateInitial(station);
-			pastStationInstance.ApplyProgram(Program.Default());
+			pastStationInstance.ApplyProgram(Program.Default(), 0);
 			DrawStationInfo(pastStationInstance, view.past_info, barPastArea, barPastTransformArea, station.GetRound(0).name);
 			
 			// right info

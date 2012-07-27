@@ -125,7 +125,7 @@
 		public function ApplyRound(round:Round):void
 		{
 			this.round = round;
-			ApplyProgram(round.exec_program);
+			ApplyProgram(round.exec_program, round.new_transform_area);
 			this.round = null;
 		}
 		
@@ -138,7 +138,7 @@
 			}
 		}
 		
-		public function ApplyProgram(program:Program):void
+		public function ApplyProgram(program:Program, new_transform_area:int):void
 		{
 			// calculate new transform area
 			var constants:Constants = Data.Get().GetConstants();
@@ -148,16 +148,22 @@
 			var home_per_area:Number = GetAverageHomeDensity();
 			var work_per_area:Number = GetAverageWorkDensity();
 			var worker_per_area:Number = GetAverageWorkerDensity();
+			
 			var transform_area_cultivated_home_delta:Number = totalTransformArea <= 0 ? 0 :
-				programTransformArea * (transform_area_cultivated_home / totalTransformArea);
+				new_transform_area * (station.transform_area_cultivated_home / station.GetTotalTransformArea());
 			var transform_area_cultivated_work_delta:Number = totalTransformArea <= 0 ? 0 :
-				programTransformArea * (transform_area_cultivated_work / totalTransformArea);
+				new_transform_area * (station.transform_area_cultivated_work / station.GetTotalTransformArea());
 			var transform_area_cultivated_mixed_delta:Number = totalTransformArea <= 0 ? 0 :
-				programTransformArea * (transform_area_cultivated_mixed / totalTransformArea);
-			var transform_area_undeveloped_urban_delta:Number = totalTransformArea <= 0 ? 0 :
-				programTransformArea * (transform_area_undeveloped_urban / totalTransformArea);
+				new_transform_area * (station.transform_area_cultivated_mixed / station.GetTotalTransformArea());
+			
 			var transform_area_undeveloped_rural_delta:Number = totalTransformArea <= 0 ? 0 :
 				programTransformArea * (transform_area_undeveloped_rural / totalTransformArea);
+			
+			var transform_area_undeveloped_urban_delta = programTransformArea -
+														 (transform_area_cultivated_home_delta +
+														  transform_area_cultivated_work_delta +
+														  transform_area_cultivated_mixed_delta +
+														  transform_area_undeveloped_rural_delta);
 			
 			area_cultivated_home -= transform_area_cultivated_home_delta;
 			area_cultivated_work -= transform_area_cultivated_work_delta;
@@ -175,7 +181,7 @@
 			count_work_total -= transform_area_cultivated_work_delta * work_per_area;
 			count_work_transform -= transform_area_cultivated_work_delta * work_per_area;
 			count_worker_total -= (transform_area_cultivated_work_delta + transform_area_cultivated_mixed_delta) * worker_per_area;
-			count_worker_transform -= (transform_area_cultivated_work_delta + transform_area_cultivated_mixed_delta) * worker_per_area;;
+			count_worker_transform -= (transform_area_cultivated_work_delta + transform_area_cultivated_mixed_delta) * worker_per_area;
 			
 			area_cultivated_home += program.area_home;
 			area_cultivated_work += program.area_work;
@@ -206,8 +212,8 @@
 		
 		private function GetAverageHomeDensity():Number
 		{
-			if (area_cultivated_home > 0)
-				return station.count_home_total / area_cultivated_home;
+			if (station.area_cultivated_home > 0)
+				return station.count_home_total / station.area_cultivated_home;
 			else
 				return Data.Get().GetTypes().GetTypesOfCategory("average_home")[0].area_density;
 		}
@@ -215,22 +221,22 @@
 		private function GetWorkAreaDensity(program:Program):Number
 		{
 			if (program.type_work.type.search("average_") > -1)
-				return station.count_work_total / area_cultivated_work;
+				return GetAverageWorkDensity();
 			else
 				return program.type_work.area_density;
 		}
 		
 		private function GetAverageWorkDensity():Number
 		{
-			if (area_cultivated_work > 0)
-				return station.count_work_total / area_cultivated_work;
+			if (station.area_cultivated_work > 0)
+				return station.count_work_total / station.area_cultivated_work;
 			else
 				return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].area_density;
 		}
 		
 		private function GetAverageWorkerDensity():Number
 		{
-			if (area_cultivated_work > 0)
+			if (station.area_cultivated_work + station.area_cultivated_mixed > 0)
 				return station.count_worker_total / (station.area_cultivated_work + station.area_cultivated_mixed);
 			else
 				return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].people_density;
@@ -239,7 +245,15 @@
 		private function GetWorkPeopleDensity(program:Program):Number
 		{
 			if (program.type_work.type.search("average_") > -1)
-				return station.count_worker_total / (area_cultivated_work + area_cultivated_mixed);
+				if (station.area_cultivated_work + station.area_cultivated_mixed > 0)
+				{
+					return station.count_worker_total / (station.area_cultivated_work + station.area_cultivated_mixed);
+				}
+				else
+				{
+					// TODO: copied from GetAverageWorkerDensity(), use different value here?
+					return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].people_density;
+				}
 			else
 				return program.type_work.people_density;
 		}
@@ -247,7 +261,15 @@
 		private function GetLeisurePeopleDensity(program:Program):Number
 		{
 			if (program.type_leisure.type.search("average_") > -1)
-				return station.count_worker_total / (area_cultivated_work + area_cultivated_mixed);
+				if (station.area_cultivated_work + station.area_cultivated_mixed > 0)
+				{
+					return station.count_worker_total / (station.area_cultivated_work + station.area_cultivated_mixed);
+				}
+				else
+				{
+					// TODO: copied from GetAverageWorkerDensity(), use different value here?
+					return Data.Get().GetTypes().GetTypesOfCategory("average_work")[0].people_density;
+				}
 			else
 				return program.type_leisure.people_density;
 		}

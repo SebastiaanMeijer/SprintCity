@@ -68,7 +68,7 @@
 				0);
 			// left info
 			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(station, Program.Default());
+				StationStatsCalculator.GetStationAfterProgram(station, Program.Default(), 0);
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			// right info
 			OnEditorChange();
@@ -196,8 +196,9 @@
 		private function OnEditorChange():void
 		{
 			CreateProgram();
+			var new_transform_area:int = parent.GetCurrentStation().GetTotalTransformArea();
 			var stationInstance:StationInstance = 
-				StationStatsCalculator.GetStationAfterProgram(parent.GetCurrentStation(), parent.GetCurrentStation().program);
+				StationStatsCalculator.GetStationAfterProgram(parent.GetCurrentStation(), parent.GetCurrentStation().program, new_transform_area);
 			DrawStationInfo(stationInstance, parent.program_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
 		}
 		
