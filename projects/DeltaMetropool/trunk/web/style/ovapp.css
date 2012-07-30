@@ -6,44 +6,53 @@
 
 
 #trajecten-container {
-	clear: both;
-	float: left;
-	width: 100%;
-	height: 322px;
-	text-align: left;
+    clear: both;
+    float: left;
+    width: 100%;
+    height: 322px;
+    text-align: left;
 }
 
 .traject {
-	position: relative;
-	width: 100%;
-	height: 55px;
+    position: relative;
+    width: 100%;
+    height: 55px;
 }
 
 .traject-title{
-	float: left;
-	width: 94px;
-	height: 100%;
-	color: #474747;
+    float: left;
+    width: 94px;
+    height: 100%;
+    color: #474747;
 }
 
 .traject-title h1 {
-	font-size: 18px;
+    font-size: 18px;
 }
 
 .traject-title h2 {
-	font-size: 10px;
+    font-size: 10px;
 }
 
 .traject-lijn {
-	min-width: 400px;
-	float: left;
-	height: 100%;
+    position: relative;
+    min-width: 400px;
+    float: left;
+    height: 100%;
 }
 
 .traject-lijn .gray-box {
-	float: left;
-	margin-top: 16px;
-	width: 16px;
-	height: 16px;
-	background: #d7cfcf;
+    position: absolute;
+    top: 16px;
+    width: 16px;
+    height: 16px;
+    background: #d7cfcf;
+}
+
+.traject-lijn .yellow-line {
+    position: absolute;
+    left: 8px;
+    top: 22px;
+    height: 4px;
+    background: #f8cb3e;
 }
