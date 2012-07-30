@@ -21,13 +21,29 @@
 
 .traject-title{
     float: left;
-    width: 94px;
+    width: 91px;
+    margin-right: 3px;
     height: 100%;
-    color: #474747;
+    color: #555;
+    cursor: pointer;
+}
+
+.traject-title:hover {
+    border-left: 3px solid #f0098d;
+    margin-right: 0;
+    padding-left: 5px;
+    width: 86px;
+    color: #333;
+}
+
+.traject-title:active {
+    border-color: black;
+    color: black;
 }
 
 .traject-title h1 {
     font-size: 18px;
+    color: black;
 }
 
 .traject-title h2 {
@@ -36,7 +52,7 @@
 
 .traject-lijn {
     position: relative;
-    
+
     float: left;
     height: 100%;
 }
@@ -56,3 +72,72 @@
     height: 4px;
     background: #f8cb3e;
 }
+
+.traject .textBoxIU {
+    float: right;
+    color: gray;
+    text-align: right;
+    margin-top: 7px;
+    margin-right: 2.5em;
+    font-size: 10px;
+    line-height: 10px;
+}
+
+.train-stop {
+    position: absolute;
+    top: 6px;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f8ce46;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+
+    border-top-style: solid;
+
+    background: white;
+
+    text-align: center;
+    line-height: 30px;
+    color: #f0098d;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    /*    border-left-style: double;
+        border-right-style: double;*/
+
+    border-left-color: #d7cfcf;
+    border-right-color: #d7cfcf;
+}
+
+.train-stop:hover {
+    border-left-color: #f0098d;
+    border-right-color: #f0098d;
+    border-left-style: solid;
+    border-right-style: solid;
+
+}
+
+.invisible {
+    border: none;
+    background: transparent;
+}
+
+.invisible:hover {
+    border-left-color: #f0098d;
+    border-right-color: #f0098d;
+    border-left-style: solid;
+    border-right-style: solid;
+    
+    border-top-style: solid;
+    border-top-color: white;
+    border-bottom-style: solid;
+    border-bottom-color: white;
+    background: white;
+}
+
+.train-stop:active, .invisible:active {
+    color: black;
+    border-left-color: #000000;
+    border-right-color: #000000;
+}
+

@@ -1,5 +1,5 @@
 function Traject(i) {
-    this.i = i;
+    this.index = i;
     
     this.traject = document.createElement('div');
     this.trajectTitle = document.createElement('div');
@@ -8,8 +8,6 @@ function Traject(i) {
     this.traject.setAttribute('class', 'traject');
     this.trajectTitle.setAttribute('class', 'traject-title');
     this.trajectLijn.setAttribute('class', 'traject-lijn');
- 
-    this.yellowLineEnd = 0;
  
     this.init();
 }
@@ -23,11 +21,11 @@ Traject.prototype.init = function() {
 Traject.prototype.draw = function() {
     this.writeTrainLabel();   
     this.drawRouteBackground();
-    this.writeIUstuff(this.i, this.traject);
+    this.writeIUstuff(this.index, this.traject);
 }
     
 Traject.prototype.writeTrainLabel = function() {
-    var i = this.i;
+    var i = this.index;
 
 
     var trainType = document.createElement('h1');
@@ -43,13 +41,11 @@ Traject.prototype.writeTrainLabel = function() {
 }
 	
 Traject.prototype.drawRouteBackground = function() {
-
-    
-                
+               
     this.drawGrayBoxes(this.trajectLijn);
         
     this.drawYellowLine(this.trajectLijn);
-		
+    this.drawCircles(this.trajectLijn);
     this.traject.appendChild(this.trajectLijn);
 }
     
@@ -64,7 +60,28 @@ Traject.prototype.drawGrayBoxes = function(trajectLijn) {
             left: offset
         });
         trajectLijn.appendChild(grayBox);
-    };
+    }
+}
+
+Traject.prototype.drawCircles = function(trajectLijn) {
+    var train = trains[this.index];
+    
+    for (var i=0; i < stations.length; i++) {
+        var trainStop = document.createElement('div');
+        $(trainStop).addClass('train-stop');
+        var offset = getDistanceBetweenStations() * i - 10;
+        $(trainStop).css({
+            left: offset
+        });
+        
+        if(train.stationStops[i] == 0) {
+           $(trainStop).addClass('invisible');
+        }
+        else {
+            $(trainStop).append(train.stationStops[i]);
+        }
+        trajectLijn.appendChild(trainStop);
+    }
 }
     
 Traject.prototype.drawYellowLine = function(trajectLijn) {
@@ -74,8 +91,6 @@ Traject.prototype.drawYellowLine = function(trajectLijn) {
     var offsetYellowLineBegin = getDistanceBetweenStations();
     var yellowLineWidth = offsetYellowLineBegin * stations.length - offsetYellowLineBegin;
     
-    this.yellowLineEnd = offsetYellowLineBegin + yellowLineWidth;
-    
     $(yellowLine).css({
         width: yellowLineWidth
     });
@@ -83,19 +98,18 @@ Traject.prototype.drawYellowLine = function(trajectLijn) {
 }
     
 Traject.prototype.writeIUstuff = function() {
-    var offset = this.yellowLineEnd + 50;
-    offset = '' + offset + 'px';
     
     var textBox = document.createElement('div');
-    $(textBox).css({
-        position: 'absolute',
-        top: '17px',
-        left: offset,
-        fontSize: '10px'
-    });
-    $(textBox).append(trains[this.i].avgIU);
+    $(textBox).addClass('textBoxIU');
+    
+
+    $(textBox).append(trains[this.index].maxIU);
+    $(textBox).append('<br /><span style="color: black">' + trains[this.index].avgIU + '</span>');
+    $(textBox).append('<br />' + trains[this.index].minIU);
     this.traject.appendChild(textBox);
 }
+
+
 	
 function getDistanceBetweenStations() {
     var canvasSize = 786;

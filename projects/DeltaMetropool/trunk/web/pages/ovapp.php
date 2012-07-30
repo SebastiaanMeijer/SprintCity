@@ -33,4 +33,5 @@
     <canvas id="graphCanvas" width=886 height=250></canvas>
 </div>
 <div id="trajecten-container">
+<!--    <div class="train-stop">3</div>-->
 </div>
