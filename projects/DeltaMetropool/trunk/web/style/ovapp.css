@@ -26,6 +26,11 @@
     height: 100%;
     color: #555;
     cursor: pointer;
+
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
+    -o-user-select: none; 
 }
 
 .traject-title:hover {
@@ -107,6 +112,11 @@
 
     border-left-color: #d7cfcf;
     border-right-color: #d7cfcf;
+
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
+    -o-user-select: none; 
 }
 
 .train-stop:hover {
@@ -114,7 +124,6 @@
     border-right-color: #f0098d;
     border-left-style: solid;
     border-right-style: solid;
-
 }
 
 .invisible {
@@ -127,7 +136,7 @@
     border-right-color: #f0098d;
     border-left-style: solid;
     border-right-style: solid;
-    
+
     border-top-style: solid;
     border-top-color: white;
     border-bottom-style: solid;

@@ -1,5 +1,5 @@
 function Traject(i) {
-    this.index = i;
+    this.train = trains[i];
     
     this.traject = document.createElement('div');
     this.trajectTitle = document.createElement('div');
@@ -16,23 +16,21 @@ Traject.prototype.init = function() {
     this.draw();
     
     $('#trajecten-container').append(this.traject);
+    
 }
 
 Traject.prototype.draw = function() {
     this.writeTrainLabel();   
     this.drawRouteBackground();
-    this.writeIUstuff(this.index, this.traject);
+    this.writeIUstuff();
 }
     
 Traject.prototype.writeTrainLabel = function() {
-    var i = this.index;
-
-
     var trainType = document.createElement('h1');
-    trainType.innerHTML = trains[i].name;
+    trainType.innerHTML = this.train.name;
 
     var trainRoute = document.createElement('h2');
-    trainRoute.innerHTML = "" + trains[i].beginStation + " -<br/>" + trains[i].endStation;
+    trainRoute.innerHTML = "" + this.train.beginStation + " -<br/>" + this.train.endStation;
 
     this.trajectTitle.appendChild(trainType);
     this.trajectTitle.appendChild(trainRoute);
@@ -64,21 +62,22 @@ Traject.prototype.drawGrayBoxes = function(trajectLijn) {
 }
 
 Traject.prototype.drawCircles = function(trajectLijn) {
-    var train = trains[this.index];
-    
     for (var i=0; i < stations.length; i++) {
         var trainStop = document.createElement('div');
         $(trainStop).addClass('train-stop');
+        
         var offset = getDistanceBetweenStations() * i - 10;
         $(trainStop).css({
             left: offset
         });
         
-        if(train.stationStops[i] == 0 || train.stationStops[i] == null) {
-           $(trainStop).addClass('invisible');
+        $(trainStop).attr('trainID', this.train.id);
+        
+        if(this.train.stationStops[i] == 0 || this.train.stationStops[i] == null) {
+            $(trainStop).addClass('invisible');
         }
         else {
-            $(trainStop).append(train.stationStops[i]);
+            $(trainStop).append(this.train.stationStops[i]);
         }
         trajectLijn.appendChild(trainStop);
     }
@@ -103,9 +102,9 @@ Traject.prototype.writeIUstuff = function() {
     $(textBox).addClass('textBoxIU');
     
 
-    $(textBox).append(trains[this.index].maxIU);
-    $(textBox).append('<br /><span style="color: black">' + trains[this.index].avgIU + '</span>');
-    $(textBox).append('<br />' + trains[this.index].minIU);
+    $(textBox).append(this.train.maxIU);
+    $(textBox).append('<br /><span style="color: black">' + this.train.avgIU + '</span>');
+    $(textBox).append('<br />' + this.train.minIU);
     this.traject.appendChild(textBox);
 }
 
