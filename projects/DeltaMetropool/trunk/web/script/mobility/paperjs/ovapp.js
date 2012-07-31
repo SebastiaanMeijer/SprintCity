@@ -140,13 +140,13 @@ function drawStationNetworkValue(stations) {
 			fontSize : 11,
 			fillColor : 'black'
 		};
-		networkValueText.content = stations[i].networkValue;
+		networkValueText.content = 'nw:' + stations[i].networkValue;
 	};
 }
 
 function drawStationTags(stations) {
 	var rectWidth = GRAPH_WIDTH / stations.length - GRAPH_BLOCK_MARGIN * 4;
-	var rectHeight = rectWidth * 0.5;
+	
 	var rectSize = new Size(rectWidth, 4);
 
 	for (var i = 0; i < stations.length; i++) {
@@ -184,7 +184,8 @@ function drawStationNames(stations) {
 
 		var stationName = stations[i].name;
 		if(stationName.length > 13) {
-			stationName = stationName.substring(0,10) + "\n" + stationName.substring(10);
+                    var spaceIndex = stationName.indexOf(" ", 7);
+			stationName = stationName.substring(0,spaceIndex) + "\n" + stationName.substring(spaceIndex);
 		}
 		
 		

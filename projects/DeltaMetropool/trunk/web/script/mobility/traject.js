@@ -74,7 +74,7 @@ Traject.prototype.drawCircles = function(trajectLijn) {
             left: offset
         });
         
-        if(train.stationStops[i] == 0) {
+        if(train.stationStops[i] == 0 || train.stationStops[i] == null) {
            $(trainStop).addClass('invisible');
         }
         else {
