@@ -59,12 +59,12 @@
          */
         
         $(trainTitle).parent().children('.traject-lijn').children('.train-stop').each(function() {
-
-            $(this).animate({color: 'black'}, 20, "swing", function(){
-                $(this).animate({color: '#f0098d'}, 20, "swing");
-            });
-            handleTrainStopClick(this);
-            
+            if ($(this).text() != ""){
+                $(this).animate({color: 'black'}, 20, "swing", function(){
+                    $(this).animate({color: '#f0098d'}, 20, "swing");
+                });
+                handleTrainStopClick(this);
+            }
         });
         
         
