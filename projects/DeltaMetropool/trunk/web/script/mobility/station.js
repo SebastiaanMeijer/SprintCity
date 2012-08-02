@@ -30,8 +30,6 @@ Station.initMockStations = function(stationArray) {
     stationArray.push(new Station("Schiedam Kethel", 14, 40, 50));
     stationArray.push(new Station("Schiedam Centraal", 40, 10, 170));
     stationArray.push(new Station("Rotterdam Centraal", 70, 200, 50));
-       
-        
-        
+     
     return stationArray;
 }
