@@ -22,23 +22,41 @@ var blockColorLight = new HsbColor(240, .03, .91);
 var pinkColor = new HsbColor(327, .98, .86);
 
 /* Final variables */
-var blockContainerWidth = Math.round((GRAPH_WIDTH) / stations.length);
+var blockContainerWidth = 0;
 
-var firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
+var firstGraphBlockCenter = 0;
 
 /* ========================================================= */
-/* Execute from here */
 
-$(document).ready(function() {
+var init = function(data) {
 
+    for (i = 0; i < data.length; i++) {     
+            
+        stations.push(
+            new Station(
+                data[i].name, 
+                data[i].networkValue,
+                data[i].currentIU,
+                data[i].cap100));  
+            
+    }
+    blockContainerWidth = Math.round((GRAPH_WIDTH) / stations.length);
+    firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
+    
+    makeGraph();
+}
+
+function makeGraph(){
+//    var line = new Path.Line(new Point(APP_INDENT, 0), new Point(APP_INDENT, CANVAS_HEIGHT));
+//    line.strokeColor = 'black';
+// 
     drawStationsGraph(stations);
     drawStationNetworkValue(stations);
     drawStationTags(stations);
     drawStationNames(stations);
 
-// var line = new Path.Line(new Point(APP_INDENT, 0), new Point(APP_INDENT, CANVAS_HEIGHT));
-// line.strokeColor = 'black';
-});
+    startApp();
+}
 
 function drawStationsGraph(stations) {
     var capPath = new Path();
@@ -58,6 +76,7 @@ function drawStationsGraph(stations) {
     var champHeight = getChampHeight(stations);
 
     for (var i = 0; i < stations.length; i++) {
+        
         /* currentIU block */
         var x = APP_INDENT  + blockContainerWidth * i;
         var y = GRAPH_HEIGHT;
@@ -109,7 +128,7 @@ function drawStationsGraph(stations) {
             addTextNextToPoint(capUnderPoint, '75,00%', 'blue');
         }
 
-    };
+    }
     project.activeLayer.insertChild(-1, capPaths);
 //put capPath in the front layer
 
@@ -180,7 +199,7 @@ function drawStationTags(stations) {
         }
         project.activeLayer.insertChild(0, path);
 
-    };
+    }
 }
 
 function drawStationNames(stations) {
@@ -251,3 +270,9 @@ function getCenteredStationPoint(i, margin, rectSize) {
 
     return point;
 }
+
+
+/* Execute here */
+$(document).ready(function() {
+    Load.loadStations(init);    
+});
