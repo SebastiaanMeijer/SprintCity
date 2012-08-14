@@ -55,7 +55,7 @@ function makeGraph(){
     drawStationTags(stations);
     drawStationNames(stations);
 
-    startApp();
+    Train.initTrains();
 }
 
 function drawStationsGraph(stations) {

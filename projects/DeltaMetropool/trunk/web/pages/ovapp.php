@@ -18,9 +18,7 @@
 
 <script type="text/javascript">
     /* Put the trains on the track */
-    function startApp() {
-        trains = Train.initTrains(trains);
-        
+    function startApp() {       
         for (var i = 0; i < trains.length; i++) {
             new Traject(i);
         };

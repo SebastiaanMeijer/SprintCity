@@ -12,8 +12,19 @@ function Train(id, name, beginStation, endStation, stationStops, avgIU) {
     this.minIU = Math.round(this.avgIU * 0.9);
 }
 
-Train.initTrains = function(trainArray) {
-    Load.loadTrains(trainArray);      
-    
-    return trainArray;
+var fillTrainArray = function(data) {
+    for (i = 0; i < data.length; i++) {
+        trains.push(new Train(
+            data[i].id, 
+            data[i].name,
+            data[i].beginStation, 
+            data[i].endStation, 
+            data[i].stationStops, 
+            data[i].avgIU));
+    }
+         startApp();
+}
+
+Train.initTrains = function() {
+    Load.loadTrains(fillTrainArray);      
 }
