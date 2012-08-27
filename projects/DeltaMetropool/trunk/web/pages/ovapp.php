@@ -14,6 +14,8 @@
     var stations = new Array();
     var trains = new Array();
     
+    
+    
 </script>
 
 <script type="text/javascript">
@@ -32,9 +34,10 @@
                 handleTrainClick(this);
             });
         }
+        
     }
     
-    function handleTrainStopClick(trainStop) {        
+    function handleTrainStopClick(trainStop) { 
         var stopNum = $(trainStop).text();
         if (stopNum == 0) {
             $(trainStop).removeClass('invisible');
@@ -50,7 +53,11 @@
         }
         
         /* prognose */
+        
+        clearCanvas();
+        
     }
+   
     
     function handleTrainClick(trainTitle) {
         /* Go inside container div and look for all divs with class train-stop
@@ -67,6 +74,12 @@
         });
         
         
+    }
+    
+    function clearCanvas() {
+        var canvas = document.getElementById('graphCanvas');
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
     }
 </script>
 <!-- HTML STUFF -->
