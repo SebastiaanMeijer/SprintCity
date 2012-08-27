@@ -1,9 +1,4 @@
-/* AJAX TEST */
-// var time = Math.random();
-// $.post("pages/testAjax.php", {man: "Frans", time: time},
-// function(data) {
-// console.log(data);
-// });
+window.Graph = {};
 
 /* ========================================================= */
 /* Constants */
@@ -54,6 +49,8 @@ function makeGraph(){
     drawStationNetworkValue(stations);
     drawStationTags(stations);
     drawStationNames(stations);
+    
+    view.draw(); /* Fixes bug that doesn't draw before mouse movement */
 
     Train.initTrains();
 }
