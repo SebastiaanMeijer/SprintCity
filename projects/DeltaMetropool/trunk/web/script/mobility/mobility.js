@@ -35,7 +35,7 @@ function poll(){
             }, 
             dataType: "json", 
             complete: function() {
-                setTimeout(poll, 2000);
+                setTimeout(poll, 1000);
             }, 
             timeout: 30000
         });
