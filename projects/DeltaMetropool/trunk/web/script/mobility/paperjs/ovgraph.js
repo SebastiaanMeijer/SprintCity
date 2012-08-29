@@ -1,4 +1,4 @@
-window.Graph = {};
+window.Graph = window.Graph || {};
 
 /* ========================================================= */
 /* Constants */
@@ -25,34 +25,26 @@ var firstGraphBlockCenter = 0;
 
 var init = function(data) {
 
-    for (i = 0; i < data.length; i++) {     
-            
-        stations.push(
-            new Station(
-                data[i].name, 
-                data[i].networkValue,
-                data[i].currentIU,
-                data[i].cap100));  
-            
-    }
+    Station.fillStations(data);
+    
     blockContainerWidth = Math.round((GRAPH_WIDTH) / stations.length);
     firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
     
-    makeGraph();
+    Graph.drawGraph();
+    Train.initTrains();
 }
 
-function makeGraph(){
-//    var line = new Path.Line(new Point(APP_INDENT, 0), new Point(APP_INDENT, CANVAS_HEIGHT));
-//    line.strokeColor = 'black';
-// 
+
+Graph.drawGraph = function(){
+    var layer = new Layer();
+    layer.activate();
+    
     drawStationsGraph(stations);
     drawStationNetworkValue(stations);
     drawStationTags(stations);
     drawStationNames(stations);
     
     view.draw(); /* Fixes bug that doesn't draw before mouse movement */
-
-    Train.initTrains();
 }
 
 function drawStationsGraph(stations) {
@@ -169,7 +161,7 @@ function drawStationNetworkValue(stations) {
             fillColor : 'black'
         };
         networkValueText.content = 'nw:' + stations[i].networkValue;
-    };
+    }
 }
 
 function drawStationTags(stations) {
@@ -266,6 +258,10 @@ function getCenteredStationPoint(i, margin, rectSize) {
     var point = new Point(x, y);
 
     return point;
+}
+
+Graph.clearPaper = function(){
+    project.activeLayer.remove();
 }
 
 

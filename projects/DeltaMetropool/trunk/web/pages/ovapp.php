@@ -28,10 +28,12 @@
         if (!READ_ONLY){
             $('.train-stop').click(function(){
                 handleTrainStopClick(this);
+                refresh();
             });
         
             $('.traject-title').click(function(){
                 handleTrainClick(this);
+                refresh();
             });
         }
         
@@ -53,9 +55,13 @@
         }
         
         /* prognose */
+       
         
-        clearCanvas();
-        
+    }
+    
+    function refresh() {
+        Graph.clearPaper();
+        Station.refreshStations();
     }
    
     
@@ -69,17 +75,10 @@
                 $(this).animate({color: 'black'}, 20, "swing", function(){
                     $(this).animate({color: '#f0098d'}, 20, "swing");
                 });
-                handleTrainStopClick(this);
+                 
+                handleTrainStopClick(this, false);
             }
         });
-        
-        
-    }
-    
-    function clearCanvas() {
-        var canvas = document.getElementById('graphCanvas');
-        var context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
     }
 </script>
 <!-- HTML STUFF -->

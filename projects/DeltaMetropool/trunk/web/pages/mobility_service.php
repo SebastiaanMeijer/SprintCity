@@ -6,15 +6,15 @@ if (isset($_POST['get'])) {
 
     if ($_POST['get'] == 'stations') {
         $stations = array(
-            array("name" => "Den Haag CS", "networkValue" => 100, "currentIU" => 60, "cap100" => 123),
-            array("name" => "Den Haag HS", "networkValue" => 30, "currentIU" => 140, "cap100" => 90),
-            array("name" => "Den Haag Moerwijk", "networkValue" => 20, "currentIU" => 50, "cap100" => 60),
-            array("name" => "Rijswijk", "networkValue" => 20, "currentIU" => 60, "cap100" => 90),
-            array("name" => "Delft", "networkValue" => 12, "currentIU" => 200, "cap100" => 180),
-            array("name" => "Delft Zuid", "networkValue" => 134, "currentIU" => 20, "cap100" => 40),
-            array("name" => "Schiedam Kethel", "networkValue" => 12, "currentIU" => 40, "cap100" => 50),
-            array("name" => "Schiedam Centraal", "networkValue" => 40, "currentIU" => 10, "cap100" => 170),
-            array("name" => "Rotterdam Centraal", "networkValue" => 70, "currentIU" => 200, "cap100" => 50)
+            array("name" => "Den Haag CS", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Den Haag HS", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Den Haag Moerwijk", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Rijswijk", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Delft", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Delft Zuid", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Schiedam Kethel", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Schiedam Centraal", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
+            array("name" => "Rotterdam Centraal", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1)
         );
         echo json_encode($stations);
     }
@@ -30,4 +30,5 @@ if (isset($_POST['get'])) {
         echo json_encode($trains);
     }
 }
+
 ?>
