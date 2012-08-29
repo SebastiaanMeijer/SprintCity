@@ -27,7 +27,7 @@ $(document).ready(function() {
 });
 
 function poll(){
-    console.log('bla)');
+   
         $.ajax({
             url: "pages/mobility/roundname.php", 
             success: function(data){
