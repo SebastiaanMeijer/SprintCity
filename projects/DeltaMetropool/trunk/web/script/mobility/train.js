@@ -14,13 +14,15 @@ function Train(id, name, beginStation, endStation, stationStops, avgIU) {
 
 var fillTrainArray = function(data) {
     for (i = 0; i < data.length; i++) {
-        trains.push(new Train(
+    	
+        trains[data[i].id] = new Train(
             data[i].id, 
             data[i].name,
             data[i].beginStation, 
             data[i].endStation, 
             data[i].stationStops, 
-            data[i].avgIU));
+            data[i].avgIU);
+            
     }
          startApp();
 }
