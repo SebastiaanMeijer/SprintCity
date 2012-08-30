@@ -37,12 +37,12 @@
 	function handleTrainStopClick(trainStop) {
 
 		changeTrainStop(trainStop);
-		sendTrainToPHPService(trainStop, refresh);
+		var trainId = $(trainStop).attr('trainid');
+		sendTrainToPHPService(trainId, refresh);
 
 	}
 	
-	function sendTrainToPHPService(trainStop, callback) {
-		var trainId = $(trainStop).attr('trainid');
+	function sendTrainToPHPService(trainId, callback) {
 		var stationStops = trains[trainId].stationStops;
 		Send.sendTrain(trainId, stationStops, callback);
 	}
@@ -95,7 +95,8 @@
 				changeTrainStop(this);
 			}
 		});
-		sendTrainToPHPService(refresh);
+		var trainId = $(trainTitle).attr('trainid');
+		sendTrainToPHPService(trainId, refresh);
 	}
 </script>
 <!-- HTML STUFF -->
