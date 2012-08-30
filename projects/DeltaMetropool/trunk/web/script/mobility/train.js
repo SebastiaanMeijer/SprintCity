@@ -12,6 +12,10 @@ function Train(id, name, beginStation, endStation, stationStops, avgIU) {
     this.minIU = Math.round(this.avgIU * 0.9);
 }
 
+Train.prototype.setStationStop = function(index, value) {
+	this.stationStops[index] = value;
+}
+
 var fillTrainArray = function(data) {
     for (i = 0; i < data.length; i++) {
     	

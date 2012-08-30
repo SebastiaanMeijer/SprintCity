@@ -3,6 +3,7 @@
 <script type="text/javascript" src="script/mobility/train.js"></script>
 <script type="text/javascript" src="script/mobility/traject.js"></script>
 <script type="text/javascript" src="script/mobility/load.js"></script>
+<script type="text/javascript" src="script/mobility/send.js"></script>
 <script type="text/paperscript" src="script/mobility/paperjs/ovgraph.js" canvas="graphCanvas"></script>
 <script type="text/javascript">
 	/* ========================================================= */
@@ -17,8 +18,7 @@
 <script type="text/javascript">
 	/* Put the trains on the track */
 	function startApp() {
-		for(var id in trains)
-		{
+		for(var id in trains) {
 			new Traject(trains[id]);
 		}
 
@@ -37,11 +37,19 @@
 	function handleTrainStopClick(trainStop) {
 
 		changeTrainStop(trainStop);
-		var trainId = $(trainStop).attr('trainid');
-		var stopIndex = $(trainStop).attr('stopindex');
-		console.log(stopIndex);
-		refresh();
+		sendTrainToPHPService(trainStop, refresh);
 
+	}
+	
+	function sendTrainToPHPService(trainStop, callback) {
+		var trainId = $(trainStop).attr('trainid');
+		var stationStops = trains[trainId].stationStops;
+		Send.sendTrain(trainId, stationStops, callback);
+	}
+
+	function updateTrainStationStops(trainId, stopIndex, stopNum) {
+		trains[trainId].setStationStop(stopIndex, stopNum);
+		// console.log('train[' + trainId +'].stationStops['+stopIndex+'] ='+ stopNum + ' | CHECK: ' + trains[trainId].stationStops[stopIndex]);
 	}
 
 	function changeTrainStop(trainStop) {
@@ -57,6 +65,12 @@
 			$(trainStop).addClass('invisible');
 			$(trainStop).text("");
 		}
+
+		var trainId = $(trainStop).attr('trainid');
+		var stopIndex = $(trainStop).attr('stopindex');
+
+		updateTrainStationStops(trainId, stopIndex, stopNum);
+
 	}
 
 	function refresh() {
@@ -81,7 +95,7 @@
 				changeTrainStop(this);
 			}
 		});
-		refresh();
+		sendTrainToPHPService(refresh);
 	}
 </script>
 <!-- HTML STUFF -->
