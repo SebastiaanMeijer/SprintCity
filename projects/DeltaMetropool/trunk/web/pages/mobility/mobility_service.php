@@ -7,7 +7,7 @@ if (isset($_REQUEST['get'])) {
 
     if ($_REQUEST['get'] == 'stations') {
 		$game_id = Game::getGameIdOfSession(session_id());
-		createTempTables($game_id);
+//		createTempTables($game_id);
         $stations = array(
             array("name" => "Den Haag CS", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),
             array("name" => "Den Haag HS", "networkValue" => rand(20, 200), "prevIU" => rand(20, 100), "currentIU" => rand(20, 200), "progIU" => rand(20, 200), "cap100" => rand(20, 200), "capOver" => -1, "capUnder" => -1),

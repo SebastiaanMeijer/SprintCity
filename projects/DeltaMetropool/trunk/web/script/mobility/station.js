@@ -47,7 +47,8 @@ Station.fillStations = function(data) {
 }
 
 /* public callback function */
-fillStationsAndDraw = function(data) {    
+fillStationsAndDraw = function(data) {  
+    
     Graph.clearPaper();
     Station.fillStations(data);
     Graph.drawGraph();

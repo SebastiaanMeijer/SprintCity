@@ -99,7 +99,7 @@ a.tab, button {
     background: none;
 }
 .ui-tabs .ui-tabs-hide {
-    display: none !important;
+    visibility: hidden !important;
 }
 
 /* ### END TABS ###*/
@@ -113,7 +113,9 @@ a.tab, button {
 
 
 #flashapp {
-    position: relative;
+    position: absolute;
+    top: 50px;
+    width: 870px;
     -webkit-box-shadow: 2px 1px 5px 1px #989898;
     box-shadow: 2px 1px 5px 1px #989898;
     padding: 0;
