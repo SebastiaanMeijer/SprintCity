@@ -14,13 +14,25 @@ function checkMax(checkgroup, limit, current)
 		{
 			alert(message)
 			current.checked = false
-			return
+			return false;
 		}
 	}
+        return true;
 }
 
 function showConfirm()
 {
-	checkMax();
+	if (checkMax()) {
+            Send.sendAmbition(loadAmbition);
+        }
+}
+
+function loadAmbition()
+{
+    Load.loadAmbition(displayAmbition);
+}
+
+function displayAmbition(data){
+    $('#ambition').text(data);
 }
 

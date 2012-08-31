@@ -4,7 +4,7 @@ var Send = Send || {};
  */
 
 Send.sendTrain = function(trainId, stationStops, callback) {
-	  /* send AJAX request */
+    /* send AJAX request */
     $.post('pages/mobility/mobility_service.php',
     {
         trainId: trainId,
@@ -12,4 +12,20 @@ Send.sendTrain = function(trainId, stationStops, callback) {
     },
     callback, 'json'
     );
+}
+
+Send.sendAmbition = function(callback) {
+    
+    $("#ambition-form input[type='checkbox']:checked").each(
+        function(){
+            var id = $(this).val();
+        
+            $.post('pages/mobility/mobility_sendvalue.php',
+            {
+                valueInstanceId: id
+            },
+            callback, 'json'
+            );
+        }
+        );
 }
