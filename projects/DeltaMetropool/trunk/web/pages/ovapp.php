@@ -74,7 +74,6 @@
 	}
 
 	function refresh() {
-		Graph.clearPaper();
 		Station.refreshStations();
 	}
 
