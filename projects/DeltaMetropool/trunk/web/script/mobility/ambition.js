@@ -24,6 +24,7 @@ function showConfirm()
 {
 	if (checkMax()) {
             Send.sendAmbition(loadAmbition);
+            Send.sendMotivation(makeMotivationReadOnly);
         }
 }
 
@@ -34,5 +35,10 @@ function loadAmbition()
 
 function displayAmbition(data){
     $('#ambition').text(data);
+    makeMotivationReadOnly();
+}
+
+function makeMotivationReadOnly() {
+    $('textarea#motivatie').attr('readonly', 'readonly');
 }
 

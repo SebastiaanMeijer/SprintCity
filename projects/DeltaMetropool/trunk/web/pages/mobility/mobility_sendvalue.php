@@ -27,16 +27,16 @@ $query = "
 $args = array('value_instance_id' => $valueInstanceId);
 $db->query($query, $args);
 
-
-//    // fill ambition motivation
-//    $query = "
-//			UPDATE TeamInstance
-//			SET TeamInstance.value_description = :motivation
-//			WHERE TeamInstance.game_id = :game_id
-//				AND TeamInstance.team_id = :team_id";
-//    $args = array(
-//        'motivation' => $_POST['ambitionMotivation'],
-//        'game_id' => $game_id,
-//        'team_id' => MOBILITY_TEAM_ID);
-//    $db->query($query, $args);
+$motivation = $_REQUEST['motivation'];
+    // fill ambition motivation
+    $query = "
+			UPDATE TeamInstance
+			SET TeamInstance.value_description = :motivation
+			WHERE TeamInstance.game_id = :game_id
+				AND TeamInstance.team_id = :team_id";
+    $args = array(
+        'motivation' => $motivation,
+        'game_id' => $game_id,
+        'team_id' => MOBILITY_TEAM_ID);
+    $db->query($query, $args);
 ?>

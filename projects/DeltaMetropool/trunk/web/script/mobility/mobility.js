@@ -11,36 +11,13 @@ $(document).ready(function() {
         
         
     });
-    
-    $("#doorvoeren").click(function() {
-        $(this).text("Verzonden.");
-        $("#motivatie").attr("clicked", "clicked");
-        $("#motivatie").attr("readonly", "readonly");
-        $("#motivatie").css({
-            color: "gray"
-        });
-    });
-    
-//    getAmbition();
+
+
     
     /* Long polling for year here */
     poll();
 });
 
-function getAmbition() {
-    $.ajax({
-        url: "pages/mobility/mobility_value.php", 
-        success: function(data){
-            if(data != false){
-                $('#ambition').text(data);
-            } else {
-                $('#ambition').text('hallo');                                
-            }
-        }, 
-        dataType: "json",
-        timeout: 30000
-    });
-}
 
 function poll(){
    
