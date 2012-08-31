@@ -21,24 +21,40 @@ $(document).ready(function() {
         });
     });
     
+//    getAmbition();
+    
     /* Long polling for year here */
     poll();
-    
 });
+
+function getAmbition() {
+    $.ajax({
+        url: "pages/mobility/mobility_value.php", 
+        success: function(data){
+            if(data != false){
+                $('#ambition').text(data);
+            } else {
+                $('#ambition').text('hallo');                                
+            }
+        }, 
+        dataType: "json",
+        timeout: 30000
+    });
+}
 
 function poll(){
    
-        $.ajax({
-            url: "pages/mobility/roundname.php", 
-            success: function(data){
-                $('#round-name').text(data);
-            }, 
-            dataType: "json", 
-            complete: function() {
-                setTimeout(poll, 1000);
-            }, 
-            timeout: 30000
-        });
-    }
+    $.ajax({
+        url: "pages/mobility/roundname.php", 
+        success: function(data){
+            $('#round-name').text(data);
+        }, 
+        dataType: "json", 
+        complete: function() {
+            setTimeout(poll, 1000);
+        }, 
+        timeout: 30000
+    });
+}
 
 

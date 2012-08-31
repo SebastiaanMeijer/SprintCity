@@ -112,9 +112,9 @@ function drawStationsGraph(stations) {
 
         //last one, add text
         if (i == (stations.length - 1)) {
-            addTextNextToPoint(capOverPoint, '125,00%', 'red');
+            addTextNextToPoint(capOverPoint, '110,00%', 'red');
             addTextNextToPoint(cap100Point, '100,00%', 'green');
-            addTextNextToPoint(capUnderPoint, '75,00%', 'blue');
+            addTextNextToPoint(capUnderPoint, '90,00%', 'blue');
         }
 
     }

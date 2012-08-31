@@ -185,3 +185,8 @@ button#doorvoeren {
     height: 34px;
     font-weight: bold;
 }
+
+#ambition .inputbutton input {
+    padding: .6em;
+    margin: .4em;
+}

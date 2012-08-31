@@ -21,3 +21,13 @@ Load.loadTrains = function(callback) {
     );
     
 }
+
+Load.loadAmbition = function(callback) {
+        /* send AJAX request */
+    $.post('pages/mobility/mobility_value.php',
+    {
+        
+    },
+    callback, 'json'
+    );
+}
