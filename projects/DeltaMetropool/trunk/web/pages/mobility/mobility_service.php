@@ -1,11 +1,12 @@
 <?php
-require_once '../../includes/master.inc.php';
+require_once(__DIR__ . '/../../includes/master.inc.php');
 
 // Get post variables that load.js gives
 
 if (isset($_REQUEST['get'])) {
     if ($_REQUEST['get'] == 'stations') {
-    	getStations();
+    	$stations = getMobilityDataStations();
+    	echo json_encode($stations);
     }
     
     elseif ($_REQUEST['get'] == 'trains') {
@@ -20,7 +21,7 @@ if (isset($_REQUEST['get'])) {
     }
 }
 
-function getStations() {
+function getMobilityDataStations() {
 	$game_id = Game::getGameIdOfSession(session_id());
 	createTempTables($game_id);
 	
@@ -28,7 +29,8 @@ function getStations() {
 	
 	$db = Database::getDatabase();
 	$query = "
-		SELECT Station.name, 
+		SELECT Station.code,
+			   Station.name, 
 			   tempNetworkValues.networkValue, 
 			   tempTravelersPerStop.station_id, 
 			   SUM(travelersPerStop) AS currentTravelers, 
@@ -70,10 +72,10 @@ function getStations() {
 	
 	while ($row = mysql_fetch_array($result))
 	{
-		$stations[] = array("name" => $row['name'], "networkValue" => round($row['networkValue']), "prevIU" => 0, "currentIU" => round($row['currentTravelers']), "progIU" => 0, "cap100" => round($row['cap100']), "capOver" => round($row['capOver']), "capUnder" => round($row['capUnder']));
+		$stations[] = array("code" => $row['code'], "name" => $row['name'], "networkValue" => round($row['networkValue']), "prevIU" => 0, "currentIU" => round($row['currentTravelers']), "progIU" => 0, "cap100" => round($row['cap100']), "capOver" => round($row['capOver']), "capUnder" => round($row['capUnder']));
 	}
-	
-    echo json_encode($stations);
+
+	return $stations;
 }
 
 function createTempTables($game_id) {

@@ -28,6 +28,7 @@
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Drawer.LineGraphDrawer;
+	
 	public class OverviewState  implements IState
 	{
 		private var parent:SprintStad = null;
@@ -178,6 +179,12 @@
 			RefreshTransformArea(station);
 		}
 		
+		private function RefreshStationCircles():void
+		{
+			var stations:Stations = Data.Get().GetStations();
+			FillStationCircles(stations);
+		}
+		
 		private function FillStationCircles(stations:Stations):void
 		{	
 			for (var i:int = 0; i < stations.GetStationCount(); i++)
@@ -191,8 +198,11 @@
 				// set outline color and filling of station circles
 				var colorTransform:ColorTransform = new ColorTransform();
 				colorTransform.color = parseInt("0x" + station.owner.color, 16);
-				movie.outline.transform.colorTransform = colorTransform;				
-				station.RefreshAreaBar();
+				movie.outline.transform.colorTransform = colorTransform;
+				if (currentMode == OverviewState.SPACE_MODE)
+					station.RefreshAreaBar();
+				else if (currentMode == OverviewState.MOBILITY_MODE)
+					station.RefreshMobilityBar();
 				movie.graph.addChild(station.areaBar.GetClip());
 				movie.alpha = 1;
 			}
@@ -219,6 +229,25 @@
 					}
 				}
 			}
+		}
+		
+		private function SetDemandWindowsVisible(visible:Boolean):void
+		{
+			var parentMovie:MovieClip = parent.overview_movie;
+			var types:Types = Data.Get().GetTypes();
+			for (var i:int = 0; i < types.GetTypeCount(); i++)
+			{
+				var type:Type = types.GetType(i);
+				if (type.id < 15)
+				{
+					TextField(parentMovie.getChildByName("type_" + type.id)).visible = visible;
+				}
+			}
+			
+			parentMovie.demand_title.visible = visible;
+			parentMovie.demand_home.visible = visible;
+			parentMovie.demand_work.visible = visible;
+			parentMovie.demand_leisure.visible = visible;
 		}
 		
 		private function SetButtons(station:Station):void
@@ -476,6 +505,11 @@
 				RefreshLineGraphs(Data.Get().GetStations().GetStation(parent.currentStationIndex));
 				
 				// set panels
+				SetDemandWindowsVisible(true);
+				
+				// refresh station circles
+				RefreshStationCircles();
+				
 				Debug.out("...Entered Space Mode");
 			}
 			catch (e:Error)
@@ -508,6 +542,12 @@
 				
 				// graph
 				parentMovie.lineGraphContainer.visible = true;
+				
+				// set panels
+				SetDemandWindowsVisible(false);
+				
+				// refresh station circles
+				RefreshStationCircles();
 				
 				RefreshLineGraphs(Data.Get().GetStations().GetStation(parent.currentStationIndex));
 			}
