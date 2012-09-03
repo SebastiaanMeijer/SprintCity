@@ -79,6 +79,22 @@
 			this.appendClipByMovieClip(newColorClip, 1, 1);
 		}
 		
+		public function drawMobilityCircle(travelers:int, capacityUnder:int, capacityOver:int):void
+		{
+			this.clearBar();
+			var newColorClip:MovieClip = new MovieClip();
+			var color:uint = 0x00ff00;
+			if (travelers < capacityUnder)
+				color = 0x0000ff;
+			else if (travelers > capacityOver)
+				color = 0xff0000;
+			newColorClip.graphics.clear();
+			newColorClip.graphics.beginFill(color);
+			newColorClip.graphics.drawCircle(17.5, 17.5, 17.5);
+			newColorClip.graphics.endFill();
+			newColorClip.alpha = 0.4;
+			this.appendClipByMovieClip(newColorClip, 1, 1);
+		}
 		
 		/*	function drawStationInstanceBar
 		*	@param: station:Station - The station for which the bar needs to be drawn

@@ -1,5 +1,6 @@
 <?php
 	require_once '../includes/master.inc.php';
+	require_once '../pages/mobility/mobility_service.php';
 
 	if (ClientSession::hasSession(session_id()))
 	{	
@@ -23,6 +24,10 @@
 			'team_id'
 		);
 		
+		$mobility_fields = array(
+			'currentIU', 'capUnder', 'capOver'
+		);
+		
 		$round_fields = array(
 			'id', 'round_info_id', 'number', 'name', 'description', 'new_transform_area', 'POVN', 'PWN'
 		);
@@ -35,7 +40,8 @@
 		
 		$station_result = getStations(session_id());
 		$scenario = Scenario::getCurrentScenario();
-
+		$train_data = getMobilityDataStations();
+		
 		echo '<stations>' . "\n";
 		echo "\t" . '<mapx>' . $scenario[key($scenario)]->init_map_position_x . '</mapx>' . "\n";
 		echo "\t" . '<mapy>' . $scenario[key($scenario)]->init_map_position_y . '</mapy>' . "\n";
@@ -46,6 +52,12 @@
 			foreach ($station_fields as $station_field)
 			{
 				echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
+			}
+			
+			$station_mobility_data = getMobilityDataForStation($train_data, $station_row['code']);
+			foreach ($mobility_fields as $mobility_field)
+			{
+				echo "\t\t" . '<' . $mobility_field . '>' . $station_mobility_data[$mobility_field] . '</' . $mobility_field . '>' . "\n";
 			}
 			
 			echo "\t\t" . '<program>' . "\n";
@@ -95,13 +107,23 @@
 		
 		echo '</stations>' . "\n";
 	}
+
+	function getMobilityDataForStation($train_data, $station_code)
+	{
+		foreach ($train_data as $station)
+		{
+			if ($station['code'] == $station_code)
+				return $station;
+		}
+		return null;
+	}
 	
 	function getStations($session_id)
 	{
 		$db = Database::getDatabase();
 		$game_id = Game::getGameIdOfSession($session_id);
 		$query = "
-			SELECT Station.*, 
+			SELECT Station.*,
 				StationInstance.id AS station_instance_id, 
 				TeamInstance.team_id, 
 				Program.id AS program_id, 
