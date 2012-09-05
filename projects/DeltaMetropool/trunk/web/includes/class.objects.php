@@ -711,6 +711,26 @@
 			$result = $db->query($query, $args);
 			return $db->getValue($result);
 		}
+		
+		public static function getCurrentRoundInfoInstanceIdBySessionId($session_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT RoundInfoInstance.id 
+				FROM RoundInfoInstance
+				INNER JOIN Game 
+				ON Game.current_round_id = RoundInfoInstance.round_info_id
+				AND Game.id = RoundInfoInstance.game_id
+				INNER JOIN TeamInstance 
+				ON TeamInstance.game_id = Game.id 
+				INNER JOIN ClientSession 
+				ON ClientSession.team_instance_id = TeamInstance.id 
+				WHERE ClientSession.id = :session_id", 
+				array('session_id' => $session_id));
+			if ($db->getValue($result) == "")
+				return 0;
+			return $db->getValue($result);
+		}
 	}
 	
 	class Value extends DBObject
@@ -1103,4 +1123,121 @@
 			return mysql_num_rows($result) > 0;
 		}
 	}
+	
+	class TrainTable extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TrainTable', array('id', 'name', 'filename', 'import_timestamp', 'description', 'is_working_copy'), $id);
+		}
+		
+		public function SetData($name, $filename, $import_timestamp, $description, $is_working_copy)
+		{
+			$this->name = $name;
+			$this->filename = $filename;
+			$this->import_timestamp = $import_timestamp;
+			$this->description = $description;
+			$this->is_working_copy = $is_working_copy;
+			
+			$this->save();
+		}
+	}
+	
+	class TrainTableTrain extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TrainTableTrain', array('id', 'train_table_id', 'name', 'type'), $id);
+		}
+		
+		public function SetData($train_table_id, $name, $type)
+		{
+			$this->train_table_id = $train_table_id;
+			$this->name = $name;
+			$this->type = $type;
+			
+			$this->save();
+		}
+	}
+		
+	class TrainTableStation extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TrainTableStation', array('id', 'train_table_id', 'code', 'name', 'chain', 'travelers'), $id);
+		}
+		
+		public function SetData($train_table_id, $code, $name)
+		{
+			$this->train_table_id = $train_table_id;
+			$this->code = $code;
+			$this->name = $name;
+			
+			$this->save();
+		}
+		
+		public static function getStationByCode($code)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM TrainTableStation
+				WHERE TrainTableStation.code = :station_code
+				LIMIT 0, 1;";
+			$args = array('station_code' => $code);
+			$result = $db->query($query, $args);
+			return DBObject::glob("TrainTableStation", $result);
+		}
 
+		public static function getStationByName($name)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM TrainTableStation
+				WHERE TrainTableStation.name = :station_name
+				LIMIT 0, 1;";
+			$args = array('station_name' => $name);
+			$result = $db->query($query, $args);
+			return DBObject::glob("TrainTableStation", $result);
+		}
+		
+		public function calculateNetworkValue()
+		{
+			
+		}
+	}
+		
+	class TrainTableEntry extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TrainTableEntry', array('id', 'train_id', 'station_id', 'frequency'), $id);
+		}
+		
+		public function SetData($train_id, $station_id, $frequency)
+		{
+			$db = Database::getDatabase();
+			$db->query("
+				SELECT * 
+				FROM `TrainTableEntry` 
+				WHERE train_id = :train_id 
+				AND station_id = :station_id
+				LIMIT 1",
+				array('train_id' => $train_id, 'station_id' => $station_id));
+			if($db->hasRows())
+			{
+				$row = $db->getRow();
+				$this->load($row);
+			}
+			else
+			{
+				$this->train_id = $train_id;
+				$this->station_id = $station_id;
+			}
+			$this->frequency = $frequency;
+			
+			$this->save();
+		}
+	}
+	
