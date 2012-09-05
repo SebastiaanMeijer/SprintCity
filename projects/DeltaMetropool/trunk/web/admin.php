@@ -52,6 +52,7 @@
 					<li><a href="admin.php?view=station">Station</a></li>
 					<li><a href="admin.php?view=scenario">Scenario</a></li>
 					<li><a href="admin.php?view=constants">Constanten</a></li>
+					<li><a href="admin.php?view=traintable">Dienstregelingen</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>
