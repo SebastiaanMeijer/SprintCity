@@ -191,7 +191,7 @@ function getMobilityDataTrains() {
 			$stationStops = array();
 		}
 
-		$train = array("id" => $row['train_id'], "name" => $row['type'], "beginStation" => $row['name'], "endStation" => "", "currentAvgIU" => round($row['currentAvgTravelers']), "minAvgIU" => round($row['initialAvgTravelers'] * 0.9), "maxAvgIU" => round($row['initialAvgTravelers'] * 1.1));
+		$train = array("id" => $row['train_id'], "name" => $row['type'], "route" => $row['name'], "currentAvgIU" => round($row['currentAvgTravelers']), "minAvgIU" => round($row['initialAvgTravelers'] * 0.9), "maxAvgIU" => round($row['initialAvgTravelers'] * 1.1));
 		$stationStops[] = $row['frequency'];
 		$trainId = $train['id'];
 	}

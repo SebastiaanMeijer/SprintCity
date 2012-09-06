@@ -1,8 +1,7 @@
-function Train(id, name, beginStation, endStation, stationStops, avgIU) {
+function Train(id, name, route, stationStops, avgIU) {
     this.id = id;
     this.name = name;
-    this.beginStation = beginStation;
-    this.endStation = endStation;
+    this.route = route;
 
     this.stationStops = stationStops;
     //array e.g. [0,0,2,2,0,2]
@@ -22,8 +21,7 @@ var fillTrainArray = function(data) {
         trains[data[i].id] = new Train(
             data[i].id, 
             data[i].name,
-            data[i].beginStation, 
-            data[i].endStation, 
+            data[i].route, 
             data[i].stationStops, 
             data[i].avgIU);
             
