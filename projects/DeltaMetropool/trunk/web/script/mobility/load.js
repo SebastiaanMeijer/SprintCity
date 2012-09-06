@@ -8,6 +8,10 @@ Load.loadStations = function(callback) {
             get: 'stations'
         },
         success: callback,
+        error: function() {
+          console.log("Error in loading stations. Trying again...");  
+          Load.loadStations(callback);
+        },
         dataType: 'json',
         timeout: 100000
     });
@@ -22,6 +26,10 @@ Load.loadTrains = function(callback) {
             get: 'trains'
         },
         success: callback,
+        error: function() {
+          console.log("Error in loading trains. Trying again...");  
+          Load.loadTrains(callback);
+        },
         dataType: 'json',
         timeout: 100000
     });
