@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/master.inc.php';
+require_once '../pages/mobility/mobility_service.php';
 
 if(!$Auth->loggedIn()) redirect('../login.php');
 
@@ -773,6 +774,9 @@ function SetNextRound($game_id)
 				'station_instance_id' => $value->station_instance_id);
 			$db->query($query, $args);
 		}
+		
+		// store the current travelers per train series per station
+		writeTravelersHistory($game_id, $current_round_id);
 		
 		// copy train table changes of current round into the next round
 		$query = "
