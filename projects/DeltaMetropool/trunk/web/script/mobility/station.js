@@ -29,6 +29,8 @@ Station.prototype.setCurrentIU = function(newIU) {
 };
 
 Station.fillStations = function(data) {
+    stations = new Array();
+    
     for (i = 0; i < data.length; i++) {     
             
         stations.push(
@@ -41,7 +43,7 @@ Station.fillStations = function(data) {
                 data[i].cap100,
                 data[i].capOver,
                 data[i].capUnder
-            ));  
+                ));  
             
     }
 }
@@ -59,7 +61,5 @@ fillStationsAndDraw = function(data) {
 
 /* static function */
 Station.refreshStations = function() {
-
-    stations = new Array();
     Load.loadStations(fillStationsAndDraw);
 }
