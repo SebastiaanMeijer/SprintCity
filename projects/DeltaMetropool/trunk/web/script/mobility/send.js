@@ -21,6 +21,9 @@ Send.sendAmbition = function(callback) {
         function(){
             var id = $(this).val();
             var motivation = $('textarea#motivatie').val();
+            if (motivation == "Vul hier je motivatie in... " || motivation == "") {
+                motivation = "[Geen motivatie ingevuld]";
+            }
         
             $.post('pages/mobility/mobility_sendvalue.php',
             {

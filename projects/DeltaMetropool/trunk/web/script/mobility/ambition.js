@@ -24,7 +24,6 @@ function showConfirm()
 {
 	if (checkMax()) {
             Send.sendAmbition(loadAmbition);
-            Send.sendMotivation(makeMotivationReadOnly);
         }
 }
 
