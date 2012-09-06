@@ -79,6 +79,7 @@
 
     function refresh() {
         Station.refreshStations();
+        Train.refreshTrains();
     }
 
     function handleTrainClick(trainTitle) {
