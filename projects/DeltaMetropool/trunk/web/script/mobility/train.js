@@ -12,10 +12,11 @@ function Train(id, name, route, stationStops, currentAvgIU, minAvgIU, maxAvgIU) 
 }
 
 Train.prototype.setStationStop = function(index, value) {
-	this.stationStops[index] = value;
+    this.stationStops[index] = value;
 }
 
 var fillTrainArray = function(data) {
+    trains = new Array();
     for (i = 0; i < data.length; i++) {
     	
         trains[data[i].id] = new Train(
@@ -27,12 +28,17 @@ var fillTrainArray = function(data) {
             data[i].minAvgIU,
             data[i].maxAvgIU
         
-    );
+            );
             
     }
-         startApp();
+    $('#trajecten-container').empty();
+    startApp();
 }
 
 Train.initTrains = function() {
     Load.loadTrains(fillTrainArray);      
+}
+
+Train.refreshTrains = function() {
+    Load.loadTrains(fillTrainArray);
 }

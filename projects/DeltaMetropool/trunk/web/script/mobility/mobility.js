@@ -24,7 +24,11 @@ function poll(){
     $.ajax({
         url: "pages/mobility/roundname.php", 
         success: function(data){
-            $('#round-name').text(data);
+            if ($('#round-name').text() != data)
+            {
+                refresh();
+                $('#round-name').text(data);
+            }
         }, 
         dataType: "json", 
         complete: function() {

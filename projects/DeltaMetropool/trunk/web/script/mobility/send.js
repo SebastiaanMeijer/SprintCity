@@ -4,6 +4,7 @@ var Send = Send || {};
  */
 
 Send.sendTrain = function(trainId, stationStops, callback) {
+    console.log(trainId + " | Sending train..." + stationStops);
     /* send AJAX request */
     $.post('pages/mobility/mobility_service.php',
     {
