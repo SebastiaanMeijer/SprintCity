@@ -23,13 +23,13 @@ var firstGraphBlockCenter = 0;
 
 /* ========================================================= */
 
-var init = function(data) {
+Graph.init = function(data) {
 
     Station.fillStations(data);
     
     blockContainerWidth = Math.round((GRAPH_WIDTH) / stations.length);
     firstGraphBlockCenter = APP_INDENT + GRAPH_BLOCK_WIDTH * .5;
-    
+    Graph.clearPaper();
     Graph.drawGraph();
     Train.initTrains();
 }
@@ -267,5 +267,5 @@ Graph.clearPaper = function(){
 
 /* Execute here */
 $(document).ready(function() {
-    Load.loadStations(init);    
+    Load.loadStations(Graph.init);    
 });
