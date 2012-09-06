@@ -28,7 +28,9 @@ Load.loadTrains = function(callback) {
         success: callback,
         error: function() {
           console.log("Error in loading trains. Trying again...");  
-          Load.loadTrains(callback);
+              Load.loadStations(Graph.init);
+
+          
         },
         dataType: 'json',
         timeout: 100000

@@ -16,6 +16,7 @@ Train.prototype.setStationStop = function(index, value) {
 }
 
 var fillTrainArray = function(data) {
+    console.log("got train data back");
     trains = new Array();
     for (i = 0; i < data.length; i++) {
     	
