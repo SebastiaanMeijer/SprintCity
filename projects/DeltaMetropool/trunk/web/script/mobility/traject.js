@@ -124,11 +124,37 @@ Traject.prototype.writeIUstuff = function() {
     var textBox = document.createElement('div');
     $(textBox).addClass('textBoxIU');
 
+    
+    
     $(textBox).append(this.train.maxIU);
-    $(textBox).append('<br /><span style="color: black">' + this.train.avgIU + '</span>');
+    
+    var colorClass = this.decideColorClass();   
+    $(textBox).append('<br /><span class="'+ colorClass +'">' + this.train.currentAvgIU + '</span>');
+    
     $(textBox).append('<br />' + this.train.minIU);
     this.traject.appendChild(textBox);
 }
+
+Traject.prototype.decideColorClass = function() {
+    var colorClass;
+
+    if (this.train.currentAvgIU < this.train.maxIU && this.train.currentAvgIU > this.train.minIU)
+    {
+        colorClass = "green-text";
+    }
+    else if (this.train.currentAvgIU > this.train.maxIU) {
+        colorClass = "red-text";
+    }
+    else if (this.train.currentAvgIU < this.train.minIU) {
+        colorClass = "blue-text"
+    }
+    else {
+        colorClass = '';
+    }
+    
+    return colorClass;
+}
+
 function getDistanceBetweenStations() {
     var canvasSize = 786;
     //magic number, i know, but its canvas size minus indent

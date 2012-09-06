@@ -1,4 +1,4 @@
-function Train(id, name, route, stationStops, avgIU) {
+function Train(id, name, route, stationStops, currentAvgIU, minAvgIU, maxAvgIU) {
     this.id = id;
     this.name = name;
     this.route = route;
@@ -6,9 +6,9 @@ function Train(id, name, route, stationStops, avgIU) {
     this.stationStops = stationStops;
     //array e.g. [0,0,2,2,0,2]
 
-    this.avgIU = avgIU;
-    this.maxIU = Math.round(this.avgIU * 1.1);
-    this.minIU = Math.round(this.avgIU * 0.9);
+    this.currentAvgIU = currentAvgIU;
+    this.maxIU = maxAvgIU;
+    this.minIU = minAvgIU;
 }
 
 Train.prototype.setStationStop = function(index, value) {
@@ -23,7 +23,11 @@ var fillTrainArray = function(data) {
             data[i].name,
             data[i].route, 
             data[i].stationStops, 
-            data[i].avgIU);
+            data[i].currentAvgIU,
+            data[i].minAvgIU,
+            data[i].maxAvgIU
+        
+    );
             
     }
          startApp();
