@@ -78,6 +78,7 @@
     }
 
     function refresh() {
+        console.log("refresh");
         Station.refreshStations();
         Train.refreshTrains();
     }
