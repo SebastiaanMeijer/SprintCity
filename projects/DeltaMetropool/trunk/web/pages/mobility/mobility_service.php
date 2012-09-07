@@ -109,12 +109,9 @@ function getMobilityDataStations() {
 		) AS A ON A.station_id = Station.id
 		LEFT JOIN TrainTableStation ON Station.code = TrainTableStation.code
 		LEFT JOIN (
-			SELECT tempEntries.station_id, ROUND(SUM(travelers_per_train_series / frequency)) AS previousTravelers
+			SELECT TravelerHistory.station_id, travelers_per_stop AS previousTravelers
 			FROM TravelerHistory
-			INNER JOIN tempEntries ON tempEntries.train_id = TravelerHistory.train_id
-			AND tempEntries.station_id = TravelerHistory.station_id
-			WHERE travelerHistory.round_info_instance_id = :round_info_instance_id - 1
-			GROUP BY tempEntries.station_id
+			WHERE TravelerHistory.round_info_instance_id = :round_info_instance_id - 1
 		) AS B ON B.station_id = TrainTableStation.id
 		LEFT JOIN tempNetworkValues ON tempNetworkValues.station_id = TrainTableStation.id
 		WHERE TeamInstance.game_id = :game_id
@@ -224,33 +221,35 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 	$train_table_id = 1;
 	
 	$query = "
-		INSERT INTO TravelerHistory (round_info_instance_id, train_id, station_id, travelers_per_train_series)
-		SELECT :round_info_instance_id, tempEntries.train_id, tempEntries.station_id, tempTravelersPerStop.travelersPerStop * tempEntries.frequency AS travelers
-		FROM tempTravelersPerStop
-		INNER JOIN (
-			SELECT train_id
-			FROM Station 
-			INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-			INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-			INNER JOIN traintableentry ON TrainTableStation.id = traintableentry.station_id
-			WHERE TeamInstance.game_id = :game_id
-			AND train_table_id = :train_table_id
-			GROUP BY train_id
-			HAVING COUNT(*) > 1
-		) AS ScenarioTrains ON ScenarioTrains.train_id = tempTravelersPerStop.train_id
-		INNER JOIN (
-			SELECT TrainTableStation.id
-			FROM Station 
-			INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-			INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-			WHERE TeamInstance.game_id = :game_id
-			AND train_table_id = :train_table_id
-		) AS ScenarioStations ON ScenarioStations.id = tempTravelersPerStop.station_id
-		INNER JOIN tempEntries ON tempEntries.train_id = tempTravelersPerStop.train_id
-		AND tempEntries.station_id = tempTravelersPerStop.station_id
-		ON DUPLICATE KEY UPDATE travelers_per_train_series = tempTravelersPerStop.travelersPerStop * tempEntries.frequency;";
+		INSERT INTO TravelerHistory (round_info_instance_id, station_id, travelers_per_stop)
+		SELECT *
+		FROM (
+			SELECT :round_info_instance_id, ScenarioStations.id, SUM(tempTravelersPerStop.travelersPerStop) AS travelers
+			FROM tempTravelersPerStop
+			INNER JOIN (
+				SELECT train_id
+				FROM Station 
+				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
+				INNER JOIN traintableentry ON TrainTableStation.id = traintableentry.station_id
+				WHERE TeamInstance.game_id = :game_id
+				AND train_table_id = :train_table_id
+				GROUP BY train_id
+				HAVING COUNT(*) > 1
+			) AS ScenarioTrains ON ScenarioTrains.train_id = tempTravelersPerStop.train_id
+			INNER JOIN (
+				SELECT TrainTableStation.id
+				FROM Station 
+				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
+				WHERE TeamInstance.game_id = :game_id
+				AND train_table_id = :train_table_id
+			) AS ScenarioStations ON ScenarioStations.id = tempTravelersPerStop.station_id
+			GROUP BY ScenarioStations.id
+		) AS A
+		ON DUPLICATE KEY UPDATE travelers_per_stop = A.travelers;";
 		echo $query . "*". $game_id . "*" . $round_info_instance_id . "*" . $train_table_id . "\n";
 	$args = array('game_id' => $game_id, 
 				  'round_info_instance_id' => $round_info_instance_id,
