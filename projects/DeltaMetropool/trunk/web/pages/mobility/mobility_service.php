@@ -265,23 +265,19 @@ function createTempTables($game_id, $round_info_instance_id) {
 
 	$train_table_id = 1;
 
-	$queries = array(	"DROP TABLE IF EXISTS tempInitialEntries;", 
-						"DROP TABLE IF EXISTS tempInitialNetworkValues;", 
-						"DROP TABLE IF EXISTS tempInitialTravelers;", 
-						"DROP TABLE IF EXISTS tempInitialTravelersPerStop;", 
-						"DROP TABLE IF EXISTS tempEntries;", 
-						"DROP TABLE IF EXISTS tempNetworkValues;", 
-						"DROP TABLE IF EXISTS tempTravelers;", 
-						"DROP TABLE IF EXISTS tempTravelersPerStop;", 
-						"CREATE TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
-						"CREATE TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE);", 
-						"CREATE TABLE tempInitialTravelers (station_id INT, travelers INT);", 
-						"CREATE TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);", 
-						"CREATE TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
-						"CREATE TABLE tempNetworkValues (station_id INT, networkValue DOUBLE);", 
-						"CREATE TABLE tempTravelers (station_id INT, travelers INT);", 
-						"CREATE TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
-						foreach ($queries as $query) {
+	$queries = array(	"CREATE TEMPORARY TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
+						"CREATE TEMPORARY TABLE tempInitialEntries2 LIKE tempInitialEntries;",
+						"CREATE TEMPORARY TABLE tempInitialEntries3 LIKE tempInitialEntries;",
+						"CREATE TEMPORARY TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE);", 
+						"CREATE TEMPORARY TABLE tempInitialTravelers (station_id INT, travelers INT);", 
+						"CREATE TEMPORARY TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);", 
+						"CREATE TEMPORARY TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
+						"CREATE TEMPORARY TABLE tempEntries2 LIKE tempEntries;",
+						"CREATE TEMPORARY TABLE tempEntries3 LIKE tempEntries;",
+						"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE);", 
+						"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);", 
+						"CREATE TEMPORARY TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	foreach ($queries as $query) {
 		$db -> query($query, array());
 	}
 
@@ -306,6 +302,8 @@ function createInitialEntriesTable($table_name, $train_table_id) {
 	WHERE train_table_id = :train_table_id;";
 	$args = array('train_table_id' => $train_table_id);
 	$db -> query($query, $args);
+	$db -> query("INSERT INTO " . $table_name . "2 SELECT * FROM " . $table_name . ";", array());
+	$db -> query("INSERT INTO " . $table_name . "3 SELECT * FROM " . $table_name . ";", array());
 }
 
 function createCurrentEntriesTable($table_name, $train_table_id, $round_info_instance_id) {
@@ -333,22 +331,24 @@ function createCurrentEntriesTable($table_name, $train_table_id, $round_info_ins
 	WHERE train_table_id = :train_table_id;";
 	$args = array('train_table_id' => $train_table_id, 'round_info_instance_id' => $round_info_instance_id);
 	$db -> query($query, $args);
+	$db -> query("INSERT INTO " . $table_name . "2 SELECT * FROM " . $table_name . ";", array());
+	$db -> query("INSERT INTO " . $table_name . "3 SELECT * FROM " . $table_name . ";", array());
 }
 
 function createNetworkValueTable($table_name, $entries_table, $train_table_id) {
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
-	SELECT traintablestation.id, IFNULL(SUM(trainvalue * frequency),0) + chain AS networkvalue
+	SELECT traintablestation.id AS station_id, IFNULL(SUM(trainvalue * frequency),0) + chain AS networkvalue
 	FROM traintablestation 
 	LEFT JOIN " . $entries_table . " ON traintablestation.id = " . $entries_table . ".station_id
 	LEFT JOIN (
 		SELECT train_id, SUM(stopvalue) / COUNT(stopvalue) AS trainvalue 
 		FROM (
-			SELECT station_id, SUM(frequency) AS stopvalue FROM " . $entries_table . "
+			SELECT station_id, SUM(frequency) AS stopvalue FROM " . $entries_table . "2
 			GROUP BY station_id
 		) AS stopvalues
-		INNER JOIN " . $entries_table . " ON stopvalues.station_id = " . $entries_table . ".station_id
+		INNER JOIN " . $entries_table . "3 ON stopvalues.station_id = " . $entries_table . "3.station_id
 		GROUP BY train_id
 	) AS trainvalues ON trainvalues.train_id = " . $entries_table . ".train_id
 	WHERE train_table_id = :train_table_id
@@ -520,10 +520,10 @@ function createTravelersPerStopTable($table_name, $entries_table, $nwval_table, 
 		SELECT train_id, SUM(stopvalue) / COUNT(stopvalue) AS trainvalue 
 		FROM (
 			SELECT station_id, SUM(frequency) AS stopvalue 
-			FROM " . $entries_table . "
+			FROM " . $entries_table . "2
 	        GROUP BY station_id
 		) AS stopvalues
-	    INNER JOIN " . $entries_table . " ON stopvalues.station_id = " . $entries_table . ".station_id
+	    INNER JOIN " . $entries_table . "3 ON stopvalues.station_id = " . $entries_table . "3.station_id
 	    GROUP BY train_id
 	) AS trainvalues
 	INNER JOIN " . $entries_table . " ON trainvalues.train_id = " . $entries_table . ".train_id
