@@ -16,7 +16,7 @@ if (isset($_REQUEST['trainId']) && isset($_REQUEST['stationStops'])) {
 	$game_id = Game::getGameIdOfSession(session_id());
 	$round_info_instance_id = RoundInfoInstance::getCurrentRoundInfoInstanceIdBySessionId(session_id());
 
-	$train_table_id = 1;
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 
 	$trainId = $_REQUEST['trainId'];
 	$stationStops = $_REQUEST['stationStops'];
@@ -66,7 +66,7 @@ function getMobilityDataStations() {
 	
 	createTempTables($game_id, $round_info_instance_id);
 
-	$train_table_id = 1;
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 
 	$query = "
 		SELECT Station.code, 
@@ -138,7 +138,7 @@ function getMobilityDataTrains() {
 	$round_info_instance_id = RoundInfoInstance::getCurrentRoundInfoInstanceIdBySessionId(session_id());
 	createTempTables($game_id, $round_info_instance_id);
 
-	$train_table_id = 1;
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 
 	$query = "
 		SELECT A.train_id, 
@@ -218,7 +218,7 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 
 	createTempTables($game_id, $round_info_instance_id);
 	
-	$train_table_id = 1;
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 	
 	$query = "
 		INSERT INTO TravelerHistory (round_info_instance_id, station_id, travelers_per_stop)
@@ -263,7 +263,7 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 function createTempTables($game_id, $round_info_instance_id) {
 	$db = Database::getDatabase();
 
-	$train_table_id = 1;
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 
 	$queries = array(	"CREATE TEMPORARY TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
 						"CREATE TEMPORARY TABLE tempInitialEntries2 LIKE tempInitialEntries;",

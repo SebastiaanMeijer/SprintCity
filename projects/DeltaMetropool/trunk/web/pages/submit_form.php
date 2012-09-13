@@ -784,13 +784,13 @@ function SetNextRound($game_id)
 		// copy train table changes of current round into the next round
 		$query = "
 			INSERT INTO traintableentryinstance (round_info_instance_id, train_id, station_id, frequency)
-			SELECT :next_round_id, train_id, station_id, frequency
+			SELECT :next_round_info_instance_id, train_id, station_id, frequency
 			FROM traintableentryinstance AS previousround
-			WHERE round_info_instance_id = :current_round_id
+			WHERE round_info_instance_id = :current_round_info_instance_id
 			ON DUPLICATE KEY UPDATE traintableentryinstance.frequency = previousround.frequency"; 
 		$args = array(
-			'next_round_id' => $next_round_info_instance_id,
-			'current_round_id' => $current_round_info_instance_id);
+			'next_round_info_instance_id' => $next_round_info_instance_id,
+			'current_round_info_instance_id' => $current_round_info_instance_id);
 		$db->query($query, $args);
 		
 		// update round
