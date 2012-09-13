@@ -24,11 +24,18 @@
 	
 	if (isset($_POST['FormAction']))
 	{
-		$data = new Spreadsheet_Excel_Reader();
-		$data->setOutputEncoding('ISO-8859-1//TRANSLIT//IGNORE');
-		$data->read($_FILES['trainTableFileName']['tmp_name']);
-
-		ImportFrequencyTable($data);		
+		if(strtolower(substr($_FILES['trainTableFileName']['name'], -3))==='xls')
+		{
+			$data = new Spreadsheet_Excel_Reader();
+			$data->setOutputEncoding('ISO-8859-1//TRANSLIT//IGNORE');
+			$data->read($_FILES['trainTableFileName']['tmp_name']);
+	
+			ImportFrequencyTable($data);
+		}
+		else
+		{
+			echo "Alleen bestanden van het XLS formaat kunnen worden geimporteerd";
+		}
 	}
 	else 
 	{
