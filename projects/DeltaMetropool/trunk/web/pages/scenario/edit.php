@@ -270,6 +270,20 @@
 										<td><input type="text" name="name" maxLength="255" style="width: 350px;" value="<?php echo $scenario->name; ?>"></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
+										<td>Dienstregeling</td>
+										<td>
+											<select name="train_table_id">
+<?php
+	$traintables = TrainTable::GetAllTrainTables();
+	foreach ($traintables as $key => $value)
+	{
+		echo "\t\t\t\t\t\t\t\t\t\t\t\t" . '<option value="' . $value->id . '">' . $value->filename . '</option>' . "\n";
+	}
+?>
+											</select>
+										</td>
+									</tr>
+									<tr class="<?php echo $class; ?>">
 										<td>Omschrijving</td>
 										<td><textarea name="description" rows="12" style="width:350px;"><?php echo $scenario->description; ?></textarea></td>
 									</tr>

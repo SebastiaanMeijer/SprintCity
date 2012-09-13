@@ -434,7 +434,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Scenario', array('id', 'name', 'description', 'init_map_position_x', 'init_map_position_y', 'init_map_scale'), $id);
+			parent::__construct('Scenario', array('id', 'train_table_id', 'name', 'description', 'init_map_position_x', 'init_map_position_y', 'init_map_scale'), $id);
 		}
 		
 		public static function getScenarioById($id)
@@ -1163,6 +1163,20 @@
 		public static function GetAllTrainTables()
 		{
 			return DBObject::glob("TrainTable", "SELECT * FROM TrainTable ORDER BY import_timestamp DESC");
+		}
+		
+		public static function GetTrainTableIdOfGame($game_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT train_table_id 
+				FROM Scenario
+				INNER JOIN Game ON Game.scenario_id = Scenario.id
+				WHERE Game.id = :game_id",
+				array('game_id' => $game_id));
+			if ($db->getValue($result) == "")
+				return 0;
+			return $db->getValue($result);
 		}
 	}
 	
