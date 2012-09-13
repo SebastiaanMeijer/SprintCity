@@ -731,6 +731,20 @@
 				return 0;
 			return $db->getValue($result);
 		}
+		
+		public static function getFromGameIdAndRoundInfoId($game_id, $round_info_id)
+		{
+			$db = Database::getDatabase();
+			$result = $db ->query("
+				SELECT RoundInfoInstance.id 
+				FROM RoundInfoInstance
+				WHERE game_id = :game_id
+				AND round_info_id = :round_info_id",
+				array('game_id' => $game_id, 'round_info_id' => $round_info_id));
+			if ($db->getValue($result) == "")
+				return 0;
+			return $db->getValue($result);
+		}
 	}
 	
 	class Value extends DBObject
@@ -1128,18 +1142,22 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('TrainTable', array('id', 'name', 'filename', 'import_timestamp', 'description', 'is_working_copy'), $id);
+			parent::__construct('TrainTable', array('id', 'filename', 'import_timestamp'), $id);
 		}
 		
-		public function SetData($name, $filename, $import_timestamp, $description, $is_working_copy)
+		public function SetData($filename)
 		{
-			$this->name = $name;
 			$this->filename = $filename;
-			$this->import_timestamp = $import_timestamp;
-			$this->description = $description;
-			$this->is_working_copy = $is_working_copy;
 			
 			$this->save();
+		}
+		
+		public function SetImportTimestamp()
+		{
+			$db = Database::getDatabase();
+			$db->query("
+				UPDATE TrainTable SET import_timestamp = NOW() WHERE id = :id",
+				array('id' => $this->id));
 		}
 	}
 	

@@ -775,8 +775,11 @@ function SetNextRound($game_id)
 			$db->query($query, $args);
 		}
 		
+		$current_round_info_instance_id = RoundInfoInstance::getFromGameIdAndRoundInfoId($game_id, $current_round_id);
+		$next_round_info_instance_id = RoundInfoInstance::getFromGameIdAndRoundInfoId($game_id, $next_round_id);
+
 		// store the current travelers per train series per station
-		writeTravelersHistory($game_id, $current_round_id);
+		writeTravelersHistory($game_id, $current_round_info_instance_id);
 		
 		// copy train table changes of current round into the next round
 		$query = "
@@ -786,8 +789,8 @@ function SetNextRound($game_id)
 			WHERE round_info_instance_id = :current_round_id
 			ON DUPLICATE KEY UPDATE traintableentryinstance.frequency = previousround.frequency"; 
 		$args = array(
-			'next_round_id' => $next_round_id,
-			'current_round_id' => $current_round_id);
+			'next_round_id' => $next_round_info_instance_id,
+			'current_round_id' => $current_round_info_instance_id);
 		$db->query($query, $args);
 		
 		// update round

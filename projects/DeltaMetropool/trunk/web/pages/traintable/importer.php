@@ -37,7 +37,8 @@
 	function ImportFrequencyTable($data)
 	{
 		$trainTable = new TrainTable();
-		$trainTable->SetData('naam', 'bestandsnaam', NULL, 'beschrijving', TRUE);
+		$trainTable->SetData($_FILES['trainTableFileName']['name']);
+		$trainTable->SetImportTimestamp();
 		
 		$columnToTrainId = array();
 		
