@@ -86,5 +86,6 @@
 				$station->save();
 			}
 		}
+		header("Location: admin.php?view=traintable");
 	}
 ?>

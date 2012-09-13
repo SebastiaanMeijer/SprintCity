@@ -3,7 +3,7 @@
 	if(!$Auth->loggedIn()) redirect('../login.php');
 	
 	$class = new Loop('odd', 'even');
-	$scenarios = Scenario::getAllScenarios();
+	$traintables = TrainTable::GetAllTrainTables();
 ?>
 						<tr>
 							<td><a href="admin.php?view=traintable&action=edit" class="button">Dienstregeling toevoegen</a></td>
@@ -12,19 +12,15 @@
 							<td>
 								<table class="data">
 									<tr>
-										<th></th>
-										<th>Naam</th>
-										<th>Omschrijving</th>
+										<th>Bestandsnaam</th>
+										<th>Toegevoegd op</th>
 									</tr>
 <?php
-	foreach ($scenarios as $key => $value) 
+	foreach ($traintables as $key => $value) 
 	{
 		echo "\t\t\t\t\t\t\t\t\t" . '<tr class="' . $class . '">' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t\t" . '<a href="admin.php?view=scenario&action=edit&scenario=' . $value->id . '" class="button">Wijzigen</a>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '</td>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->name . '</td>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->description . '</td>' . "\n";
+		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->filename . '</td>' . "\n";
+		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->import_timestamp . '</td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '</tr>' . "\n";
 	}
 ?>
