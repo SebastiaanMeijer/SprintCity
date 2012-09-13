@@ -1159,6 +1159,11 @@
 				UPDATE TrainTable SET import_timestamp = NOW() WHERE id = :id",
 				array('id' => $this->id));
 		}
+		
+		public static function GetAllTrainTables()
+		{
+			return DBObject::glob("TrainTable", "SELECT * FROM TrainTable ORDER BY import_timestamp DESC");
+		}
 	}
 	
 	class TrainTableTrain extends DBObject
