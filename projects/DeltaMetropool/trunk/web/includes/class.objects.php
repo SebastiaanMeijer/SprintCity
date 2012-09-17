@@ -1213,28 +1213,32 @@
 			$this->save();
 		}
 		
-		public static function getStationByCode($code)
+		public static function getStationByCode($train_table_id, $code)
 		{
 			$db = Database::getDatabase();
 			$query = "
 				SELECT *
 				FROM TrainTableStation
 				WHERE TrainTableStation.code = :station_code
+				AND TrainTableStation.train_table_id = :train_table_id
 				LIMIT 0, 1;";
-			$args = array('station_code' => $code);
+			$args = array('station_code' => $code,
+						  'train_table_id' => $train_table_id);
 			$result = $db->query($query, $args);
 			return DBObject::glob("TrainTableStation", $result);
 		}
 
-		public static function getStationByName($name)
+		public static function getStationByName($train_table_id, $name)
 		{
 			$db = Database::getDatabase();
 			$query = "
 				SELECT *
 				FROM TrainTableStation
 				WHERE TrainTableStation.name = :station_name
+				AND TrainTableStation.train_table_id = :train_table_id
 				LIMIT 0, 1;";
-			$args = array('station_name' => $name);
+			$args = array('station_name' => $name,
+						  'train_table_id' => $train_table_id);
 			$result = $db->query($query, $args);
 			return DBObject::glob("TrainTableStation", $result);
 		}
