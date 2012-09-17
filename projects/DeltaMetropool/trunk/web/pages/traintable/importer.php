@@ -85,7 +85,7 @@
 		{
 			if (isset($data->sheets[SHEET_TRAVELERS]['cells'][$i][TRAVELERS_COLUMN_STATION_CODES])) {
 				$stationCode = $data->sheets[SHEET_TRAVELERS]['cells'][$i][TRAVELERS_COLUMN_STATION_CODES];
-				$stationArray = TrainTableStation::getStationByCode($stationCode);
+				$stationArray = TrainTableStation::getStationByCode($trainTable->id, $stationCode);
 				$keys = array_keys($stationArray);
 				$station = $stationArray[$keys[0]];
 				$station->travelers = $data->sheets[SHEET_TRAVELERS]['cells'][$i][TRAVELERS_COLUMN_TRAVELERS];
