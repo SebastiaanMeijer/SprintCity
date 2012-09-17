@@ -277,7 +277,14 @@
 	$traintables = TrainTable::GetAllTrainTables();
 	foreach ($traintables as $key => $value)
 	{
-		echo "\t\t\t\t\t\t\t\t\t\t\t\t" . '<option value="' . $value->id . '">' . $value->filename . '</option>' . "\n";
+		if ($key == $scenario->train_table_id)
+		{
+			echo "\t\t\t\t\t\t\t\t\t\t\t\t" . '<option value="' . $value->id . '" selected>' . $value->filename . '</option>' . "\n";
+		}
+		else
+		{
+			echo "\t\t\t\t\t\t\t\t\t\t\t\t" . '<option value="' . $value->id . '">' . $value->filename . '</option>' . "\n";
+		}
 	}
 ?>
 											</select>
