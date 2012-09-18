@@ -267,5 +267,5 @@ Graph.clearPaper = function(){
 
 /* Execute here */
 $(document).ready(function() {
-    Load.loadStations(Graph.init);    
+    Load.loadAll(Graph.init);
 });

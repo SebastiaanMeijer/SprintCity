@@ -20,9 +20,9 @@ var fillTrainArray = function(data) {
     
     // check if the server date matches the client data
     if (trains.length > 0) {
-        for (i = 0; i < data.length; i++) {
-            for (j = 0; j < data[i].stationStops.length; j++) {
-                if (trains[data[i].id].stationStops[j] != data[i].stationStops[j]) {
+        for (i = 0; i < data['trains'].length; i++) {
+            for (j = 0; j < data['trains'][i].stationStops.length; j++) {
+                if (trains[data['trains'][i].id].stationStops[j] != data['trains'][i].stationStops[j]) {
                     // if server and client do not match, request it again, and do not update trains on the client
                     Station.refreshStations();
                     Train.refreshTrains();
@@ -33,15 +33,15 @@ var fillTrainArray = function(data) {
     }
     
     trains = new Array();
-    for (i = 0; i < data.length; i++) {
-        trains[data[i].id] = new Train(
-            data[i].id, 
-            data[i].name,
-            data[i].route, 
-            data[i].stationStops, 
-            data[i].currentAvgIU,
-            data[i].minAvgIU,
-            data[i].maxAvgIU
+    for (i = 0; i < data['trains'].length; i++) {
+        trains[data['trains'][i].id] = new Train(
+            data['trains'][i].id, 
+            data['trains'][i].name,
+            data['trains'][i].route, 
+            data['trains'][i].stationStops, 
+            data['trains'][i].currentAvgIU,
+            data['trains'][i].minAvgIU,
+            data['trains'][i].maxAvgIU
             );
     }
     $('#trajecten-container').empty();
@@ -49,9 +49,9 @@ var fillTrainArray = function(data) {
 }
 
 Train.initTrains = function() {
-    Load.loadTrains(fillTrainArray);      
+    Load.loadAll(fillTrainArray);
 }
 
 Train.refreshTrains = function() {
-    Load.loadTrains(fillTrainArray);
+    Load.loadAll(fillTrainArray);
 }

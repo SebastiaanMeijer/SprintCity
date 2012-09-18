@@ -1,11 +1,11 @@
 var Load = Load || {};
 
-Load.loadStations = function(callback) {
+Load.loadAll = function(callback) {
 
     $.ajax({
         url:   'pages/mobility/mobility_service.php',
         data: {
-            get: 'stations'
+            get: 'all'
         },
         success: callback,
         error: function() {
@@ -16,26 +16,6 @@ Load.loadStations = function(callback) {
         timeout: 100000
     });
            
-}
-
-Load.loadTrains = function(callback) {
-    /* send AJAX request */
-    $.ajax({
-        url:   'pages/mobility/mobility_service.php',
-        data: {
-            get: 'trains'
-        },
-        success: callback,
-        error: function() {
-          console.log("Error in loading trains. Trying again...");  
-              Load.loadStations(Graph.init);
-
-          
-        },
-        dataType: 'json',
-        timeout: 100000
-    });
-    
 }
 
 Load.loadAmbition = function(callback) {

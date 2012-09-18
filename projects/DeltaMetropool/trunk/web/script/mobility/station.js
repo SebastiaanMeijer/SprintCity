@@ -16,8 +16,6 @@ function Station(name, networkValue, prevIU, currentIU, progIU, cap100, capOver,
         this.capOver = this.cap100 * 1.25;
         this.capUnder = this.cap100 * 0.75;
     }
-    
-    
 }
 
 
@@ -31,20 +29,19 @@ Station.prototype.setCurrentIU = function(newIU) {
 Station.fillStations = function(data) {
     stations = new Array();
     
-    for (i = 0; i < data.length; i++) {     
+    for (i = 0; i < data['stations'].length; i++) {
             
         stations.push(
             new Station(
-                data[i].name, 
-                data[i].networkValue,
-                data[i].prevIU,
-                data[i].currentIU,
-                data[i].progIU,
-                data[i].cap100,
-                data[i].capOver,
-                data[i].capUnder
-                ));  
-            
+                data['stations'][i].name, 
+                data['stations'][i].networkValue,
+                data['stations'][i].prevIU,
+                data['stations'][i].currentIU,
+                data['stations'][i].progIU,
+                data['stations'][i].cap100,
+                data['stations'][i].capOver,
+                data['stations'][i].capUnder
+                ));
     }
 }
 
@@ -61,5 +58,5 @@ fillStationsAndDraw = function(data) {
 
 /* static function */
 Station.refreshStations = function() {
-    Load.loadStations(fillStationsAndDraw);
+    Load.loadAll(fillStationsAndDraw);
 }
