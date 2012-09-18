@@ -60,6 +60,8 @@
 			}
 		}
 		
+		$entryValues = "";
+		
 		for ($i=FREQ_ROW_DATA_START; $i <= $data->sheets[SHEET_TRAIN_FREQUENCIES]['numRows']; $i++)
 		{
 			if (isset($data->sheets[SHEET_TRAIN_FREQUENCIES]['cells'][$i][FREQ_COLUMN_STATION_CODES])) {
@@ -71,12 +73,22 @@
 				{
 					if (isset($columnToTrainId[$j]) && isset($data->sheets[SHEET_TRAIN_FREQUENCIES]['cells'][$i][$j]))
 					{
-						$entry = new TrainTableEntry();
-						$entry->SetData($columnToTrainId[$j], $station->id, $data->sheets[SHEET_TRAIN_FREQUENCIES]['cells'][$i][$j]);
+						if ($entryValues !== "")
+						{
+							$entryValues .= ", ";
+						}
+						$entryValues .= "($columnToTrainId[$j], $station->id, " . $data->sheets[SHEET_TRAIN_FREQUENCIES]['cells'][$i][$j] . ")";
 					}
 				}
 			}
 		}
+		
+		$db = Database::getDatabase();
+		$db->query("
+			INSERT INTO TrainTableEntry (train_id, station_id, frequency)
+			VALUES " . $entryValues, 
+			array());
+		
 		
 		// the excel reader can't read the station names in the chain sheet, so assume the station order of the traveler sheet
 		// applies to the chain sheet as well
