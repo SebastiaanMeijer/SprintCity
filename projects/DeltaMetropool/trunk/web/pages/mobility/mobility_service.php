@@ -250,14 +250,59 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 			GROUP BY ScenarioStations.id
 		) AS A
 		ON DUPLICATE KEY UPDATE travelers_per_stop = A.travelers;";
-		echo $query . "*". $game_id . "*" . $round_info_instance_id . "*" . $train_table_id . "\n";
 	$args = array('game_id' => $game_id, 
 				  'round_info_instance_id' => $round_info_instance_id,
 				  'train_table_id' => $train_table_id);
 	$db -> query($query, $args);
 	
 	$db -> query("COMMIT");
+}
+
+function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
+	$db = Database::getDatabase();
+	$db -> query("START TRANSACTION");
+
+	//createTempTables($game_id, $round_info_instance_id);
 	
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
+	
+	$query = "
+		SELECT ScenarioStations.station_id, tempNetworkValues.networkValue
+		FROM (
+			SELECT Station.id AS station_id, TrainTableStation.id AS train_table_station_id
+			FROM Station 
+			INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
+			WHERE TeamInstance.game_id = :game_id
+			AND train_table_id = :train_table_id
+		) AS ScenarioStations
+		INNER JOIN tempNetworkValues ON tempNetworkValues.station_id = ScenarioStations.train_table_station_id;";
+	$args = array(
+		'train_table_id' => $train_table_id,
+		'game_id' => $game_id);
+	$result = $db->query($query, $args);
+	
+	// fill in new povn values in next round's round instance
+	while ($row = mysql_fetch_array($result)) {
+		$query = "
+			UPDATE RoundInstance
+			INNER JOIN Round ON RoundInstance.round_id = Round.id
+			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			SET RoundInstance.POVN = :new_povn
+			WHERE Round.round_info_id = :current_round_id
+				AND StationInstance.station_id = :station_id
+				AND TeamInstance.game_id = :game_id;";
+		$args = array(
+			'new_povn' => $row['networkValue'],
+			'current_round_id' => $current_round_id,
+			'station_id' => $row['station_id'],
+			'game_id' => $game_id);
+		$db->query($query, $args);
+	}
+	
+	$db -> query("COMMIT");
 }
 
 function createTempTables($game_id, $round_info_instance_id) {

@@ -51,7 +51,14 @@
 			echo "\t" . '<station>' . "\n";
 			foreach ($station_fields as $station_field)
 			{
-				echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
+				if ($station_field != 'POVN')
+				{
+					echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
+				}
+				else
+				{
+					echo "\t\t" . '<POVN>' . $station_row['initial_POVN'] . '</POVN>' . "\n";
+				}
 			}
 			
 			$station_mobility_data = getMobilityDataForStation($train_data, $station_row['code']);
@@ -124,7 +131,8 @@
 		$game_id = Game::getGameIdOfSession($session_id);
 		$query = "
 			SELECT Station.*,
-				StationInstance.id AS station_instance_id, 
+				StationInstance.id AS station_instance_id,
+				StationInstance.initial_POVN,
 				TeamInstance.team_id, 
 				Program.id AS program_id, 
 				Program.area_home, Program.area_work, Program.area_leisure, 

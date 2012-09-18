@@ -130,6 +130,25 @@ function NewGame()
 		$db->query($query, $args);
 	}
 	
+	// calculate initial network values for the participating stations
+	createTempTables($game_id, 0);
+	$result = $db->query("
+		SELECT Station.id AS station_id, tempInitialNetworkValues.networkValue 
+		FROM Game
+		INNER JOIN Scenario ON Scenario.id = Game.scenario_id
+		INNER JOIN ScenarioStation ON ScenarioStation.scenario_id = Scenario.id
+		INNER JOIN Station ON Station.id = ScenarioStation.station_id
+		INNER JOIN TrainTableStation ON TrainTableStation.code = Station.code
+			AND TrainTableStation.train_table_id = Scenario.train_table_id
+		INNER JOIN tempInitialNetworkValues ON tempInitialNetworkValues.station_id = TrainTableStation.id
+		WHERE Game.id = :game_id;",
+		array('game_id' => $game_id));
+	
+	$stationIdToPOVN = array();
+	while ($row = mysql_fetch_array($result)) {
+		$stationIdToPOVN[$row['station_id']] = $row['networkValue'];
+	}
+			
 	// insert the game tree in the database
 	foreach($game_tree as $team_id => $station_collection)
 	{
@@ -157,13 +176,14 @@ function NewGame()
 			// station instance
 			$query = "
 				INSERT INTO `StationInstance` 
-					(`station_id`, `team_instance_id`, `program_id`) 
+					(`station_id`, `team_instance_id`, `program_id`, `initial_POVN`) 
 				VALUES 
-					(:station_id, :team_instance_id, :program_id);";
+					(:station_id, :team_instance_id, :program_id, :povn);";
 			$args = array(
 				'station_id' => $station_id,
 				'team_instance_id' => $team_instance_id,
-				'program_id' => $program_id);
+				'program_id' => $program_id,
+				'povn' => $stationIdToPOVN[$station_id]);
 			$db->query($query, $args);
 			
 			// add empty round_instances and programs for every station
@@ -780,6 +800,9 @@ function SetNextRound($game_id)
 
 		// store the current travelers per train series per station
 		writeTravelersHistory($game_id, $current_round_info_instance_id);
+		
+		// update the network values in the round instances
+		updateNetworkValues($game_id, $current_round_info_instance_id, $next_round_info_instance_id);
 		
 		// copy train table changes of current round into the next round
 		$query = "

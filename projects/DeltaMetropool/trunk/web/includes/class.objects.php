@@ -931,7 +931,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('StationInstance', array('id', 'station_id', 'team_instance_id'), $id);
+			parent::__construct('StationInstance', array('id', 'station_id', 'team_instance_id', 'initial_POVN'), $id);
 		}
 		
 		public static function rowCountByGame($gameId)
