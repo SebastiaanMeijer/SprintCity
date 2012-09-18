@@ -79,8 +79,7 @@
 
     function refresh() {
         console.log("refresh");
-        Station.refreshStations();
-        Train.refreshTrains();
+        Load.loadAll();
     }
 
     function handleTrainClick(trainTitle) {
