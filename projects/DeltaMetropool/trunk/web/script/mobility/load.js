@@ -15,7 +15,15 @@ Load.loadAll = function(callback) {
         dataType: 'json',
         timeout: 100000
     });
-           
+}
+
+Load.refreshAll = function() {
+    Load.loadAll(refreshCallback);
+}
+
+var refreshCallback = function(data) {
+    fillTrainArray(data);
+    fillStationsAndDraw(data);
 }
 
 Load.loadAmbition = function(callback) {

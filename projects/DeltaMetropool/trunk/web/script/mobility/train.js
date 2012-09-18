@@ -24,8 +24,7 @@ var fillTrainArray = function(data) {
             for (j = 0; j < data['trains'][i].stationStops.length; j++) {
                 if (trains[data['trains'][i].id].stationStops[j] != data['trains'][i].stationStops[j]) {
                     // if server and client do not match, request it again, and do not update trains on the client
-                    Station.refreshStations();
-                    Train.refreshTrains();
+                    Load.refreshAll();
                     return;
                 }
             }

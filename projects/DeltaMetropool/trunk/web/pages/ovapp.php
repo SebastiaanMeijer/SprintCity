@@ -79,7 +79,7 @@
 
     function refresh() {
         console.log("refresh");
-        Load.loadAll();
+        Load.refreshAll();
     }
 
     function handleTrainClick(trainTitle) {
