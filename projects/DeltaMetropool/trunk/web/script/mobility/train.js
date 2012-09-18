@@ -17,9 +17,23 @@ Train.prototype.setStationStop = function(index, value) {
 
 var fillTrainArray = function(data) {
     console.log("got train data back");
+    
+    // check if the server date matches the client data
+    if (trains.length > 0) {
+        for (i = 0; i < data.length; i++) {
+            for (j = 0; j < data[i].stationStops.length; j++) {
+                if (trains[data[i].id].stationStops[j] != data[i].stationStops[j]) {
+                    // if server and client do not match, request it again, and do not update trains on the client
+                    Station.refreshStations();
+                    Train.refreshTrains();
+                    return;
+                }
+            }
+        }
+    }
+    
     trains = new Array();
     for (i = 0; i < data.length; i++) {
-    	
         trains[data[i].id] = new Train(
             data[i].id, 
             data[i].name,
@@ -28,9 +42,7 @@ var fillTrainArray = function(data) {
             data[i].currentAvgIU,
             data[i].minAvgIU,
             data[i].maxAvgIU
-        
             );
-            
     }
     $('#trajecten-container').empty();
     startApp();
