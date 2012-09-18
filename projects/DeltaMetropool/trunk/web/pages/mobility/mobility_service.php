@@ -1,14 +1,15 @@
 <?php
 require_once (__DIR__ . '/../../includes/master.inc.php');
 
+$tempTablesExist = false;
+
 // Get post variables that load.js gives
 if (isset($_REQUEST['get'])) {
-	if ($_REQUEST['get'] == 'stations') {
-		$stations = getMobilityDataStations();
-		echo json_encode($stations);
-	} elseif ($_REQUEST['get'] == 'trains') {
-		$trains = getMobilityDataTrains();
-		echo json_encode($trains);
+	if ($_REQUEST['get'] == 'all') {
+		$result = array();
+		$result['stations'] = getMobilityDataStations();
+		$result['trains'] = getMobilityDataTrains();
+		echo json_encode($result);
 	}
 }
 
@@ -306,6 +307,11 @@ function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
 }
 
 function createTempTables($game_id, $round_info_instance_id) {
+	if ($GLOBALS['tempTablesExist']) {
+		return;
+	}
+	$GLOBALS['tempTablesExist'] = true;
+	
 	$db = Database::getDatabase();
 
 	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
