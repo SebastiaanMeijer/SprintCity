@@ -29,7 +29,26 @@ if (isset($_REQUEST['action']))
 }
 else
 {
+	if (isset($_REQUEST['intent']) && $_REQUEST['intent'] == "submit_xls")
+	{
+?>
+						<tr class="error">
+							<td>
+								Geen bestand gevonden. Het geselecteerde bestand overschrijdt waarschijnlijk het upload limiet van <?php echo getUploadLimit(); ?>MB.
+								Maak een backup van de excel file en verwijder de volgende werkbladen om de file te verkleinen: deelnw, gemstat, iuperstop, Achtergrond, Speelscherm.
+							</td>
+						</tr>
+<?php
+	}
 	include 'pages/traintable/list.php';
+}
+
+function getUploadLimit()
+{
+	$max_upload = (int)(ini_get('upload_max_filesize'));
+	$max_post = (int)(ini_get('post_max_size'));
+	$memory_limit = (int)(ini_get('memory_limit'));
+	return min($max_upload, $max_post, $memory_limit);
 }
 ?>
 					</table>
