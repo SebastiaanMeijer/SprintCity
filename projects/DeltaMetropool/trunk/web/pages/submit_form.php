@@ -35,7 +35,11 @@ switch( $vars[0] )
 		break;
 	case "edit_constants":
 		EditConstants();
-		header("Location: ../admin.php?view=constants");
+		header("Location: ../admin.php?view=constants&intent=done");
+		break;
+	case "edit_station_types":
+		EditStationTypes();
+		header("Location: ../admin.php?view=station_types&intent=done");
 		break;
 	case "delete_game":
 		DeleteGame($vars);
@@ -868,11 +872,46 @@ function EditConstants()
 	$query = "
 		UPDATE `constants` 
 		SET `average_citizens_per_home` = :average_citizens_per_home, 
-			`average_workers_per_bvo` = :average_workers_per_bvo 
+			`average_workers_per_bvo` = :average_workers_per_bvo, 
+			`average_travelers_per_citizen` = :average_travelers_per_citizen, 
+			`average_travelers_per_worker` = :average_travelers_per_worker, 
+			`average_travelers_per_ha_leisure` = :average_travelers_per_ha_leisure
 		LIMIT 1;";
 	$args = array(
 		'average_citizens_per_home' => $_REQUEST['average_citizens_per_home'], 
-		'average_workers_per_bvo' => $_REQUEST['average_workers_per_bvo']);
+		'average_workers_per_bvo' => $_REQUEST['average_workers_per_bvo'], 
+		'average_travelers_per_citizen' => $_REQUEST['average_travelers_per_citizen'], 
+		'average_travelers_per_worker' => $_REQUEST['average_travelers_per_worker'], 
+		'average_travelers_per_ha_leisure' => $_REQUEST['average_travelers_per_ha_leisure']);
 	$db->query($query, $args);
+}
+
+function EditStationTypes()
+{
+	$db = Database::getDatabase();
+	
+	$stationTypes = StationTypes::getAllStationTypes();
+	foreach ($stationTypes as $stationType_key => $stationType_value)
+	{
+		$query = "
+			UPDATE `stationtypes` 
+			SET `name` = :name,
+				`description` = :description, 
+				`POVN` = :povn, 
+				`PWN` = :pwn,
+				`IWD` = :iwd,
+				`MNG` = :mng
+			WHERE `id` = :id;";
+		$args = array(
+			'id' => $stationType_key, 
+			'name' => $_REQUEST['name,' . $stationType_key],
+			'description' => $_REQUEST['description,' . $stationType_key],
+			'povn' => $_REQUEST['povn,' . $stationType_key],
+			'pwn' => $_REQUEST['pwn,' . $stationType_key],
+			'iwd' => $_REQUEST['iwd,' . $stationType_key],
+			'mng' => $_REQUEST['mng,' . $stationType_key]
+			);
+		$db->query($query, $args);
+	}
 }
 ?>

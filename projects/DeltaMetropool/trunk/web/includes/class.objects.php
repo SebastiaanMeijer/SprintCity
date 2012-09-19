@@ -1041,6 +1041,19 @@
 		}
 	}
 	
+	class StationTypes extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('StationTypes', array('id', 'name', 'description', 'image', 'POVN', 'PWN', 'IWD', 'MNG'), $id);
+		}
+		
+		public static function getAllStationTypes()
+		{
+			return DBObject::glob("StationTypes", "SELECT * FROM stationtypes");
+		}
+	}
+	
 	class Program extends DBObject
 	{
 		public function __construct($id = null)
