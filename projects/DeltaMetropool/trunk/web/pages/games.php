@@ -13,7 +13,7 @@
 	<h2>Spellen</h2>
 <?php
 	$class = new Loop('odd', 'even');
-	$pager = new Pager(getPage(), 10, Team::rowCount());
+	$pager = new Pager(getPage(), 10, Game::rowCount());
 	$objects = Game::getGames($pager->firstRecord, $pager->perPage);
 	printPager($pager, isset($_REQUEST['view']) ? $_REQUEST['view'] : "start");
 ?>
