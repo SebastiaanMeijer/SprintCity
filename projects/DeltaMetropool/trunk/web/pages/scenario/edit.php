@@ -53,7 +53,8 @@
 			{
 				foreach($_POST['stations'] as $code)
 				{
-					$stations[] = array_pop(Station::getStationByCode($code));
+					$stations = Station::getStationByCode($code);
+					$stations[] = array_pop($stations);
 				}
 			}
 			else
