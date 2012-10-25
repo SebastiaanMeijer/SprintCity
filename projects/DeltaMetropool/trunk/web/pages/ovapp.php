@@ -61,7 +61,7 @@
         if(stopNum == 0) {
             $(trainStop).removeClass('invisible');
         }
-        if(stopNum < 7) {
+        if(stopNum < 8) {
             stopNum++;
             $(trainStop).text(stopNum);
         } else {
