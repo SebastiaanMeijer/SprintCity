@@ -43,6 +43,10 @@ a.tab, button {
     text-decoration: none;
 }
 
+#main #tabs a.provincie-tab {
+    color: #29476b;
+}
+
 #main #tabs a.tab:active {
 }
 #main #tabs a.tab:visited {
@@ -61,6 +65,11 @@ a.tab, button {
     background: -ms-linear-gradient(top,  #eb429e 0%,#da0178 100%); /* IE10+ */
     background: linear-gradient(to bottom,  #eb429e 0%,#da0178 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eb429e', endColorstr='#da0178',GradientType=0 ); /* IE6-8 */
+}
+
+#main #tabs .ui-state-active a.provincie-tab {
+    background: #29476b;
+    border: black;
 }
 
 .ui-tabs {
