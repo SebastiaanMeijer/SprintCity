@@ -147,8 +147,29 @@ a.tab, button {
     box-shadow: 2px 1px 5px 1px #989898;
 }
 
+.sidebarbox p.log {
+    color: gray;
+    font-size: 11px;
+    text-align: left;
+    padding: 1em;
+    line-height: 1.5em;
+}
+
+#bonus-stations, #bonus-bouw, #bonus-button, #penalty, #penalty-button {
+    width: 80%;
+}
+
+#bonus-button, #penalty-button {
+    
+    margin: 10px 0;
+}
+
 .bigpink {
     color: #e6007e;
+}
+
+.bigblue {
+    color: #29476b;
 }
 
 .sidebarbox .title {
@@ -160,6 +181,12 @@ a.tab, button {
     filter: dropshadow(color=#ffffff, offx=1, offy=1);
     -webkit-border-radius: 10px 10px 0px 0px;
     border-radius: 10px 10px 0px 0px;
+}
+
+.sidebarbox .blue-title {
+    background-color: #29476b;
+    text-shadow: none;
+    color: white;
 }
 
 .sidebarbox .title span {
