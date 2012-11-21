@@ -142,7 +142,7 @@
 				stationInstance.transform_area_undeveloped_rural) + " ha resterend.)";
 			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
-			view.current_info.amount_citizens.text = Math.round(stationInstance.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
+			view.current_info.amount_citizens.text = StationStatsCalculator.GetCitizenStats(stationInstance);
 			view.current_info.amount_workers.text = Math.round(stationInstance.count_worker_total);
 			view.current_info.amount_houses.text = Math.round(stationInstance.count_home_total);
 			view.current_info.bvo_work.text = Math.round(stationInstance.count_work_total);

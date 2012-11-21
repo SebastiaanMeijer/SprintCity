@@ -202,7 +202,7 @@
 			return null;
 		}
 		
-		function GetInitialTravelerCount($station_id)
+		public static function GetInitialTravelerCount($station_id)
 		{
 
 			if (isset($station_id))

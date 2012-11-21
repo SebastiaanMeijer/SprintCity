@@ -176,6 +176,8 @@ function LoadTravelerDataMinMax($game_id)
 								) 
 								+ 
 								SUM(Program.area_home * TypesHome.area_density)
+								+
+								SUM(Facility.citizens)
 							) 
 							* 
 							Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
@@ -197,6 +199,8 @@ function LoadTravelerDataMinMax($game_id)
 								) 
 								+ 
 								SUM(Program.area_work * TypesWork.people_density)
+								+
+								SUM(Facility.workers)
 							)
 							*
 							Constants.average_travelers_per_worker
@@ -232,6 +236,7 @@ function LoadTravelerDataMinMax($game_id)
 						IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
 						+ 1
 					)
+					+ SUM(Facility.travelers)
 				) AS TravelerCount
 				FROM Constants, Station
 				INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
@@ -247,6 +252,8 @@ function LoadTravelerDataMinMax($game_id)
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
 				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+				LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+				LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 				WHERE Game.id = :game_id
 				GROUP BY Station.id, RoundInfo2.id
 				ORDER BY RoundInfo2.id
@@ -312,6 +319,8 @@ function LoadTravelerData($game_id, $station_id)
 							) 
 							+ 
 							SUM(Program.area_home * TypesHome.area_density)
+							+
+							SUM(Facility.citizens)
 						) 
 						* 
 						Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
@@ -333,6 +342,8 @@ function LoadTravelerData($game_id, $station_id)
 							) 
 							+ 
 							SUM(Program.area_work * TypesWork.people_density)
+							+
+							SUM(Facility.workers)
 						)
 						*
 						Constants.average_travelers_per_worker
@@ -368,6 +379,7 @@ function LoadTravelerData($game_id, $station_id)
 					IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
 					+ 1
 				)
+				+ SUM(Facility.travelers)
 			) AS TravelerCount
 			FROM Constants, Station
 			INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
@@ -383,6 +395,8 @@ function LoadTravelerData($game_id, $station_id)
 			INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 			INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
 			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+			LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+			LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 			WHERE Game.id = :game_id AND Station.id = :station_id
 			GROUP BY Station.id, RoundInfo2.id
 			ORDER BY RoundInfo2.id;";

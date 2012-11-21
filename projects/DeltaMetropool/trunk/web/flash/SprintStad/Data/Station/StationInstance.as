@@ -31,6 +31,8 @@
 		public var count_work_transform:Number = 0;
 		public var count_worker_total:Number = 0;
 		public var count_worker_transform:Number = 0;
+		public var count_traveler_bonus:Number = 0;
+		public var count_citizen_bonus:Number = 0;
 		
 		public function StationInstance() 
 		{}
@@ -195,9 +197,12 @@
 			{
 				POVN = round.POVN;
 				PWN = round.PWN;
+				count_worker_total += round.worker_bonus;
+				count_traveler_bonus += round.traveler_bonus;
+				count_citizen_bonus += round.citizen_bonus;
 			}
 			
-			var citizens:Number = count_home_total * constants.average_citizens_per_home;
+			var citizens:Number = count_home_total * constants.average_citizens_per_home + count_citizen_bonus;
 			IWD = (citizens + count_worker_total) /  (area_cultivated_home + area_cultivated_work + area_cultivated_mixed);
 			MNG = Math.min(citizens * 5, count_worker_total) / Math.max(citizens * 5, count_worker_total) * 100;
 		}
