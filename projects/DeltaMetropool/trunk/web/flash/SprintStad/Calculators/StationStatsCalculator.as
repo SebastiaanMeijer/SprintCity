@@ -38,7 +38,12 @@
 				traveler_growth = (povn_growth / 15);
 			else
 				traveler_growth = (povn_growth / 10);
-			return int(Math.round(travelers * (1 + traveler_growth)));
+			return int(Math.round(travelers * (1 + traveler_growth))) + stationInstance.count_traveler_bonus;
+		}
+		
+		public static function GetCitizenStats(stationInstance:StationInstance):int
+		{
+			return int(stationInstance.count_home_total * Data.Get().GetConstants().average_citizens_per_home) + stationInstance.count_citizen_bonus;
 		}
 		
 		public static function GetInitialTravelersStats(station:StationInstance):Number

@@ -134,7 +134,7 @@
 			clip.transform_area.text = "(" + Math.round( station.GetTotalTransformArea()) + " ha resterend.)";
 			
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
-			clip.amount_citizens.text = int(station.count_home_total * Data.Get().GetConstants().average_citizens_per_home);
+			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);
 			clip.amount_workers.text = Math.round(station.count_worker_total);
 			clip.amount_houses.text = Math.round(station.count_home_total);
 			clip.bvo_work.text = Math.round(station.count_work_total);

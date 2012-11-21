@@ -477,6 +477,8 @@ function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_t
 								) 
 								+ 
 								SUM(Program.area_home * TypesHome.area_density)
+								+
+								SUM(Facility.citizens)
 							) 
 							* 
 							Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
@@ -499,6 +501,8 @@ function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_t
 								) 
 								+ 
 								SUM(Program.area_work * TypesWork.people_density)
+								+
+								SUM(Facility.workers)
 							)
 							*
 							Constants.average_travelers_per_worker
@@ -526,6 +530,8 @@ function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_t
 							Constants.average_travelers_per_worker
 						)
 					)
+					+
+					SUM(Facility.travelers)
 				) AS travelers
 				FROM Constants, Station
 				INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
@@ -541,6 +547,8 @@ function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_t
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
 				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+				LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+				LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 				WHERE Game.id = :game_id
 				GROUP BY Station.id, RoundInfo2.id
 				ORDER BY RoundInfo2.id
