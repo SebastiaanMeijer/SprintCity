@@ -13,6 +13,12 @@
 		public var POVN:Number = 0;
 		public var PWN:Number = 0;
 		
+		// bonuses
+		public var citizen_bonus:int = 0;
+		public var worker_bonus:int = 0;
+		public var traveler_bonus:int = 0;
+		public var bonuses:String = "";
+		
 		// game data
 		public var plan_program:Program;
 		public var exec_program:Program;

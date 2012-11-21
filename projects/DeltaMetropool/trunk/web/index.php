@@ -37,6 +37,8 @@ if (ClientSession::hasSession(session_id()))
 {
 	if(ClientSession::isMobilityTeam(session_id()))
 		header('Location: ./mobility.php');
+	else if (ClientSession::isProvinceTeam(session_id()))
+		header('Location: ./province.php');
 	else
 		header('Location: ./game.php');
 }

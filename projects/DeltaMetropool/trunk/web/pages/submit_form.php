@@ -106,15 +106,17 @@ function NewGame()
 		$db->query($query, $args);
 	}
 	
-	// create mobility team
+	// create mobility/province team
 	$query = "
 		INSERT INTO `TeamInstance` 
 			(`game_id`, `team_id`) 
 		VALUES
-			(:game_id, :team_id);";
+			(:game_id, :team_id_ov), 
+			(:game_id, :team_id_province);";
 	$args = array(
 		'game_id' => $game_id,
-		'team_id' => MOBILITY_TEAM_ID);
+		'team_id_ov' => MOBILITY_TEAM_ID,
+		'team_id_province' => PROVINCE_TEAM_ID);
 	$db->query($query, $args);
 	$team_instance_id = mysql_insert_id($db->db);
 	
