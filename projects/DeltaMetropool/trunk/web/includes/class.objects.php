@@ -38,6 +38,18 @@
 					array('id' => $id));
 			return $db->getValue($result) == MOBILITY_TEAM_ID;
 		}
+		
+		public static function isProvinceTeam($id)
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+					SELECT team_id 
+					FROM TeamInstance
+					INNER JOIN ClientSession ON TeamInstance.id = ClientSession.team_instance_id
+					WHERE ClientSession.id = :id;",
+					array('id' => $id));
+			return $db->getValue($result) == PROVINCE_TEAM_ID;
+		}
 	}
 	
 	class Team extends DBObject
@@ -55,7 +67,7 @@
 		
 		public static function getTeams($fromIndex, $numberOfRecords)
 		{
-			return DBObject::glob("Team", "SELECT * FROM team WHERE id > 0 ORDER BY `created` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
+			return DBObject::glob("Team", "SELECT * FROM team WHERE id > 1 ORDER BY `created` DESC LIMIT " . $fromIndex . " , " . $numberOfRecords);
 		}
 		
 		public static function getTeamsInGame($gameId)

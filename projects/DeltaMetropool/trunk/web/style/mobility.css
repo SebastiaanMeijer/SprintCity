@@ -181,6 +181,10 @@ a.tab, button {
     color: #29476b;
 }
 
+.bigwhite {
+    color: #ffffff;
+}
+
 .sidebarbox .title {
     width: 100%;
     line-height: 25px;

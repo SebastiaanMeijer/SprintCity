@@ -29,7 +29,8 @@
 		);
 		
 		$round_fields = array(
-			'id', 'round_info_id', 'number', 'name', 'description', 'new_transform_area', 'POVN', 'PWN'
+			'id', 'round_info_id', 'number', 'name', 'description', 'new_transform_area', 'POVN', 'PWN', 
+			'citizen_bonus', 'worker_bonus', 'traveler_bonus', 'bonuses'
 		);
 		
 		$program_fields = array(
@@ -156,15 +157,17 @@
 			SELECT Round.id, Round.new_transform_area, RoundInstance.POVN, Round.PWN, 
 				RoundInfo.number, RoundInfo.name, RoundInfo.description, 
 				RoundInfo.id AS round_info_id, 
-				RoundInstance.plan_program_id, RoundInstance.exec_program_id
+				RoundInstance.plan_program_id, RoundInstance.exec_program_id, RoundInstance.exec_program_id,
+				SUM(Facility.citizens) AS citizen_bonus, SUM(Facility.workers) AS worker_bonus, SUM(Facility.travelers) AS traveler_bonus, 
+				GROUP_CONCAT(Facility.id SEPARATOR ', ') AS bonuses
 			FROM StationInstance 
-			INNER JOIN RoundInstance 
-			ON StationInstance.id = RoundInstance.station_instance_id 
-			INNER JOIN Round 
-			ON RoundInstance.round_id = Round.id 
-			INNER JOIN RoundInfo 
-			ON Round.round_info_id = RoundInfo.id 
+			INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
+			INNER JOIN Round ON RoundInstance.round_id = Round.id 
+			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id 
+			LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+			LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 			WHERE RoundInstance.station_instance_id = :station_instance_id
+			GROUP BY Round.id
 			ORDER BY RoundInfo.number";
 		$args = array('station_instance_id' => $station_instance_id);
 		return $db->query($query, $args);

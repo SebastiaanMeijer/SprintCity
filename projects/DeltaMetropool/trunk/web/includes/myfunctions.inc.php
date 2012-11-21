@@ -1,5 +1,6 @@
 <?php
 	define('MOBILITY_TEAM_ID', 0);
+	define('PROVINCE_TEAM_ID', 1);
 	define('MASTERPLAN_ROUND_ID', 1);
 	
 	function printPager($pager, $view)
