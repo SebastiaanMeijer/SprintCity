@@ -164,23 +164,26 @@ function LoadTravelerDataMinMax($game_id)
 							(
 								(
 									(
-										Station.area_cultivated_home - 
 										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-											* 
-											(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+											Station.area_cultivated_home - 
+											(
+												(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+												* 
+												(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+											)
 										)
-									)
-									* 
-									(count_home_total / area_cultivated_home)
+										* 
+										(count_home_total / area_cultivated_home)
+									) 
+									+ 
+									SUM(Program.area_home * TypesHome.area_density)
 								) 
-								+ 
-								SUM(Program.area_home * TypesHome.area_density)
+								* 
+								Constants.average_citizens_per_home
 								+
-								SUM(Facility.citizens)
+								IFNULL(SUM(Facility.citizens), 0)
 							) 
-							* 
-							Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
+							* Constants.average_travelers_per_citizen
 						) 
 						+
 						(
@@ -200,7 +203,7 @@ function LoadTravelerDataMinMax($game_id)
 								+ 
 								SUM(Program.area_work * TypesWork.people_density)
 								+
-								SUM(Facility.workers)
+								IFNULL(SUM(Facility.workers), 0)
 							)
 							*
 							Constants.average_travelers_per_worker
@@ -226,6 +229,8 @@ function LoadTravelerDataMinMax($game_id)
 							*
 							Constants.average_travelers_per_worker
 						)
+						+
+						IFNULL(SUM(Facility.travelers), 0)
 					)
 					*
 					(
@@ -236,7 +241,6 @@ function LoadTravelerDataMinMax($game_id)
 						IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
 						+ 1
 					)
-					+ SUM(Facility.travelers)
 				) AS TravelerCount
 				FROM Constants, Station
 				INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
@@ -307,23 +311,26 @@ function LoadTravelerData($game_id, $station_id)
 						(
 							(
 								(
-									Station.area_cultivated_home - 
 									(
-										(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-										* 
-										(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										Station.area_cultivated_home - 
+										(
+											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+											* 
+											(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										)
 									)
-								)
-								* 
-								(count_home_total / area_cultivated_home)
+									* 
+									(count_home_total / area_cultivated_home)
+								) 
+								+ 
+								SUM(Program.area_home * TypesHome.area_density)
 							) 
-							+ 
-							SUM(Program.area_home * TypesHome.area_density)
+							* 
+							Constants.average_citizens_per_home
 							+
-							SUM(Facility.citizens)
+							IFNULL(SUM(Facility.citizens), 0)
 						) 
-						* 
-						Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
+						* Constants.average_travelers_per_citizen
 					) 
 					+
 					(
@@ -343,7 +350,7 @@ function LoadTravelerData($game_id, $station_id)
 							+ 
 							SUM(Program.area_work * TypesWork.people_density)
 							+
-							SUM(Facility.workers)
+							IFNULL(SUM(Facility.workers), 0)
 						)
 						*
 						Constants.average_travelers_per_worker
@@ -369,6 +376,8 @@ function LoadTravelerData($game_id, $station_id)
 						*
 						Constants.average_travelers_per_worker
 					)
+					+
+					IFNULL(SUM(Facility.travelers), 0)
 				)
 				*
 				(
@@ -379,7 +388,6 @@ function LoadTravelerData($game_id, $station_id)
 					IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
 					+ 1
 				)
-				+ SUM(Facility.travelers)
 			) AS TravelerCount
 			FROM Constants, Station
 			INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
