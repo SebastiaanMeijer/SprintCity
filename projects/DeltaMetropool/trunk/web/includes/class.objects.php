@@ -7,6 +7,18 @@
 		{
 			parent::__construct('users', array('id', 'username', 'password', 'level', 'email'), $id);
 		}
+		
+		public static function isProvince()
+		{
+			$db = Database::getDatabase();
+			$result = $db->query("
+				SELECT * 
+				FROM TeamInstance 
+				INNER JOIN ClientSession ON TeamInstance.id = ClientSession.team_instance_id 
+				WHERE ClientSession.id = :session_id AND TeamInstance.team_id = :province_team_id",
+				array('session_id' => session_id(), 'province_team_id' => PROVINCE_TEAM_ID));
+			return $db->numRows($result) > 0;
+		}
 	}
 	
 	class ClientSession extends DBObject
@@ -1027,6 +1039,72 @@
 		public static function getStationAppliedPrograms($stationid, $roundId)
 		{
 			
+		}
+	}
+	
+	class Facility extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('Facility', array('id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers'), $id);
+		}
+		
+		public static function getAllFacilities()
+		{
+			return DBObject::glob("Facility", "SELECT * FROM `facility`;");
+		}
+		
+		public static function getFacilitiesInGame($game_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT RoundInfo.name AS Round, Station.name AS Station, Facility.name AS Facility
+				FROM Game
+				INNER JOIN TeamInstance ON Game.id = TeamInstance.game_id
+				INNER JOIN StationInstance ON TeamInstance.id = StationInstance.team_instance_id
+				INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+				INNER JOIN Round ON RoundInstance.round_id = Round.id
+				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				INNER JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+				INNER JOIN Facility ON FacilityInstance.facility_id = Facility.id
+				WHERE Game.id = :game_id AND RoundInfo.id <= Game.current_round_id;";
+			$args = array('game_id' => $game_id);
+			return $db->query($query, $args);
+		}
+		
+		public static function getFacilityById($id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Facility
+				WHERE Facility.id = :facility_id;";
+			$args = array('facility_id' => $id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Facility", $result);
+		}
+		
+		public static function addFacilityToStation($game_id, $facility_id, $station_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				INSERT INTO FacilityInstance (round_instance_id, facility_id)
+				SELECT RoundInstance.id, :facility_id
+				FROM RoundInstance
+				INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				INNER JOIN RoundInfo ON Game.current_round_id = RoundInfo.id
+				INNER JOIN Round ON RoundInfo.id = Round.round_info_id AND RoundInstance.round_id = Round.id
+				WHERE 
+					StationInstance.station_id = :station_id AND
+					Game.id = :game_id;";
+			$args = array(
+				'game_id' => $game_id,
+				'facility_id' => $facility_id,
+				'station_id' => $station_id);
+			$db->query($query, $args);
 		}
 	}
 	

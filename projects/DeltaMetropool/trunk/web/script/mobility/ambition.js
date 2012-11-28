@@ -23,13 +23,13 @@ function checkMax(checkgroup, limit, current)
 function showConfirm()
 {
 	if (checkMax()) {
-            Send.sendAmbition(loadAmbition);
+            Send.sendOVAmbition(loadAmbition);
         }
 }
 
 function loadAmbition()
 {
-    Load.loadAmbition(displayAmbition);
+    Load.loadOVAmbition(displayAmbition);
 }
 
 function displayAmbition(data){

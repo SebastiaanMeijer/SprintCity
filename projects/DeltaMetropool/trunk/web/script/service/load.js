@@ -26,7 +26,7 @@ var refreshCallback = function(data) {
     fillStationsAndDraw(data);
 }
 
-Load.loadAmbition = function(callback) {
+Load.loadOVAmbition = function(callback) {
     /* send AJAX request */
     $.post('pages/mobility/mobility_value.php',
     {

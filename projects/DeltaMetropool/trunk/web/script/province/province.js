@@ -1,23 +1,9 @@
 $(document).ready(function() {
     $("#tabs").tabs();
-	
-    $("#motivatie").click(function(){
-        if($("#motivatie").text() == "Vul hier je motivatie in... ")
-        {
-            $("#motivatie").text("");   
-            
-            $("#motivatie").attr("clicked", "clicked");
-        }
-        
-        
-    });
 
-
-    
     /* Long polling for year here */
     poll();
 });
-
 
 function poll(){
    
@@ -37,5 +23,3 @@ function poll(){
         timeout: 30000
     });
 }
-
-
