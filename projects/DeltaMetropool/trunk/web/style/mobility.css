@@ -67,7 +67,7 @@ a.tab, button {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eb429e', endColorstr='#da0178',GradientType=0 ); /* IE6-8 */
 }
 
-#main #tabs .ui-state-active a.provincie-tab {
+#main #tabs .ui-state-active a.provincie-tab, #main #tabs .ui-state-hover a.provincie-tab:hover {
     background: #29476b;
     border: black;
 }

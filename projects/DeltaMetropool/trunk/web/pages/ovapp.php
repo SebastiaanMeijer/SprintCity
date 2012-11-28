@@ -2,13 +2,13 @@
 <script type="text/javascript" src="script/mobility/station.js"></script>
 <script type="text/javascript" src="script/mobility/train.js"></script>
 <script type="text/javascript" src="script/mobility/traject.js"></script>
-<script type="text/javascript" src="script/mobility/load.js"></script>
-<script type="text/javascript" src="script/mobility/send.js"></script>
+<script type="text/javascript" src="script/service/load.js"></script>
+<script type="text/javascript" src="script/service/send.js"></script>
 <script type="text/paperscript" src="script/mobility/paperjs/ovgraph.js" canvas="graphCanvas"></script>
 <script type="text/javascript">
     /* ========================================================= */
     /* Initialization */
-    var READ_ONLY = false;
+    var READ_ONLY = <?php echo isset($ovapp_readonly) && $ovapp_readonly == true ? 'true' : 'false'; ?>
         
     var locked = false;
 
