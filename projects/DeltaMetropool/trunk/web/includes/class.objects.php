@@ -1108,6 +1108,98 @@
 		}
 	}
 	
+	class TypeRestriction extends DBObject
+	{
+		public function __construct($id = null)
+		{
+			parent::__construct('TypeRestriction', array('id', 'station_instance_id', 'from_round_info_id', 'to_round_info_id', 'type_id'), $id);
+		}
+		
+		public static function getActiveRestrictionsInGame($game_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Station.name AS Station, Station.id AS StationId, Types.name AS Type, Types.id AS TypeId
+				FROM TypeRestriction
+				INNER JOIN StationInstance ON TypeRestriction.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				INNER JOIN Types ON TypeRestriction.type_id = Types.id
+				WHERE 
+					Game.id = :game_id AND
+					TypeRestriction.from_round_info_id <= Game.current_round_id AND
+					(ISNULL(TypeRestriction.to_round_info_id) OR TypeRestriction.to_round_info_id > Game.current_round_id)
+				ORDER BY Station.name, Types.id";
+			$args = array('game_id' => $game_id);
+			return $db->query($query, $args);
+		}
+		
+		public static function isActive($game_id, $station_id, $type_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT TypeRestriction.id
+				FROM TypeRestriction
+				INNER JOIN StationInstance ON TypeRestriction.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				INNER JOIN Types ON TypeRestriction.type_id = Types.id
+				WHERE 
+					Game.id = :game_id AND 
+					StationInstance.station_id = :station_id AND 
+					TypeRestriction.type_id = :type_id AND 
+					TypeRestriction.from_round_info_id <= Game.current_round_id AND 
+					(ISNULL(TypeRestriction.to_round_info_id) OR TypeRestriction.to_round_info_id > Game.current_round_id)";
+			$args = array(
+				'game_id' => $game_id,
+				'station_id' => $station_id,
+				'type_id' => $type_id);
+			$result = $db->query($query, $args);
+			return mysql_num_rows($result) > 0;
+		}
+		
+		public static function addRestriction($game_id, $station_id, $type_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				INSERT INTO TypeRestriction (station_instance_id, from_round_info_id, type_id)
+				SELECT StationInstance.id, Game.current_round_id, :type_id
+				FROM StationInstance
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				WHERE
+					Game.id = :game_id AND  
+					StationInstance.station_id = :station_id;";
+			$args = array(
+				'game_id' => $game_id,
+				'station_id' => $station_id,
+				'type_id' => $type_id);
+			$db->query($query, $args);
+		}
+		
+		public static function removeRestriction($game_id, $station_id, $type_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				UPDATE TypeRestriction
+				INNER JOIN StationInstance ON TypeRestriction.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				SET to_round_info_id = Game.current_round_id
+				WHERE
+					Game.id = :game_id AND  
+					StationInstance.station_id = :station_id AND
+					TypeRestriction.type_id = :type_id;";
+			$args = array(
+				'game_id' => $game_id,
+				'station_id' => $station_id,
+				'type_id' => $type_id);
+			$db->query($query, $args);
+		}
+	}
+	
 	class Type extends DBObject
 	{
 		public function __construct($id = null)
@@ -1128,6 +1220,18 @@
 		public static function getAverageTypes()
 		{
 			return DBObject::glob("Type", "SELECT * FROM types WHERE type = 'average_home' OR type = 'average_work' OR type = 'average_leisure'");
+		}
+		
+		public static function getTypeById($id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT *
+				FROM Type
+				WHERE Type.id = :type_id;";
+			$args = array('type_id' => $id);
+			$result = $db->query($query, $args);
+			return DBObject::glob("Type", $result);
 		}
 	}
 	

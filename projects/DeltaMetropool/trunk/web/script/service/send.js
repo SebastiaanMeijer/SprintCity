@@ -58,7 +58,11 @@ Send.addRestriction = function() {
             stationId: $("#restriction-form #bonus-stations").val(),
             typeId: $("#restriction-form #penalty").val()
         },
-        function(data) {alert(data);}, 'json'
+        function(data)
+        {
+            $("#restriction-form .log").html(data);
+        },
+        'text'
     );
 }
 
@@ -69,6 +73,10 @@ Send.removeRestriction = function(stationId, typeId) {
             stationId: stationId,
             typeId: typeId
         },
-        function(data) {alert(data);}, 'json'
+        function(data)
+        {
+            $("#restriction-form .log").html(data);
+        },
+        'text'
     );
 }
