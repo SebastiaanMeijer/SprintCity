@@ -151,6 +151,18 @@ function addTextNextToPoint(point, text, color) {
 }
 
 function drawStationNetworkValue(stations) {
+    // label
+    var textPoint = getCenteredStationPoint(0, 16);
+    textPoint.x -= 104;
+    var labelText = new PointText(textPoint);
+    labelText.justification = 'left';
+    labelText.characterStyle = {
+        fontSize : 11,
+        fillColor : 'black'
+    };
+    labelText.content = 'Netwerkwaarde:';
+    
+    // values
     for (var i = 0; i < stations.length; i++) {
         var textPoint = getCenteredStationPoint(i, 16);
 
@@ -160,19 +172,19 @@ function drawStationNetworkValue(stations) {
             fontSize : 11,
             fillColor : 'black'
         };
-        networkValueText.content = 'nw:' + stations[i].networkValue;
+        networkValueText.content = stations[i].networkValue;
     }
 }
 
 function drawStationTags(stations) {
     var rectWidth = GRAPH_WIDTH / stations.length - GRAPH_BLOCK_MARGIN * 4;
 	
-    var rectSize = new Size(rectWidth, 4);
+    var rectSize = new Size(rectWidth, 8);
 
     for (var i = 0; i < stations.length; i++) {
         var tagPoint = getCenteredStationPoint(i, 20, rectSize);
         var tagRectangle = new Rectangle(tagPoint, rectSize);
-        var tagCornerSize = new Size(2, 2);
+        var tagCornerSize = new Size(4, 4);
         var path = new Path.RoundRectangle(tagRectangle, tagCornerSize);
 
         /* determine color */
@@ -193,7 +205,7 @@ function drawStationTags(stations) {
 
 function drawStationNames(stations) {
     for (var i = 0; i < stations.length; i++) {
-        var textPoint = getCenteredStationPoint(i, 36);
+        var textPoint = getCenteredStationPoint(i, 42);
 
         var text = new PointText(textPoint);
         text.justification = 'center';
