@@ -31,7 +31,7 @@
 			Debug.out(this + " I know " + data);
 			loadCount++;
 			// stage two loading
-			if (loadCount >= 6)
+			if (loadCount >= 7)
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 		}
 		
@@ -56,6 +56,7 @@
 			DataLoader.Get().AddJob(DataLoader.DATA_TEAMS, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_TYPES, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_STATION_TYPES, OnStageOneLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_FACILITES, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_CONSTANTS, OnStageOneLoadingDone);
 			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnStageOneLoadingDone);
 		}
