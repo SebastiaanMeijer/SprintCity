@@ -6,6 +6,7 @@
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
+	import flash.filters.ColorMatrixFilter;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -42,6 +43,11 @@
 		
 		private var popup:StationTypePopup = null;
 		private var popupImage:Bitmap = new Bitmap();
+		private static var desaturateFilter:ColorMatrixFilter = new ColorMatrixFilter(
+			[0.309, 0.609, 0.082, 0, 0, 
+			0.309, 0.609, 0.082, 0, 0, 
+			0.309, 0.609, 0.082, 0, 0, 
+			0, 0, 0, 1, 0]);
 		
 		public function RoundState(parent:SprintStad) 
 		{
@@ -80,7 +86,7 @@
 			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
 			
 			// init windows
-			InitWindows();
+			InitWindows(station);
 			
 			// right info
 			OnEditorChange();
@@ -188,7 +194,7 @@
 			ErrorDisplay.Get().DisplayError("error uploading program");
 		}
 		
-		private function InitWindows():void
+		private function InitWindows(station:Station):void
 		{
 			var view:MovieClip = parent.round_movie;
 			var types:Types = Data.Get().GetTypes();
@@ -206,7 +212,6 @@
 				view.leisure_window.getChildByName("type_" + (i + 1)).type_area.text = "";
 			}
 			
-			
 			cat_types = types.GetTypesOfCategory("home");
 			for (i = 0; i < cat_types.length; i++)
 			{
@@ -217,10 +222,17 @@
 				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
-				clip.buttonMode = true;
 				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
-				clip.type_area.background = true;
-				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				if (station.HasRestrictionFor(cat_types[i].id))
+				{
+					clip.filters = [desaturateFilter];
+					clip.alpha = 0.3;
+				}
+				else
+				{
+					clip.buttonMode = true;
+					clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				}
 			}
 			
 			cat_types = types.GetTypesOfCategory("work");
@@ -233,10 +245,18 @@
 				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
-				clip.buttonMode = true;
 				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
 				clip.type_area.background = true;
-				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				if (station.HasRestrictionFor(cat_types[i].id))
+				{
+					clip.filters = [desaturateFilter];
+					clip.alpha = 0.3;
+				}
+				else
+				{
+					clip.buttonMode = true;
+					clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				}
 			}
 			
 			cat_types = types.GetTypesOfCategory("leisure");
@@ -249,10 +269,18 @@
 				clip.type_image.addChild(bitmap);
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
-				clip.buttonMode = true;
 				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
 				clip.type_area.background = true;
-				clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				if (station.HasRestrictionFor(cat_types[i].id))
+				{
+					clip.filters = [desaturateFilter];
+					clip.alpha = 0.3;
+				}
+				else
+				{
+					clip.buttonMode = true;
+					clip.addEventListener(MouseEvent.CLICK, OnTypeButtonClicked);
+				}
 			}
 		}
 		
@@ -385,7 +413,7 @@
 			if (loadCount >= 2)
 			{
 				loadCount = 0;
-				DrawUI(parent.GetCurrentStation());				
+				DrawUI(parent.GetCurrentStation());
 				//remove loading screen
 				parent.removeChild(SprintStad.LOADER);
 			}

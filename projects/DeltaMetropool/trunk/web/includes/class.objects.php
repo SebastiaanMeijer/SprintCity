@@ -1134,6 +1134,29 @@
 			$args = array('game_id' => $game_id);
 			return $db->query($query, $args);
 		}
+
+		public static function getActiveRestrictionsForStation($game_id, $station_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT Station.name AS Station, Station.id AS StationId, Types.name AS Type, Types.id AS TypeId
+				FROM TypeRestriction
+				INNER JOIN StationInstance ON TypeRestriction.station_instance_id = StationInstance.id
+				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id
+				INNER JOIN Station ON StationInstance.station_id = Station.id
+				INNER JOIN Types ON TypeRestriction.type_id = Types.id
+				WHERE 
+					Game.id = :game_id AND
+					StationInstance.station_id = :station_id AND
+					TypeRestriction.from_round_info_id <= Game.current_round_id AND
+					(ISNULL(TypeRestriction.to_round_info_id) OR TypeRestriction.to_round_info_id > Game.current_round_id)
+				ORDER BY Types.id";
+			$args = array(
+				'game_id' => $game_id, 
+				'station_id' => $station_id);
+			return $db->query($query, $args);
+		}
 		
 		public static function isActive($game_id, $station_id, $type_id)
 		{

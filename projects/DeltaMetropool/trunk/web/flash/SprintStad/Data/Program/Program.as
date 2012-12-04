@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data.Program 
 {
 	import SprintStad.Data.Data;
+	import SprintStad.Data.Station.Station;
 	import SprintStad.Data.Types.Type;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
@@ -43,6 +44,48 @@
 				type_work = type;
 			else if (type.type == "leisure" || type.type == "average_leisure")
 				type_leisure = type;
+		}
+		
+		public function UpdateProgramUsingRestrictions(station:Station):void
+		{
+			var alternatives:Array;
+			var i:int;
+			if (station.HasRestrictionFor(type_home.id))
+			{
+				alternatives = Data.Get().GetTypes().GetTypesOfCategory(Type.TYPE_HOME);
+				for (i = 0; i < alternatives.length; i++)
+				{
+					if (!station.HasRestrictionFor(alternatives[i].id))
+					{
+						type_home = alternatives[i];
+						break;
+					}
+				}
+			}
+			if (station.HasRestrictionFor(type_work.id))
+			{
+				alternatives = Data.Get().GetTypes().GetTypesOfCategory(Type.TYPE_WORK);
+				for (i = 0; i < alternatives.length; i++)
+				{
+					if (!station.HasRestrictionFor(alternatives[i].id))
+					{
+						type_work = alternatives[i];
+						break;
+					}
+				}
+			}
+			if (station.HasRestrictionFor(type_leisure.id))
+			{
+				alternatives = Data.Get().GetTypes().GetTypesOfCategory(Type.TYPE_LEISURE);
+				for (i = 0; i < alternatives.length; i++)
+				{
+					if (!station.HasRestrictionFor(alternatives[i].id))
+					{
+						type_leisure = alternatives[i];
+						break;
+					}
+				}
+			}
 		}
 		
 		public function ParseXML(xmlData:XML):void

@@ -39,6 +39,7 @@
 		
 		$db = Database::getDatabase();
 		
+		$game_id = Game::getGameIdOfSession(session_id());
 		$station_result = getStations(session_id());
 		$scenario = Scenario::getCurrentScenario();
 		$train_data = getMobilityDataStations();
@@ -109,7 +110,7 @@
 				echo "\t\t\t" . '</round>' . "\n";
 			}			
 			echo "\t\t" . '</rounds>' . "\n";
-			
+			echo "\t\t" . '<restrictions>' . getRestrictions($game_id, $station_row['id']) . '</restrictions>' . "\n";
 			echo "\t" . '</station>' . "\n";
 		}
 		
@@ -182,5 +183,16 @@
 			WHERE id = :program_id";
 		$args = array('program_id' => $program_id);
 		return $db->query($query, $args);
+	}
+	
+	function getRestrictions($game_id, $station_id)
+	{
+		$restrictions = TypeRestriction::getActiveRestrictionsForStation($game_id, $station_id);
+		$result = '';
+		while ($restriction = mysql_fetch_array($restrictions))
+		{
+			$result .= $restriction['TypeId'] . ',';
+		}
+		return $result;
 	}
 ?>

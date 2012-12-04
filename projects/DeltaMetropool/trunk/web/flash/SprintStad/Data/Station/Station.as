@@ -13,6 +13,7 @@
 	import SprintStad.Data.Team.Team;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Team.Team;
+	import SprintStad.Data.Types.Type;
 	import SprintStad.Debug.Debug;
 	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.Drawer.AreaBarDrawer;
@@ -54,6 +55,7 @@
 		public var capOver:int = 0;
 		
 		public var rounds:Array = new Array();
+		public var restrictions:Array = new Array();
 		
 		private var loader:Loader = null;
 		
@@ -143,7 +145,16 @@
 				transform_area_undeveloped_urban;
 		}
 		
-
+		public function HasRestrictionFor(type_id:int):Boolean
+		{
+			for (var i:int = 0; i < restrictions.length; i++)
+			{
+				if (restrictions[i] == type_id)
+					return true;
+			}
+			return false;
+		}
+		
 		public function PostConstruct():void
 		{
 			try
