@@ -173,6 +173,16 @@ a.tab, button {
     margin: 10px 0;
 }
 
+#restriction-form a {
+	color: gray;
+	text-decoration: none;
+}
+
+#restriction-form a:hover {
+	color: gray;
+	text-decoration: line-through;
+}
+
 .bigpink {
     color: #e6007e;
 }
