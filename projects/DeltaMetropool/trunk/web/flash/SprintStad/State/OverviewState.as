@@ -2,6 +2,8 @@
 {
 	import fl.motion.Color;
 	import fl.motion.MatrixTransformer;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -17,6 +19,7 @@
 	import flash.utils.ByteArray;
 	import SprintStad.Data.Data;
 	import SprintStad.Data.DataLoader;
+	import SprintStad.Data.Facility.Facility;
 	import SprintStad.Data.Graph.LineGraph;
 	import SprintStad.Data.Round.Round;
 	import SprintStad.Data.Station.Station;
@@ -176,6 +179,7 @@
 			RefreshBars(station);
 			RefreshMobility(station);
 			RefreshLineGraphs(station);
+			RefreshFacilities(station);
 			RefreshTransformArea(station);
 		}
 		
@@ -394,6 +398,34 @@
 			}
 		}
 		
+		private function RefreshFacilities(station:Station):void
+		{
+			Debug.out("Refreshing Facilities, stationID:" + station.id);
+			try {
+				var container:MovieClip = parent.overview_movie.facilitiesContainer;
+				while (container.numChildren > 0)
+					container.removeChildAt(0);
+				container.scaleX = 0.5;
+				container.scaleY = 0.5;
+				var x:Number = 0;
+				for (var i:int; i < station.bonuses.length; i++)
+				{
+					var facility:Facility = Data.Get().GetFacilities().GetFacilityById(station.bonuses[i]);
+					if (facility)
+					{
+						var bitmap:Bitmap = new Bitmap(facility.imageData);
+						bitmap.x = x;
+						container.addChild(bitmap);
+						x += bitmap.width + 10;
+					}
+				}
+			}
+			catch (e:Error)
+			{
+				Debug.out(e.getStackTrace());
+			}
+		}
+		
 		private function ChangePlannedBarTitles():void
 		{
 			Debug.out("Changing Planned/Assigned Bar titles...");
@@ -501,7 +533,6 @@
 				
 				// graph
 				parentMovie.lineGraphContainer.visible = true;
-				
 				RefreshLineGraphs(Data.Get().GetStations().GetStation(parent.currentStationIndex));
 				
 				// set panels

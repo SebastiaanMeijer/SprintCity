@@ -1,6 +1,7 @@
 ﻿package SprintStad.Data 
 {
 	import SprintStad.Data.Constants.Constants;
+	import SprintStad.Data.Facility.Facilities;
 	import SprintStad.Data.Round.MobilityReport;
 	import SprintStad.Data.Station.Stations;
 	import SprintStad.Data.StationTypes.StationTypes;
@@ -22,6 +23,7 @@
 		private var types:Types = new Types();
 		private var constants:Constants = new Constants();
 		private var mobilityReport:MobilityReport = new MobilityReport();
+		private var facilities:Facilities = new Facilities();
 		
 		public function Data() 
 		{
@@ -68,12 +70,17 @@
 			return mobilityReport;
 		}
 		
+		public function GetFacilities():Facilities
+		{
+			return facilities;
+		}
+		
 		public function PostConstruct():void
 		{
 		}
 		
 		public function Clear():void
-		{			
+		{
 		}
 		
 		public function ParseXML(xmlData:XML):void

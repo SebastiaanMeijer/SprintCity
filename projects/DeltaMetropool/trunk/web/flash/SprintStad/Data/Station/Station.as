@@ -56,6 +56,7 @@
 		
 		public var rounds:Array = new Array();
 		public var restrictions:Array = new Array();
+		public var bonuses:Array = new Array();
 		
 		private var loader:Loader = null;
 		
@@ -207,6 +208,8 @@
 					}
 					else
 					{
+						if (xml.name() == "bonuses" && String(xml).length > 0)
+							bonuses.splice(0, 0, String(xml).split(','));
 						round[xml.name()] = xml;
 					}
 				}
