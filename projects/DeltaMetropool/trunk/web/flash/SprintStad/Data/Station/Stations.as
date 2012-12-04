@@ -136,6 +136,10 @@
 					{
 						station.ParseXML(xml);
 					}
+					else if (xml.name() == "restrictions")
+					{
+						station[xml.name()] = String(xml).split(',');
+					}
 					else
 					{
 						station[xml.name()] = xml;

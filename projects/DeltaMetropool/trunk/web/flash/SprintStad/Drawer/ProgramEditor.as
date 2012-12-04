@@ -124,6 +124,10 @@
 				if (round != null)
 				{
 					availableArea += round.new_transform_area;
+					
+					// if building types are restricted, they can still exits in the current program
+					// change the types in the program so the program editor will not have a default disallowed type
+					round.plan_program.UpdateProgramUsingRestrictions(station);
 					// set sliders
 					sliders.push(new ProgramSlider(round.plan_program.type_home, round.plan_program.area_home));
 					sliders.push(new ProgramSlider(round.plan_program.type_work, round.plan_program.area_work));

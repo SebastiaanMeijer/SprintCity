@@ -16,6 +16,13 @@
 	import SprintStad.Debug.ErrorDisplay;
 	public class Type
 	{
+		public static const TYPE_HOME = "home";
+		public static const TYPE_WORK = "work";
+		public static const TYPE_LEISURE = "leisure";
+		public static const TYPE_AVERAGE_HOME = "average_home";
+		public static const TYPE_AVERAGE_WORK = "average_work";
+		public static const TYPE_AVERAGE_LEISURE = "average_leisure";
+		
 		public var id:int = 0;
 		public var name:String = "";
 		public var type:String = "";
