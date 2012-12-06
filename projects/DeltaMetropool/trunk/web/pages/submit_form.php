@@ -136,17 +136,19 @@ function NewGame()
 		$db->query($query, $args);
 	}
 	
-	// calculate initial network values for the participating stations
-	createTempTables($game_id, 0);
+	// fill InitialNetworkValues and InitialTravelersPerStop tables
+	createInitialTables($game_id);
+	
+	// set initial network values for the participating stations
 	$result = $db->query("
-		SELECT Station.id AS station_id, tempInitialNetworkValues.networkValue 
+		SELECT Station.id AS station_id, InitialNetworkValues.networkValue 
 		FROM Game
 		INNER JOIN Scenario ON Scenario.id = Game.scenario_id
 		INNER JOIN ScenarioStation ON ScenarioStation.scenario_id = Scenario.id
 		INNER JOIN Station ON Station.id = ScenarioStation.station_id
 		INNER JOIN TrainTableStation ON TrainTableStation.code = Station.code
 			AND TrainTableStation.train_table_id = Scenario.train_table_id
-		INNER JOIN tempInitialNetworkValues ON tempInitialNetworkValues.station_id = TrainTableStation.id
+		INNER JOIN InitialNetworkValues ON InitialNetworkValues.station_id = TrainTableStation.id
 		WHERE Game.id = :game_id;",
 		array('game_id' => $game_id));
 	
