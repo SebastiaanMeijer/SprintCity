@@ -2,7 +2,7 @@
 	require_once './includes/Excel/reader.php';
 	require_once 'includes/master.inc.php';
 	
-	define('SHEET_TRAIN_FREQUENCIES', 4);
+	define('SHEET_TRAIN_FREQUENCIES', 0);
 	define('FREQ_ROW_TRAIN_NAMES', 2);
 	define('FREQ_ROW_TRAIN_TYPES', 3);
 	define('FREQ_ROW_DATA_START', 5);
@@ -10,12 +10,12 @@
 	define('FREQ_COLUMN_STATION_NAMES', 2);
 	define('FREQ_COLUMN_DATA_START', 3);
 	
-	define('SHEET_CHAIN_VALUES', 7);
+	define('SHEET_CHAIN_VALUES', 3);
 	define('CHAIN_ROW_DATA_START', 3);
 	define('CHAIN_COLUMN_STATION_NAMES', 2);
 	define('CHAIN_COLUMN_CHAIN_VALUES', 9);
 	
-	define('SHEET_TRAVELERS', 8);
+	define('SHEET_TRAVELERS', 4);
 	define('TRAVELERS_ROW_DATA_START', 2);
 	define('TRAVELERS_COLUMN_STATION_CODES', 1);
 	define('TRAVELERS_COLUMN_TRAVELERS', 3);
@@ -26,6 +26,7 @@
 	{
 		if(strtolower(substr($_FILES['trainTableFileName']['name'], -3))==='xls')
 		{
+			ini_set('memory_limit', '-1');
 			$data = new Spreadsheet_Excel_Reader();
 			$data->setOutputEncoding('ISO-8859-1//TRANSLIT//IGNORE');
 			$data->read($_FILES['trainTableFileName']['tmp_name']);
