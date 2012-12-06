@@ -72,7 +72,7 @@ function getMobilityDataStations() {
 	$query = "
 		SELECT Station.code, 
 			   Station.name, 
-			   tempNetworkValues.networkValue, 
+			   tempNetworkValues.networkValue + tempNetworkValues.chainValue AS networkValue, 
 			   IFNULL(B.previousTravelers, 0) AS previousTravelers, 
 			   IFNULL(A.currentTravelers, 0) AS currentTravelers, 
 			   IFNULL(A.cap100, 0) AS cap100, 
@@ -85,28 +85,22 @@ function getMobilityDataStations() {
 		INNER JOIN ScenarioStation ON ScenarioStation.scenario_id = Game.scenario_id AND ScenarioStation.station_id = Station.id
 		LEFT JOIN (
 			SELECT Station.id AS station_id, 
-				   SUM(travelersPerStop) AS currentTravelers, 
-				   SUM(avg_travelers_per_stop) AS cap100, 
-				   SUM(avg_travelers_per_stop) * 1.1 AS capOver, 
-				   SUM(avg_travelers_per_stop) * 0.9 AS capUnder
+				   current_avg_travelers_per_stop AS currentTravelers, 
+				   initial_avg_travelers_per_stop AS cap100, 
+				   initial_avg_travelers_per_stop * 1.1 AS capOver, 
+				   initial_avg_travelers_per_stop * 0.9 AS capUnder
 			FROM Station 
 			INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-			INNER JOIN tempTravelersPerStop ON TrainTableStation.id = tempTravelersPerStop.station_id
-			INNER JOIN (SELECT train_id, COUNT(*) AS station_count
-				FROM Station 
-				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-				INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-				INNER JOIN traintableentry ON TrainTableStation.id = traintableentry.station_id
-				WHERE TeamInstance.game_id = :game_id
-				AND train_table_id = train_table_id
-				GROUP BY train_id) AS StationCounts ON tempTravelersPerStop.train_id = StationCounts.train_id
-			INNER JOIN (SELECT train_id, AVG(travelersPerStop) AS avg_travelers_per_stop
-				FROM tempInitialTravelersPerStop
-				GROUP BY train_id) AS AvgTravelersPerStop ON StationCounts.train_id = AvgTravelersPerStop.train_id
-			WHERE station_count > 1
-			AND train_table_id = :train_table_id
-			GROUP BY Station.id
+			INNER JOIN (SELECT station_id, AVG(travelersPerStop) AS current_avg_travelers_per_stop
+				FROM tempTravelersPerStop
+				GROUP BY station_id) AS CurrentAvgTravelersPerStop
+			ON TrainTableStation.id = CurrentAvgTravelersPerStop.station_id
+			INNER JOIN (SELECT station_id, AVG(travelersPerStop) AS initial_avg_travelers_per_stop
+				FROM InitialTravelersPerStop
+				WHERE game_id = :game_id
+				GROUP BY station_id) AS InitialAvgTravelersPerStop 
+			ON CurrentAvgTravelersPerStop.station_id = InitialAvgTravelersPerStop.station_id
+			WHERE train_table_id = :train_table_id
 		) AS A ON A.station_id = Station.id
 		LEFT JOIN TrainTableStation ON Station.code = TrainTableStation.code
 		LEFT JOIN (
@@ -180,7 +174,8 @@ function getMobilityDataTrains() {
 		INNER JOIN (
 			SELECT train_id, 
 				   AVG(travelersPerStop) AS avgTravelers
-			FROM tempInitialTravelersPerStop
+			FROM InitialTravelersPerStop
+			WHERE game_id = :game_id
 			GROUP BY train_id
 		) AS initialAvgTravelersPerStop ON initialAvgTravelersPerStop.train_id = A.train_id
 		INNER JOIN (
@@ -225,20 +220,8 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 		INSERT INTO TravelerHistory (round_info_instance_id, station_id, travelers_per_stop)
 		SELECT *
 		FROM (
-			SELECT :round_info_instance_id, ScenarioStations.id, SUM(tempTravelersPerStop.travelersPerStop) AS travelers
+			SELECT :round_info_instance_id, ScenarioStations.id, AVG(tempTravelersPerStop.travelersPerStop) AS travelers
 			FROM tempTravelersPerStop
-			INNER JOIN (
-				SELECT train_id
-				FROM Station 
-				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
-				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-				INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-				INNER JOIN traintableentry ON TrainTableStation.id = traintableentry.station_id
-				WHERE TeamInstance.game_id = :game_id
-				AND train_table_id = :train_table_id
-				GROUP BY train_id
-				HAVING COUNT(*) > 1
-			) AS ScenarioTrains ON ScenarioTrains.train_id = tempTravelersPerStop.train_id
 			INNER JOIN (
 				SELECT TrainTableStation.id
 				FROM Station 
@@ -306,6 +289,34 @@ function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
 	$db -> query("COMMIT");
 }
 
+function createInitialTables($game_id) {
+	$db = Database::getDatabase();
+	$db -> query("START TRANSACTION");
+
+	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
+
+	$queries = array(	"CREATE TEMPORARY TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
+						"CREATE TEMPORARY TABLE tempInitialEntries2 LIKE tempInitialEntries;",
+						"CREATE TEMPORARY TABLE tempInitialEntries3 LIKE tempInitialEntries;",
+						"CREATE TEMPORARY TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
+						"CREATE TEMPORARY TABLE tempInitialTravelers (station_id INT, travelers INT);", 
+						"CREATE TEMPORARY TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	foreach ($queries as $query) {
+		$db -> query($query, array());
+	}
+	createInitialEntriesTable("tempInitialEntries", $train_table_id);
+	createNetworkValueTable("tempInitialNetworkValues", "tempInitialEntries", $train_table_id);
+
+	$db -> query("INSERT INTO InitialNetworkValues SELECT station_id, networkValue, chainValue, " . $game_id . " FROM tempInitialNetworkValues;", array());
+	
+	createTravelersTable("tempInitialTravelers", "InitialNetworkValues", "tempInitialNetworkValues", $game_id, $train_table_id);
+	createTravelersPerStopTable("tempInitialTravelersPerStop", "tempInitialEntries", "tempInitialNetworkValues", "tempInitialTravelers");
+	
+	$db -> query("INSERT INTO InitialTravelersPerStop SELECT train_id, station_id, travelersPerStop, " . $game_id . " FROM tempInitialTravelersPerStop;", array());
+	
+	$db -> query("COMMIT");
+}
+
 function createTempTables($game_id, $round_info_instance_id) {
 	if ($GLOBALS['tempTablesExist']) {
 		return;
@@ -316,30 +327,19 @@ function createTempTables($game_id, $round_info_instance_id) {
 
 	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 
-	$queries = array(	"CREATE TEMPORARY TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
-						"CREATE TEMPORARY TABLE tempInitialEntries2 LIKE tempInitialEntries;",
-						"CREATE TEMPORARY TABLE tempInitialEntries3 LIKE tempInitialEntries;",
-						"CREATE TEMPORARY TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE);", 
-						"CREATE TEMPORARY TABLE tempInitialTravelers (station_id INT, travelers INT);", 
-						"CREATE TEMPORARY TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);", 
-						"CREATE TEMPORARY TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
+	$queries = array(	"CREATE TEMPORARY TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
 						"CREATE TEMPORARY TABLE tempEntries2 LIKE tempEntries;",
 						"CREATE TEMPORARY TABLE tempEntries3 LIKE tempEntries;",
-						"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE);", 
+						"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
 						"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);", 
 						"CREATE TEMPORARY TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
 	foreach ($queries as $query) {
 		$db -> query($query, array());
 	}
-
-	createInitialEntriesTable("tempInitialEntries", $train_table_id);
-	createNetworkValueTable("tempInitialNetworkValues", "tempInitialEntries", $train_table_id);
-	createInitialTravelersTable("tempInitialTravelers", $game_id, $train_table_id);
-	createTravelersPerStopTable("tempInitialTravelersPerStop", "tempInitialEntries", "tempInitialNetworkValues", "tempInitialTravelers");
-
+	
 	createCurrentEntriesTable("tempEntries", $train_table_id, $round_info_instance_id);
 	createNetworkValueTable("tempNetworkValues", "tempEntries", $train_table_id);
-	createCurrentTravelersTable("tempTravelers", "tempInitialNetworkValues", "tempNetworkValues", $game_id, $train_table_id);
+	createTravelersTable("tempTravelers", "InitialNetworkValues", "tempNetworkValues", $game_id, $train_table_id);
 	createTravelersPerStopTable("tempTravelersPerStop", "tempEntries", "tempNetworkValues", "tempTravelers");
 }
 
@@ -390,7 +390,7 @@ function createNetworkValueTable($table_name, $entries_table, $train_table_id) {
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
-	SELECT traintablestation.id AS station_id, IFNULL(SUM(trainvalue * frequency),0) + chain AS networkvalue
+	SELECT traintablestation.id AS station_id, IFNULL(SUM(trainvalue * frequency),0) AS networkvalue, chain AS chainvalue
 	FROM traintablestation 
 	LEFT JOIN " . $entries_table . " ON traintablestation.id = " . $entries_table . ".station_id
 	LEFT JOIN (
@@ -408,7 +408,7 @@ function createNetworkValueTable($table_name, $entries_table, $train_table_id) {
 	$db -> query($query, $args);
 }
 
-function createInitialTravelersTable($table_name, $game_id, $train_table_id) {
+/*function createInitialTravelersTable($table_name, $game_id, $train_table_id) {
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
@@ -436,9 +436,9 @@ function createInitialTravelersTable($table_name, $game_id, $train_table_id) {
 	GROUP BY A.code;";
 	$args = array('train_table_id' => $train_table_id);
 	$db -> query($query, $args);
-}
+}*/
 
-function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_table_current, $game_id, $train_table_id) {
+function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_current, $game_id, $train_table_id) {
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
@@ -566,6 +566,7 @@ function createCurrentTravelersTable($table_name, $nwval_table_initial, $nwval_t
 			INNER JOIN " . $nwval_table_initial . " AS initial ON initial.station_id = traintablestation.id
 			INNER JOIN " . $nwval_table_current . " AS current ON current.station_id = traintablestation.id
 			WHERE train_table_id = :train_table_id
+			AND game_id = :game_id
 		) AS A 
 		UNION
 		SELECT code, travelers
