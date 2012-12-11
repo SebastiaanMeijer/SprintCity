@@ -118,8 +118,23 @@ function getMobilityDataStations() {
 	$result = $db -> query($query, $args);
 	$db -> query("COMMIT");
 
+	$sum = 0;
+	$count = 0;
 	while ($row = mysql_fetch_array($result)) {
 		$stations[] = array("code" => $row['code'], "name" => $row['name'], "networkValue" => round($row['networkValue']), "prevIU" => round($row['previousTravelers']), "currentIU" => round($row['currentTravelers']), "progIU" => 0, "cap100" => round($row['cap100']), "capOver" => round($row['capOver']), "capUnder" => round($row['capUnder']));
+		if (round($row['cap100']) > 0) {
+			$sum += round($row['cap100']);
+			$count++;
+		}
+	}
+	
+	for ($i = 0; $i < count($stations); ++$i) {
+		if ($stations[$i]['cap100'] == 0) {
+			
+			$stations[$i]['cap100'] = $sum / $count;
+			$stations[$i]['capOver'] = ($sum / $count) * 1.1;
+			$stations[$i]['capUnder'] = ($sum / $count) * 0.9;
+		}
 	}
 
 	return $stations;
