@@ -77,7 +77,8 @@ function getMobilityDataStations() {
 			   IFNULL(A.currentTravelers, 0) AS currentTravelers, 
 			   IFNULL(A.cap100, 0) AS cap100, 
 			   IFNULL(A.capOver, 0) AS capOver, 
-			   IFNULL(A.capUnder, 0) AS capUnder
+			   IFNULL(A.capUnder, 0) AS capUnder,
+			   tempTravelers.travelers AS totalTravelers
 		FROM Station
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
 		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
@@ -109,6 +110,7 @@ function getMobilityDataStations() {
 			WHERE TravelerHistory.round_info_instance_id = :round_info_instance_id - 1
 		) AS B ON B.station_id = TrainTableStation.id
 		LEFT JOIN tempNetworkValues ON tempNetworkValues.station_id = TrainTableStation.id
+		LEFT JOIN tempTravelers ON tempTravelers.station_id = TrainTableStation.id
 		WHERE TeamInstance.game_id = :game_id
 		AND train_table_id = :train_table_id
 		ORDER BY ScenarioStation.order;";
@@ -121,7 +123,16 @@ function getMobilityDataStations() {
 	$sum = 0;
 	$count = 0;
 	while ($row = mysql_fetch_array($result)) {
-		$stations[] = array("code" => $row['code'], "name" => $row['name'], "networkValue" => round($row['networkValue']), "prevIU" => round($row['previousTravelers']), "currentIU" => round($row['currentTravelers']), "progIU" => 0, "cap100" => round($row['cap100']), "capOver" => round($row['capOver']), "capUnder" => round($row['capUnder']));
+		$stations[] = array("code" => $row['code'], 
+							"name" => $row['name'], 
+							"networkValue" => round($row['networkValue']), 
+							"prevIU" => round($row['previousTravelers']), 
+							"currentIU" => round($row['currentTravelers']), 
+							"progIU" => 0, 
+							"cap100" => round($row['cap100']), 
+							"capOver" => round($row['capOver']), 
+							"capUnder" => round($row['capUnder']),
+							"totalTravelers" => round($row['totalTravelers']));
 		if (round($row['cap100']) > 0) {
 			$sum += round($row['cap100']);
 			$count++;
