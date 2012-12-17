@@ -613,6 +613,22 @@
 		{
 			$db = Database::getDatabase();
 			
+			$db->query("DELETE TravelerHistory
+			FROM TravelerHistory
+			INNER JOIN RoundInfoInstance ON RoundInfoInstance.id = TravelerHistory.round_info_instance_id
+			WHERE RoundInfoInstance.game_id = :id",
+			array('id' => $id));
+			
+			$db->query("DELETE InitialNetworkValues
+			FROM InitialNetworkValues
+			WHERE InitialNetworkValues.game_id = :id",
+			array('id' => $id));
+			
+			$db->query("DELETE InitialTravelersPerStop
+			FROM InitialTravelersPerStop
+			WHERE InitialTravelersPerStop.game_id = :id",
+			array('id' => $id));
+			
 			$db->query("DELETE Program
 			FROM Program, RoundInstance
 			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
