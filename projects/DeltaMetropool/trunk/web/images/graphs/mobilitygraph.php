@@ -173,7 +173,7 @@ function LoadTravelerDataMinMax($game_id)
 											)
 										)
 										* 
-										(count_home_total / area_cultivated_home)
+										IFNULL(count_home_total / area_cultivated_home, 0)
 									) 
 									+ 
 									SUM(Program.area_home * TypesHome.area_density)
@@ -198,7 +198,7 @@ function LoadTravelerDataMinMax($game_id)
 										)
 									)
 									* 
-									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 								) 
 								+ 
 								SUM(Program.area_work * TypesWork.people_density)
@@ -221,7 +221,7 @@ function LoadTravelerDataMinMax($game_id)
 										)
 									)
 									* 
-									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 								) 
 								+ 
 								SUM(Program.area_leisure * TypesLeisure.people_density)
@@ -234,12 +234,15 @@ function LoadTravelerDataMinMax($game_id)
 					)
 					*
 					(
-						(RoundInstance2.POVN - Station.POVN) 
-						/ 
-						Station.POVN 
-						/
-						IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
-						+ 1
+						IFNULL(
+							(RoundInstance2.POVN - StationInstance.initial_POVN) 
+							/ 
+							StationInstance.initial_POVN 
+							/
+							IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
+							+ 1
+							, 1
+						)
 					)
 				) AS TravelerCount
 				FROM Constants, Station
@@ -320,7 +323,7 @@ function LoadTravelerData($game_id, $station_id)
 										)
 									)
 									* 
-									(count_home_total / area_cultivated_home)
+									IFNULL(count_home_total / area_cultivated_home, 0)
 								) 
 								+ 
 								SUM(Program.area_home * TypesHome.area_density)
@@ -345,7 +348,7 @@ function LoadTravelerData($game_id, $station_id)
 									)
 								)
 								* 
-								(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 							) 
 							+ 
 							SUM(Program.area_work * TypesWork.people_density)
@@ -368,7 +371,7 @@ function LoadTravelerData($game_id, $station_id)
 									)
 								)
 								* 
-								(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 							) 
 							+ 
 							SUM(Program.area_leisure * TypesLeisure.people_density)
@@ -381,12 +384,15 @@ function LoadTravelerData($game_id, $station_id)
 				)
 				*
 				(
-					(RoundInstance2.POVN - Station.POVN) 
-					/ 
-					Station.POVN 
-					/
-					IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
-					+ 1
+					IFNULL (
+						(RoundInstance2.POVN - StationInstance.initial_POVN) 
+						/ 
+						StationInstance.initial_POVN 
+						/
+						IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
+						+ 1
+						, 1
+					)
 				)
 			) AS TravelerCount
 			FROM Constants, Station
