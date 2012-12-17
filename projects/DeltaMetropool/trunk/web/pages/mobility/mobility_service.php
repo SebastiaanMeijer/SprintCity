@@ -357,7 +357,7 @@ function createTempTables($game_id, $round_info_instance_id) {
 						"CREATE TEMPORARY TABLE tempEntries2 LIKE tempEntries;",
 						"CREATE TEMPORARY TABLE tempEntries3 LIKE tempEntries;",
 						"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
-						"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);", 
+						"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);",
 						"CREATE TEMPORARY TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
 	foreach ($queries as $query) {
 		$db -> query($query, array());
@@ -499,7 +499,7 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 											)
 										)
 										* 
-										(count_home_total / area_cultivated_home)
+										IFNULL(count_home_total / area_cultivated_home, 0)
 									) 
 									+ 
 									SUM(Program.area_home * TypesHome.area_density)
@@ -524,7 +524,7 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 										)
 									)
 									* 
-									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 								) 
 								+ 
 								SUM(Program.area_work * TypesWork.people_density)
@@ -547,7 +547,7 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 										)
 									)
 									* 
-									(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 								) 
 								+ 
 								SUM(Program.area_leisure * TypesLeisure.people_density)
@@ -557,15 +557,6 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 						)
 						+
 						IFNULL(SUM(Facility.travelers), 0)
-					)
-					*
-					(
-						(RoundInstance2.POVN - Station.POVN) 
-						/ 
-						Station.POVN 
-						/
-						IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 5, 20, IF((RoundInstance2.POVN - Station.POVN) / Station.POVN > 1, 15, 10))
-						+ 1
 					)
 				) AS travelers
 				FROM Constants, Station
@@ -591,7 +582,7 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 			INNER JOIN traintablestation ON A.code = traintablestation.code
 			INNER JOIN " . $nwval_table_initial . " AS initial ON initial.station_id = traintablestation.id
 			INNER JOIN " . $nwval_table_current . " AS current ON current.station_id = traintablestation.id
-			WHERE train_table_id = :train_table_id
+			WHERE traintablestation.train_table_id = :train_table_id
 			AND game_id = :game_id
 		) AS A 
 		UNION
