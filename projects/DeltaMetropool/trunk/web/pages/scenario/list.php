@@ -23,7 +23,7 @@
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t\t" . '<a href="admin.php?view=scenario&action=edit&scenario=' . $value->id . '" class="button">Wijzigen</a>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '</td>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->name . '</td>' . "\n";
+		echo "\t\t\t\t\t\t\t\t\t\t" . '<td width="200">' . $value->name . '</td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value->description . '</td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '</tr>' . "\n";
 	}
