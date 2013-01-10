@@ -8,7 +8,7 @@ Send.sendTrain = function(trainId, stationStops, callback) {
         trainId: trainId,
         stationStops: stationStops
     },
-    function(data) {},
+    callback,
     'json'
     );
 }
