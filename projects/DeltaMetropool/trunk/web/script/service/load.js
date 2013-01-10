@@ -10,7 +10,7 @@ Load.loadAll = function(callback) {
         success: callback,
         error: function() {
           console.log("Error in loading stations. Trying again...");  
-          Load.loadStations(callback);
+          Load.loadAll(callback);
         },
         dataType: 'json',
         timeout: 100000
