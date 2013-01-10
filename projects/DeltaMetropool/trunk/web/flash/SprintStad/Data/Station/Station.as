@@ -209,7 +209,7 @@
 					else
 					{
 						if (xml.name() == "bonuses" && String(xml).length > 0)
-							bonuses.splice(0, 0, String(xml).split(','));
+							bonuses = String(xml).split(',').concat(bonuses);
 						round[xml.name()] = xml;
 					}
 				}
