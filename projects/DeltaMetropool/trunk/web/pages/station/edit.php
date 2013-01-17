@@ -177,14 +177,21 @@
 			echo "\t\t\t\t\t\t\t\t\t" . '<tr class="' . $class . '">' . "\n";
 			echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value['label'] . '</td>' . "\n";
 			echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . "\n";
-			switch($value['tag'])
+			if ($value['name'] == "name")
 			{
-				case "input":
-					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . $station->{$value['name']} . '" '. $value['disabled'] . '>' . "\n";
-				break;
-				case "textarea":
-					echo "\t\t\t\t\t\t\t\t\t\t\t" . '<textarea name="' . $value['name'] . '" rows="' . $value['rows'] . '" style="width:350px;">' . $station->{$value['name']} . '</textarea>' . "\n";
-				break;
+				echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . str_replace("&shy;", "&#38shy;", $station->{$value['name']}) . '" '. $value['disabled'] . '>' . "\n";
+			}
+			else
+			{
+				switch($value['tag'])
+				{
+					case "input":
+						echo "\t\t\t\t\t\t\t\t\t\t\t" . '<input type="' . $value['type'] . '" name="' . $value['name'] . '" maxlength="' . $value['maxlength'] . '" value="' . $station->{$value['name']} . '" '. $value['disabled'] . '>' . "\n";
+					break;
+					case "textarea":
+						echo "\t\t\t\t\t\t\t\t\t\t\t" . '<textarea name="' . $value['name'] . '" rows="' . $value['rows'] . '" style="width:350px;">' . $station->{$value['name']} . '</textarea>' . "\n";
+					break;
+				}
 			}
 			echo "\t\t\t\t\t\t\t\t\t\t" . '</td>' . "\n";
 			echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $value['description'] . '</td>' . "\n";
