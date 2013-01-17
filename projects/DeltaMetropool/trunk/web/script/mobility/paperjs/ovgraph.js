@@ -41,6 +41,7 @@ Graph.drawGraph = function(){
     
     drawStationsGraph(stations);
     drawStationNetworkValue(stations);
+    drawTravelersPerDayValue(stations);
     drawStationTags(stations);
     drawStationNames(stations);
     
@@ -176,13 +177,40 @@ function drawStationNetworkValue(stations) {
     }
 }
 
+
+function drawTravelersPerDayValue(stations) {
+    // label
+    var textPoint = getCenteredStationPoint(0, 32);
+    textPoint.x -= 104;
+    var labelText = new PointText(textPoint);
+    labelText.justification = 'left';
+    labelText.characterStyle = {
+        fontSize : 11,
+        fillColor : 'black'
+    };
+    labelText.content = 'Reizigers/dag:';
+    
+    // values
+    for (var i = 0; i < stations.length; i++) {
+        var textPoint = getCenteredStationPoint(i, 32);
+
+        var networkValueText = new PointText(textPoint);
+        networkValueText.justification = 'center';
+        networkValueText.characterStyle = {
+            fontSize : 11,
+            fillColor : 'black'
+        };
+        networkValueText.content = stations[i].totalTravelers;
+    }
+}
+
 function drawStationTags(stations) {
     var rectWidth = GRAPH_WIDTH / stations.length - GRAPH_BLOCK_MARGIN * 4;
 	
     var rectSize = new Size(rectWidth, 8);
 
     for (var i = 0; i < stations.length; i++) {
-        var tagPoint = getCenteredStationPoint(i, 20, rectSize);
+        var tagPoint = getCenteredStationPoint(i, 36, rectSize);
         var tagRectangle = new Rectangle(tagPoint, rectSize);
         var tagCornerSize = new Size(4, 4);
         var path = new Path.RoundRectangle(tagRectangle, tagCornerSize);
@@ -204,34 +232,10 @@ function drawStationTags(stations) {
 }
 
 function drawStationNames(stations) {
+    $('#station-names').empty();
+    $('#station-names').append('<div class="station-label" style="width:' + getLeftMargin() + 'px;"></div>');
     for (var i = 0; i < stations.length; i++) {
-        var textPoint = getCenteredStationPoint(i, 42);
-
-        var text = new PointText(textPoint);
-        text.justification = 'center';
-        text.characterStyle = {
-            fontSize : 11,
-            fillColor : '#333333'
-        };
-
-        var stationName = stations[i].name;
-        var spaceIndex;
-                
-        if (stations.length > 6 && stations.length < 13) {
-            if(stationName.length > 13) {
-                spaceIndex = stationName.indexOf(" ", 7);
-                stationName = stationName.substring(0,spaceIndex) + "\n" + stationName.substring(spaceIndex);
-            }
-        }
-        else if (stations.length > 12) {
-            if(stationName.length > 10) {
-                spaceIndex = stationName.indexOf(" ", 8);
-                stationName = stationName.substring(0,spaceIndex) + "\n" + stationName.substring(spaceIndex);
-            }
-        }
-		
-		
-        text.content = stationName;
+       $('#station-names').append('<div class="station-label" style="width:' + getStationBlockWidth() + 'px;">' + stations[i].name + '</div>');
     };
 }
 
@@ -270,6 +274,14 @@ function getCenteredStationPoint(i, margin, rectSize) {
     var point = new Point(x, y);
 
     return point;
+}
+
+function getLeftMargin() {
+    return firstGraphBlockCenter - blockContainerWidth / 2;
+}
+
+function getStationBlockWidth() {
+    return blockContainerWidth;
 }
 
 Graph.clearPaper = function(){

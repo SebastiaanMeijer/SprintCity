@@ -1,4 +1,4 @@
-function Station(name, networkValue, prevIU, currentIU, progIU, cap100, capOver, capUnder) {
+function Station(name, networkValue, prevIU, currentIU, progIU, cap100, capOver, capUnder, totalTravelers) {
     this.name = name;
     this.networkValue = networkValue;
 
@@ -7,6 +7,8 @@ function Station(name, networkValue, prevIU, currentIU, progIU, cap100, capOver,
     this.progIU = progIU;
 
     this.cap100 = cap100;
+    
+    this.totalTravelers = totalTravelers;
     
     if (capOver != -1 && capUnder != -1) {
         this.capOver = capOver;    
@@ -40,7 +42,8 @@ Station.fillStations = function(data) {
                 data['stations'][i].progIU,
                 data['stations'][i].cap100,
                 data['stations'][i].capOver,
-                data['stations'][i].capUnder
+                data['stations'][i].capUnder,
+                data['stations'][i].totalTravelers
                 ));
     }
 }

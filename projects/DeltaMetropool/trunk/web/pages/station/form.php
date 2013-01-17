@@ -31,10 +31,10 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "name",
 			"label" => "Naam",
-			"description" => "",
+			"description" => "Gebruik wanneer nodig <i>&#38;shy;</i> op plaatsen waar het mogelijk is de naam op te breken (dit wordt gebruikt wanneer er weinig ruimte voor de station naam is in de OV applicatie grafiek).",
 			"type" => "text",
 			"maxlength" => 255,
-			"disabled" => $disabled
+			"disabled" => ""
 		),
 		2 => array
 		(

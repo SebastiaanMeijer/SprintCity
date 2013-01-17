@@ -53,13 +53,17 @@
 			echo "\t" . '<station>' . "\n";
 			foreach ($station_fields as $station_field)
 			{
-				if ($station_field != 'POVN')
+				switch($station_field)
 				{
-					echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
-				}
-				else
-				{
-					echo "\t\t" . '<POVN>' . $station_row['initial_POVN'] . '</POVN>' . "\n";
+					case 'POVN':
+						echo "\t\t" . '<POVN>' . $station_row['initial_POVN'] . '</POVN>' . "\n";
+						break;
+					case 'name':
+						echo "\t\t" . '<name>' . str_replace("&shy;", "", $station_row['name']) . '</name>' . "\n";
+						break;
+					default:
+						echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
+						break;
 				}
 			}
 			

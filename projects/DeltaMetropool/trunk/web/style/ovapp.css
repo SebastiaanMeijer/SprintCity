@@ -163,3 +163,13 @@
     border-right-color: #000000;
 }
 
+.station-label {
+	float: left;
+	display: inline-block;
+	background-color: white;
+	min-height: 10;
+	font-family: Arial;
+	font-size: 8pt;
+	color: #333333;
+}
+

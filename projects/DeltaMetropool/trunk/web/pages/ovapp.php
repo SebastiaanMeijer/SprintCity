@@ -105,6 +105,8 @@
 </script>
 <!-- HTML STUFF -->
 <div id="grafiek">
-    <canvas id="graphCanvas" width=886 height=250></canvas>
+    <canvas id="graphCanvas" width=886 height=240></canvas>
+</div>
+<div id="station-names" width=886>
 </div>
 <div id="trajecten-container"></div>
