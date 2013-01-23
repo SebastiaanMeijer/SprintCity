@@ -37,7 +37,12 @@
 		private var parent:SprintStad = null;
 		private var selection:StationSelection = new StationSelection();
 		
+		private var previousRoundId:int = -1;
 		private var loadCount:int = 0;
+		private var targetLoadCount:int = int.MAX_VALUE;
+		
+		private var initialMapScaleX:Number = Number.MIN_VALUE;
+		private var initialMapScaleY:Number = Number.MIN_VALUE;
 		
 		private var barInitial:AreaBarDrawer;
 		private var barMasterplan:AreaBarDrawer;
@@ -62,16 +67,6 @@
 		private function Init():void
 		{
 			var stations:Stations = Data.Get().GetStations();
-			// set map position
-			parent.overview_movie.map.x = stations.MapX;
-			parent.overview_movie.map.y = stations.MapY;
-			// Scale according to scenario
-			var relPosX:Number = parent.overview_movie.map.x / parent.overview_movie.map.width;
-			var relPosY:Number = parent.overview_movie.map.y / parent.overview_movie.map.height;
-			parent.overview_movie.map.scaleX *= stations.ScaleFactor;
-			parent.overview_movie.map.scaleY *= stations.ScaleFactor;
-			parent.overview_movie.map.x = relPosX * parent.overview_movie.map.width + (.5 * parent.stage.stageWidth * (1-stations.ScaleFactor));
-			parent.overview_movie.map.y = relPosY * parent.overview_movie.map.height + (.5 * parent.stage.stageHeight * (1-stations.ScaleFactor));
 
 			// setup station circles
 			FillStationCircles(stations);
@@ -104,12 +99,11 @@
 				
 				parent.addChild(SprintStad.LOADER);
 				
-				//LoadStations();
-				Debug.out("Load the stations");
-				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
-				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
-				DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
-				DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
+				Debug.out("Load data");
+				DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingCurrentRoundDone);
+				
+				// refresh background map
+				RefreshMap();
 				
 				// buttons
 				view.program_button.buttonMode = true;
@@ -132,7 +126,10 @@
 				barPlanned = new AreaBarDrawer(spacePanel.graph_planned);
 				barAllocated = new AreaBarDrawer(spacePanel.graph_allocated);
 				
-				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				// only initially load lineGraphDrawer, otherwise this is done in OnLoadingCurrentRoundDone()
+				if (lineGraphDrawer == null)
+					lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				
 				// station buttons
 				for (var i:int = 0; i < stations.GetStationCount(); i++)
 				{
@@ -181,6 +178,29 @@
 			RefreshLineGraphs(station);
 			RefreshFacilities(station);
 			RefreshTransformArea(station);
+		}
+		
+		private function RefreshMap():void
+		{
+			var stations:Stations = Data.Get().GetStations();
+			
+			// take not of initial map scale if not already done so
+			if (initialMapScaleX == Number.MIN_VALUE && initialMapScaleY == Number.MIN_VALUE)
+			{
+				initialMapScaleX = parent.overview_movie.map.scaleX;
+				initialMapScaleY = parent.overview_movie.map.scaleY;
+			}
+			
+			// set map position
+			parent.overview_movie.map.x = stations.MapX;
+			parent.overview_movie.map.y = stations.MapY;
+			// Scale according to scenario
+			var relPosX:Number = parent.overview_movie.map.x / parent.overview_movie.map.width;
+			var relPosY:Number = parent.overview_movie.map.y / parent.overview_movie.map.height;
+			parent.overview_movie.map.scaleX = initialMapScaleX * stations.ScaleFactor;
+			parent.overview_movie.map.scaleY = initialMapScaleY * stations.ScaleFactor;
+			parent.overview_movie.map.x = relPosX * parent.overview_movie.map.width + (.5 * parent.stage.stageWidth * (1-stations.ScaleFactor));
+			parent.overview_movie.map.y = relPosY * parent.overview_movie.map.height + (.5 * parent.stage.stageHeight * (1-stations.ScaleFactor));
 		}
 		
 		private function RefreshStationCircles():void
@@ -707,11 +727,41 @@
 				parent.gotoAndPlay(SprintStad.FRAME_ROUND);
 		}
 		
+		public function OnLoadingCurrentRoundDone(data:int):void
+		{
+			Debug.out(this + " I know " + data);
+			
+			// determine further loading
+			targetLoadCount = 0;
+			
+			// only load if the round has changed
+			if (previousRoundId < Data.Get().current_round_id)
+			{
+				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+				DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
+				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				targetLoadCount += 2;
+			}
+			// only load values if -in- or -just out of- masterplan phase
+			if (Data.Get().current_round_id == 1 || previousRoundId == 1)
+			{
+				DataLoader.Get().AddJob(DataLoader.DATA_VALUES, OnLoadingDone);
+				targetLoadCount += 1;
+			}
+			
+			// set previous to current round
+			previousRoundId = Data.Get().current_round_id;
+			
+			// if nothing needs to be loaded, just call OnLoadingDone with a dummy value to run the UI init code
+			if (targetLoadCount == 0)
+				OnLoadingDone( -1);
+		}
+		
 		public function OnLoadingDone(data:int):void
 		{
 			Debug.out(this + " I know " + data);
 			loadCount++;
-			if (loadCount >= 4)
+			if (loadCount >= targetLoadCount)
 			{
 				loadCount = 0;
 				Init();
