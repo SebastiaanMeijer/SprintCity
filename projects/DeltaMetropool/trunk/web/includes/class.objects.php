@@ -613,6 +613,7 @@
 		{
 			$db = Database::getDatabase();
 			
+			// delete OV data
 			$db->query("DELETE TravelerHistory
 			FROM TravelerHistory
 			INNER JOIN RoundInfoInstance ON RoundInfoInstance.id = TravelerHistory.round_info_instance_id
@@ -629,6 +630,29 @@
 			WHERE InitialTravelersPerStop.game_id = :id",
 			array('id' => $id));
 			
+			$db->query("DELETE TrainTableEntryInstance
+			FROM TrainTableEntryInstance
+			INNER JOIN RoundInfoInstance ON TrainTableEntryInstance.round_info_instance_id = RoundInfoInstance.id
+			WHERE RoundInfoInstance.game_id = :id",
+			array('id' => $id));
+			
+			// delete province data
+			$db->query("DELETE FacilityInstance
+			FROM FacilityInstance
+			INNER JOIN RoundInstance ON FacilityInstance.round_instance_id = RoundInstance.id
+			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			WHERE TeamInstance.game_id = :id",
+			array('id' => $id));
+			
+			$db->query("DELETE TypeRestriction
+			FROM TypeRestriction
+			INNER JOIN StationInstance ON TypeRestriction.station_instance_id = StationInstance.id
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			WHERE TeamInstance.game_id = :id",
+			array('id' => $id));
+			
+			// delete team data
 			$db->query("DELETE Program
 			FROM Program, RoundInstance
 			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
