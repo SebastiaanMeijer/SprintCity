@@ -37,6 +37,7 @@
 	{
 		global $scenarioId, $scenario, $stations, $otherStations, $demand, $types, $usedRoundInfos, $scenarioInUse;
 		$scenarioInUse = Scenario::isScenarioInUse($scenarioId);
+		$scenarioInUse = false;
 		if (isset($_POST['FormAction']))
 		{		
 			$stations = array();
