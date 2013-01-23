@@ -38,10 +38,9 @@
 	{
 		global $disabled, $stationId, $station, $rounds, $usedRoundInfos;
 		$inUse = Station::isStationInUse($stationId);
+		$inUse = false;
 		FormInit($inUse);
-		if($inUse)
-			$disabled = "DISABLED";
-			
+		
 		if (isset($_POST['FormAction']))
 		{
 			if (!is_null($stationId))
@@ -242,7 +241,6 @@
 	function GenerateRoundsForm($rounds)
 	{
 		global $class, $usedRoundInfos, $disabled;
-		echo $disabled
 ?>
 								<table class="data">
 									<tr>
@@ -283,20 +281,17 @@
 						<tr>
 							
 								<?php
-									if($disabled != "")
+									$games = Station::getGamesByStation($station->id);
+									
+									if (mysql_num_rows($games) > 0)
 									{
-										$games = Station::getGamesByStation($station->id);
-										
-										echo "<td>Dit station is momenteel in gebruik in een spel. Verwijder de volgende spel(len) om het station te mogen wijzigen:<br><br>";
-										echo "<ul>";
+										$messages = array();
+										$messages[0] = "Het wijzigen van dit station heeft effect op spel(len): ";
 										while ($row = mysql_fetch_array($games))
 										{
-											echo "<li>";
-											echo $row["id"]." ".$row["name"]."<br>";
-											echo "</li>";
+											$messages[0] .= $row["id"]." - ".$row["name"].", ";
 										}
-										echo "</ul>";
-										echo "</td>";
+										DisplayMessage("warning", "Waarschuwing", $messages);
 									}
 								?>
 									

@@ -10,9 +10,7 @@ $form_fields_transform;
 function FormInit($inUse)
 {
 	$disabled = "";
-	if($inUse)
-		$disabled = "DISABLED";
-		
+	
 	global $form_fields_stats, $form_fields_profile, $form_fields_area, $form_fields_transform;
 	$form_fields_stats = array
 	(
