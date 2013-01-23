@@ -233,7 +233,7 @@ function drawStationTags(stations) {
 
 function drawStationNames(stations) {
     $('#station-names').empty();
-    $('#station-names').append('<div class="station-label" style="width:' + getLeftMargin() + 'px;"></div>');
+    $('#station-names').append('<div class="station-label" style="width:' + getLeftMargin() + 'px;">&nbsp;</div>');
     for (var i = 0; i < stations.length; i++) {
        $('#station-names').append('<div class="station-label" style="width:' + getStationBlockWidth() + 'px;">' + stations[i].name + '</div>');
     };
