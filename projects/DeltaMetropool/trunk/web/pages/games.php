@@ -59,7 +59,7 @@
 ?>
 				</td>
 				<td>
-					<button type="submit" onclick="return confirm('Weet u zeker dat u dit spel wilt verwijderen?');" name="Action" value="delete_game,<?php echo $key; ?>">Verwijder</button>				
+					<button type="submit" onclick="return confirm('Weet u zeker dat u dit spel wilt verwijderen?');" name="Action" value="delete_game,<?php echo $key; ?>">Verwijder</button>
 			</tr>
 <?php
 	}
