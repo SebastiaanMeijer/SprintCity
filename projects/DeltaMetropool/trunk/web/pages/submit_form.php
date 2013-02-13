@@ -344,7 +344,7 @@ function CalculateFinalPrograms($game_id)
 	/*
 	 * Procedure:
 	 * 1. Just copy all plan programs to the exec(final) programs
-	 * 2. Add all demand area (D) of all types of all rounds until and including the current round
+	 * 2. Add all demand area(marktvraag) (D) of all types of all rounds until and including the current round
 	 * 3. Add all exec (final) program area (P) of all types of all rounds until and including the current round
 	 * 4. D - P = Shortage of area
 	 * 5. If the shortage is lower than 0 reduce the station exec programs areas according to their area type.
@@ -518,6 +518,7 @@ function CalculateFinalPrograms($game_id)
 		$area_used_value = isset($area_used[$type]) ? $area_used[$type] : 0;
 		if ($area_used_value + $area_planned[$type] > $demand[$type])
 		{
+			echo "<b>Start Distributing area: " . ($demand[$type] - $area_used_value) . " of type: " . $type . "</b><br>";
 			switch($type_id[$type])
 			{
 				case 'home':
@@ -531,6 +532,7 @@ function CalculateFinalPrograms($game_id)
 					break;
 				default:
 			}
+			echo "<br>";
 		}
 	}
 }
@@ -543,10 +545,17 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 	$db = Database::getDatabase();
 	$query = "
 		SELECT 
+			Station.name AS name,
 			Program.id AS id, 
 			Program.area_home AS area, 
-			ABS(Station.count_home_total / Station.area_cultivated_home - Types.area_density) AS density_delta, 
-			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta 
+			Station.count_home_total / Station.area_cultivated_home AS density, 
+			RoundInstance.POVN AS povn, 
+			Types.area_density AS type_density, 
+			Types.POVN AS type_povn, 
+			MIN(TypeExtremes.area_density) AS min_density, 
+			MAX(TypeExtremes.area_density) AS max_density, 
+			MIN(TypeExtremes.POVN) AS min_povn, 
+			MAX(TypeExtremes.POVN) AS max_povn
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -555,11 +564,13 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 		INNER JOIN Game ON TeamInstance.game_id = Game.id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN Types ON Program.type_home = Types.id 
+		INNER JOIN Types AS TypeExtremes ON Types.type = TypeExtremes.type
 		WHERE 
 			Game.id = :game_id AND 
 			Program.type_home = :type AND 
 			Program.area_home > 0 AND 
-			Round.round_info_id = Game.current_round_id;";
+			Round.round_info_id = Game.current_round_id
+		GROUP BY Station.id;";
 	$args = array(
 		'game_id' => $game_id, 
 		'type' => $type);
@@ -572,7 +583,7 @@ function RedistributeAreaOfHomeType($game_id, $type, $distribute_area)
 	$data = DistributeArea($data, $distribute_area);
 	
 	// commit the redistributed data in the programs
-	foreach ($data as $key => $value)
+	foreach ($data['entries'] as $key => $value)
 	{
 		$updateQuery = "
 			UPDATE `Program` 
@@ -593,10 +604,17 @@ function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 	$db = Database::getDatabase();
 	$query = "
 		SELECT 
+			Station.name AS name,
 			Program.id AS id, 
 			Program.area_work AS area, 
-			ABS(Station.count_work_total / Station.area_cultivated_work - Types.area_density) AS density_delta, 
-			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta
+			Station.count_home_total / Station.area_cultivated_home AS density, 
+			RoundInstance.POVN AS povn, 
+			Types.area_density AS type_density, 
+			Types.POVN AS type_povn, 
+			MIN(TypeExtremes.area_density) AS min_density, 
+			MAX(TypeExtremes.area_density) AS max_density, 
+			MIN(TypeExtremes.POVN) AS min_povn, 
+			MAX(TypeExtremes.POVN) AS max_povn
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -605,11 +623,13 @@ function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 		INNER JOIN Game ON TeamInstance.game_id = Game.id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN Types ON Program.type_work = Types.id 
+		INNER JOIN Types AS TypeExtremes ON Types.type = TypeExtremes.type
 		WHERE 
 			Game.id = :game_id AND 
 			Program.type_work = :type AND 
 			Program.area_work > 0 AND 
-			Round.round_info_id = Game.current_round_id;";
+			Round.round_info_id = Game.current_round_id
+		GROUP BY Station.id;";
 	$args = array(
 		'game_id' => $game_id, 
 		'type' => $type);
@@ -622,7 +642,7 @@ function RedistributeAreaOfWorkType($game_id, $type, $distribute_area)
 	$data = DistributeArea($data, $distribute_area);
 	
 	// commit the redistributed data in the programs
-	foreach ($data as $key => $value)
+	foreach ($data['entries'] as $key => $value)
 	{
 		$updateQuery = "
 			UPDATE `Program` 
@@ -642,9 +662,13 @@ function RedistributeAreaOfLeisureType($game_id, $type, $distribute_area)
 	$db = Database::getDatabase();
 	$query = "
 		SELECT 
+			Station.name AS name,
 			Program.id AS id, 
 			Program.area_leisure AS area,
-			ABS(RoundInstance.POVN - Types.POVN) AS povn_delta 
+			RoundInstance.POVN AS povn, 
+			Types.POVN AS type_povn, 
+			MIN(TypeExtremes.POVN) AS min_povn, 
+			MAX(TypeExtremes.POVN) AS max_povn
 		FROM Station 
 		INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
 		INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 
@@ -653,11 +677,13 @@ function RedistributeAreaOfLeisureType($game_id, $type, $distribute_area)
 		INNER JOIN Game ON TeamInstance.game_id = Game.id 
 		INNER JOIN Round ON RoundInstance.round_id = Round.id 
 		INNER JOIN Types ON Program.type_leisure = Types.id 
+		INNER JOIN Types AS TypeExtremes ON Types.type = TypeExtremes.type
 		WHERE 
 			Game.id = :game_id AND 
 			Program.type_leisure = :type AND 
 			Program.area_leisure > 0 AND 
-			Round.round_info_id = Game.current_round_id;";
+			Round.round_info_id = Game.current_round_id
+		GROUP BY Station.id;";
 	$args = array(
 		'game_id' => $game_id, 
 		'type' => $type);
@@ -665,12 +691,12 @@ function RedistributeAreaOfLeisureType($game_id, $type, $distribute_area)
 	
 	// structure the data
 	$data = StructureRedistributeData($result);
-		
+	
 	// distribute the available area based on the structured data
 	$data = DistributeArea($data, $distribute_area);
 	
 	// commit the redistributed data in the programs
-	foreach ($data as $key => $value)
+	foreach ($data['entries'] as $key => $value)
 	{
 		$updateQuery = "
 			UPDATE `Program` 
@@ -687,36 +713,73 @@ function StructureRedistributeData($result)
 {
 	// structure the data
 	$data = array();
+	$data['entries'] = array();
+	$data['totals'] = array();
 	$index = 0;	
 	while ($row = mysql_fetch_array($result))
 	{
+		$data['entries'][$index]['station'] = $row['name'];
 		// program id
-		$data[$index]['id'] = $row['id'];
+		$data['entries'][$index]['id'] = $row['id'];
 		// desired area
-		$data[$index]['area'] = $row['area'];
+		$data['entries'][$index]['area'] = $row['area'];
 		// definitive area assigned to this station
-		$data[$index]['def_area'] = 0;
+		$data['entries'][$index]['def_area'] = 0;
 		// difference between the typical resident density of the type and 
 		// the resient density of the station who issued this program
-		if (isset($row['density_delta']))
-			$data[$index]['density_delta'] = $row['density_delta'];
+		// clamped between min and max type density, this helps extreme stations to be the best for their respective types
+		if (isset($row['density']))
+			$data['entries'][$index]['density_delta'] = abs(max($row['min_density'], min($row['max_density'], $row['density'])) - $row['type_density']);
 		else
-			$data[$index]['density_delta'] = 0;
+			$data['entries'][$index]['density_delta'] = 0;
 		// difference between the typical povn of the type and
 		// the povn of the station who issued this program
-		$data[$index]['povn_delta'] = $row['povn_delta'];
+		// clamped between min and max type povn, this helps extreme stations to be the best for their respective types
+		$data['entries'][$index]['povn_delta'] = abs(max($row['min_povn'], min($row['max_povn'], $row['povn'])) - $row['type_povn']);
+		
 		// need more index!
 		$index++;
 	}
 	
-	// invert deltas
-	$count = sizeof($data);
-	for ($i = 0; $i < floor($count / 2); $i++)
+	$data = CalculateTotals($data);
+	
+	return $data;
+}
+
+function CalculateTotals($data)
+{
+	// calc the total density delta to properly scale over all stations
+	$data['totals']['total_density_delta'] = 0;
+	$data['totals']['max_density_delta'] = 0;
+	$data['totals']['total_povn_delta'] = 0;
+	$data['totals']['max_povn_delta'] = 0;
+	$data['totals']['candidates'] = 0;
+	foreach ($data['entries'] as $index => $row)
 	{
-		$j = $count - $i - 1;
-		// swap vars
-		list($data[$i]['density_delta'], $data[$j]['density_delta']) = array($data[$j]['density_delta'], $data[$i]['density_delta']);
-		list($data[$i]['povn_delta'], $data[$j]['povn_delta']) = array($data[$j]['povn_delta'], $data[$i]['povn_delta']);
+		// only do this when the station can actually accept more area
+		if ($row['def_area'] < $row['area'])
+		{
+			$data['totals']['total_density_delta'] += $row['density_delta'];
+			$data['totals']['max_density_delta'] = max($data['totals']['max_density_delta'], $row['density_delta']);
+			$data['totals']['total_povn_delta'] += $row['povn_delta'];
+			$data['totals']['max_povn_delta'] = max($data['totals']['max_povn_delta'], $row['povn_delta']);
+			$data['totals']['candidates']++;
+		}
+	}
+	
+	// calc fractions and total fraction
+	$data['totals']['total_fraction'] = 0;
+	foreach ($data['entries'] as $index => $row)
+	{
+		// only do this when the station can actually accept more area
+		if ($row['def_area'] < $row['area'])
+		{
+			$fraction = 
+				(1 - $row['density_delta'] / $data['totals']['max_density_delta'] + 1 / $data['totals']['candidates']) + 
+				(1 - $row['povn_delta'] / $data['totals']['max_povn_delta'] + 1 / $data['totals']['candidates']);
+			$data['entries'][$index]['fraction'] = $fraction;
+			$data['totals']['total_fraction'] += $fraction;
+		}
 	}
 	
 	return $data;
@@ -726,8 +789,6 @@ function StructureRedistributeData($result)
 // over the programs based on the provided density and povn data
 function DistributeArea($data, $distribute_area)
 {
-	$total_density_delta = 0;
-	$total_povn_delta = 0;
 	$remainder = 0;
 	$start_distribute_area = $distribute_area;
 	
@@ -735,31 +796,20 @@ function DistributeArea($data, $distribute_area)
 	if ($distribute_area == 0)
 		return $data;
 	
-	// calc the total density delta to properly scale over all stations
-	foreach ($data as $index => $row)
-	{
-		// only do this when the station can actually accept more area
-		if ($row['def_area'] < $row['area'])
-		{
-			$total_density_delta += $row['density_delta'];
-			$total_povn_delta += $row['povn_delta'];
-		}
-	}
-	
+	$debug = "<pre>Distribute area: " . $distribute_area . " pieces: <br>";
 	// distribute!
-	foreach ($data as $index => $row)
+	foreach ($data['entries'] as $index => $row)
 	{
 		// only distribute if the station can actually accept more area
 		if ($row['def_area'] < $row['area'])
 		{
-			// calc fraction of total based on density/povn
-			$density_fraction = $total_density_delta != $row['density_delta'] ? $row['density_delta'] / $total_density_delta : 1;
-			$povn_fraction = $total_povn_delta != $row['povn_delta'] ? $row['povn_delta'] / $total_povn_delta : 1;
 			// calc what this fraction means in terms of area
-			$piece_of_the_pie = round(($density_fraction + $povn_fraction) * 0.5 * $distribute_area);
+			$piece_of_the_pie = round($row['fraction'] / $data['totals']['total_fraction'] * $distribute_area);
+			
+			$debug .= "\t" . $row['station'] . "(dd:" . $row['density_delta'] . ", pd: " . $row['povn_delta'] . ", pop: " . round($row['fraction'] / $data['totals']['total_fraction'] * 100) . "%): " . $piece_of_the_pie . "/" . $row['area'] . "<br>";
 			// make sure not more area is given than requested in the program
 			$final_value = min($piece_of_the_pie, $row['area'] - $row['def_area']);
-			$data[$index]['def_area'] += $final_value;
+			$data['entries'][$index]['def_area'] += $final_value;
 			// if more was given, store how much of area is left
 			$remainder += $piece_of_the_pie - $final_value;
 			
@@ -767,7 +817,11 @@ function DistributeArea($data, $distribute_area)
 			$distribute_area -= $piece_of_the_pie;
 		}
 	}
-		
+	$debug .= "</pr>";
+	echo $debug;
+	// if stations are full, recalculate totals
+	if ($remainder > 0)
+		$data = CalculateTotals($data);
 	// stop if the area can't be devided honoustly
 	if ($start_distribute_area == ($distribute_area + $remainder))
 		return $data;
