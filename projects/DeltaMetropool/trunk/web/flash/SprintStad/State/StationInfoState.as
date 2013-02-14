@@ -141,7 +141,8 @@
 				stationInstance.transform_area_undeveloped_urban +
 				stationInstance.transform_area_undeveloped_rural) + " ha resterend.)";
 			
-			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
+			//view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
+			view.current_info.amount_travelers.text = station.count_travelers;	// cheat to make the traveler count exactly the same as the ov app
 			view.current_info.amount_citizens.text = StationStatsCalculator.GetCitizenStats(stationInstance);
 			view.current_info.amount_workers.text = Math.round(stationInstance.count_worker_total);
 			view.current_info.amount_houses.text = Math.round(stationInstance.count_home_total);

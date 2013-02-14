@@ -50,6 +50,7 @@
 		public var count_work_transform:int = 0;
 		public var count_worker_total:int = 0;
 		public var count_worker_transform:int = 0;
+		public var count_travelers:int = 0;
 		public var currentIU:int = 0;
 		public var capUnder:int = 0;
 		public var capOver:int = 0;
