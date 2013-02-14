@@ -148,10 +148,12 @@
 			if (title == "TOEKOMST")
 			{
 				transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), CreateProgram());
+				clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			}
 			else
 			{
 				transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), null);
+				clip.amount_travelers.text = station.station.count_travelers;
 			}
 			
 			clip.transform_area.text = "(" + Math.round( 
@@ -161,7 +163,6 @@
 				station.transform_area_undeveloped_urban +
 				station.transform_area_undeveloped_rural) + " ha resterend.)";
 				
-			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);
 			clip.amount_workers.text = Math.round(station.count_worker_total);
 			clip.amount_houses.text = Math.round(station.count_home_total);

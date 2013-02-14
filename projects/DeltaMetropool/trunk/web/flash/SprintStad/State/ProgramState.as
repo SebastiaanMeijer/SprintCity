@@ -133,7 +133,14 @@
 				0);
 			clip.transform_area.text = "(" + Math.round( station.GetTotalTransformArea()) + " ha resterend.)";
 			
-			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
+			if (title == "TOEKOMST")
+			{
+				clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
+			}
+			else
+			{
+				clip.amount_travelers.text = station.station.count_travelers;
+			}
 			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);
 			clip.amount_workers.text = Math.round(station.count_worker_total);
 			clip.amount_houses.text = Math.round(station.count_home_total);
