@@ -335,6 +335,9 @@ function ResetPlanPrograms($game_id, $round_id)
 
 function NextStepGame($vars)
 {
+	// debug
+	echo '<a href="/Sprintstad/admin.php?view=games&page=' . (isset($_REQUEST['page']) ? $_REQUEST['page'] : 1) . '">Continue</a><br>';
+	
 	CalculateFinalPrograms($vars[1]);
 	SetNextRound($vars[1]);
 }
