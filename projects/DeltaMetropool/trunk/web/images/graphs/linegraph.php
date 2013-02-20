@@ -205,7 +205,7 @@ class LineGraph
 		}
 		else
 		{
-			$text = 'Waiting for input...';
+			$text = '';
 			
 			$this->DrawText($text,
 				$this->sidePadding + 10,

@@ -572,7 +572,7 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
 				LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
 				LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 				WHERE Game.id = :game_id
