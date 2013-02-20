@@ -109,7 +109,7 @@
 				if (round.round_info_id == id)
 					return round;
 			}
-			return null;
+			return round;
 		}
 		
 		public function GetCurrentRound():Round
