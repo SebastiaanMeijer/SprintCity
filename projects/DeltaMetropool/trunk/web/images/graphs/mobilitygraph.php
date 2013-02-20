@@ -17,12 +17,6 @@ require_once('linegraph.php');
 	
 	$povnData = LoadPOVNData($gameId, $stationId);
 	$travelerData = LoadTravelerData($gameId, $stationId);
-	$initTravelerCount = Station::GetInitialTravelerCount($stationId);
-	
-	if(isset($initTravelerCount))
-		array_unshift($travelerData, $initTravelerCount);
-	else
-		$travelerData = array($initTravelerCount);
 	
 	if (count($povnData) == 0)
 		$povnData = array(0);
@@ -131,7 +125,7 @@ function LoadPOVNDataMinMax($game_id)
 				INNER JOIN Game ON TeamInstance.game_id = Game.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id
 				WHERE Game.id = :game_id 
-				AND Round.round_info_id < Game.current_round_id
+				AND Round.round_info_id <= Game.current_round_id
 			) AS t1 LIMIT 0,1;";
 		$args = array('game_id' => $game_id);
 		$result = $db->query($query, $args);
@@ -258,7 +252,7 @@ function LoadTravelerDataMinMax($game_id)
 				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
 				LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
 				LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 				WHERE Game.id = :game_id
@@ -292,7 +286,7 @@ function LoadPOVNData($game_id, $station_id)
 					INNER JOIN Round ON RoundInstance.round_id = Round.id
 					WHERE Game.id = :game_id 
 					AND StationInstance.station_id = :station_id
-					AND Round.round_info_id < Game.current_round_id;
+					AND Round.round_info_id <= Game.current_round_id;
 				";
 		$args = array('game_id' => $game_id, 'station_id' => $station_id);
 		$result = $db->query($query, $args);
@@ -408,7 +402,7 @@ function LoadTravelerData($game_id, $station_id)
 			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
 			INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 			INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id < current_round_id
+			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
 			LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
 			LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
 			WHERE Game.id = :game_id AND Station.id = :station_id
