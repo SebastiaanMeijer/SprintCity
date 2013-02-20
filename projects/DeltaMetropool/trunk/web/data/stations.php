@@ -62,7 +62,8 @@
 						echo "\t\t" . '<name>' . str_replace("&shy;", "", $station_row['name']) . '</name>' . "\n";
 						break;
 					case 'count_travelers':
-						echo "\t\t" . '<count_travelers>' . getMobilityDataForStation($train_data, $station_row['code'])['totalTravelers'] . '</count_travelers>' . "\n";
+						$mobility_data = getMobilityDataForStation($train_data, $station_row['code']);
+						echo "\t\t" . '<count_travelers>' . $mobility_data['totalTravelers'] . '</count_travelers>' . "\n";
 						break;
 					default:
 						echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";
