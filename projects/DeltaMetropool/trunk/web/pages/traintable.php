@@ -35,7 +35,7 @@ else
 						<tr class="error">
 							<td>
 								Geen bestand gevonden. Het geselecteerde bestand overschrijdt waarschijnlijk het upload limiet van <?php echo getUploadLimit(); ?>MB.
-								Maak een backup van de excel file en verwijder de volgende werkbladen om de file te verkleinen: deelnw, gemstat, iuperstop, Achtergrond, Speelscherm.
+								Verander de volgende variablen in de php.ini: post_max_size=20M, upload_max_filesize=20M.
 							</td>
 						</tr>
 <?php

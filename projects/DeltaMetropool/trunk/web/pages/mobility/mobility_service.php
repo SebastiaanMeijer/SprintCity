@@ -123,6 +123,7 @@ function getMobilityDataStations() {
 	$sum = 0;
 	$count = 0;
 	while ($row = mysql_fetch_array($result)) {
+		$count++;
 		$stations[] = array("code" => $row['code'], 
 							"name" => $row['name'], 
 							"networkValue" => round($row['networkValue']), 
@@ -135,7 +136,6 @@ function getMobilityDataStations() {
 							"totalTravelers" => round($row['totalTravelers']));
 		if (round($row['cap100']) > 0) {
 			$sum += round($row['cap100']);
-			$count++;
 		}
 	}
 	
