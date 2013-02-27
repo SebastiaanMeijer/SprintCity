@@ -25,6 +25,8 @@
 		
 		public function Round() 
 		{
+			plan_program = Program.Default();
+			exec_program = Program.Default();
 		}
 	}
 }
