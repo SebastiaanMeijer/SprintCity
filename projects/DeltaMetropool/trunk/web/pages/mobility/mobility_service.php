@@ -123,7 +123,6 @@ function getMobilityDataStations() {
 	$sum = 0;
 	$count = 0;
 	while ($row = mysql_fetch_array($result)) {
-		$count++;
 		$stations[] = array("code" => $row['code'], 
 							"name" => $row['name'], 
 							"networkValue" => round($row['networkValue']), 
@@ -135,6 +134,7 @@ function getMobilityDataStations() {
 							"capUnder" => round($row['capUnder']),
 							"totalTravelers" => round($row['totalTravelers']));
 		if (round($row['cap100']) > 0) {
+			$count++;
 			$sum += round($row['cap100']);
 		}
 	}
@@ -352,13 +352,29 @@ function createTempTables($game_id, $round_info_instance_id) {
 	$db = Database::getDatabase();
 
 	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
-
-	$queries = array(	"CREATE TEMPORARY TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
-						"CREATE TEMPORARY TABLE tempEntries2 LIKE tempEntries;",
-						"CREATE TEMPORARY TABLE tempEntries3 LIKE tempEntries;",
-						"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
-						"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);",
-						"CREATE TEMPORARY TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	
+	//debug
+	/*
+	$queries = array(
+		"CREATE TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
+		"CREATE TABLE tempEntries2 LIKE tempEntries;",
+		"CREATE TABLE tempEntries3 LIKE tempEntries;",
+		"CREATE TABLE tempNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
+		"CREATE TABLE tempTravelers (station_id INT, travelers INT);",
+		"CREATE TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);"
+	);
+	*/
+	// release
+	
+	$queries = array(
+		"CREATE TEMPORARY TABLE tempEntries (train_id INT, station_id INT, frequency INT);", 
+		"CREATE TEMPORARY TABLE tempEntries2 LIKE tempEntries;",
+		"CREATE TEMPORARY TABLE tempEntries3 LIKE tempEntries;",
+		"CREATE TEMPORARY TABLE tempNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
+		"CREATE TEMPORARY TABLE tempTravelers (station_id INT, travelers INT);",
+		"CREATE TEMPORARY TABLE tempTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);"
+	);
+	
 	foreach ($queries as $query) {
 		$db -> query($query, array());
 	}
