@@ -268,7 +268,7 @@ function writeTravelersHistory($game_id, $round_info_instance_id) {
 	$db -> query("COMMIT");
 }
 
-function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
+function updateNetworkValues($game_id, $current_round_instance_id, $next_round_id) {
 	$db = Database::getDatabase();
 	$db -> query("START TRANSACTION");
 
@@ -277,7 +277,7 @@ function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
 	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
 	
 	$query = "
-		SELECT ScenarioStations.station_id, tempNetworkValues.networkValue
+		SELECT ScenarioStations.station_id, (tempNetworkValues.networkValue + tempNetworkValues.chainValue) AS networkValue
 		FROM (
 			SELECT Station.id AS station_id, TrainTableStation.id AS train_table_station_id
 			FROM Station 
@@ -298,15 +298,17 @@ function updateNetworkValues($game_id, $current_round_id, $next_round_id) {
 		$query = "
 			UPDATE RoundInstance
 			INNER JOIN Round ON RoundInstance.round_id = Round.id
+			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
+			INNER JOIN RoundInfoInstance ON RoundInfo.id = RoundInfoInstance.round_info_id
 			INNER JOIN StationInstance ON RoundInstance.station_instance_id = StationInstance.id
 			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
 			SET RoundInstance.POVN = :new_povn
-			WHERE Round.round_info_id = :current_round_id
+			WHERE RoundInfoInstance.id = :current_round_info_instance_id
 				AND StationInstance.station_id = :station_id
 				AND TeamInstance.game_id = :game_id;";
 		$args = array(
-			'new_povn' => $row['networkValue'],
-			'current_round_id' => $current_round_id,
+			'new_povn' => round($row['networkValue']),
+			'current_round_info_instance_id' => $current_round_instance_id,
 			'station_id' => $row['station_id'],
 			'game_id' => $game_id);
 		$db->query($query, $args);
@@ -320,13 +322,25 @@ function createInitialTables($game_id) {
 	$db -> query("START TRANSACTION");
 
 	$train_table_id = TrainTable::GetTrainTableIdOfGame($game_id);
-
+	
+	// debug
+	/*
+	$queries = array(	"CREATE TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
+						"CREATE TABLE tempInitialEntries2 LIKE tempInitialEntries;",
+						"CREATE TABLE tempInitialEntries3 LIKE tempInitialEntries;",
+						"CREATE TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
+						"CREATE TABLE tempInitialTravelers (station_id INT, travelers INT);", 
+						"CREATE TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	*/
+	// release
+	
 	$queries = array(	"CREATE TEMPORARY TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
 						"CREATE TEMPORARY TABLE tempInitialEntries2 LIKE tempInitialEntries;",
 						"CREATE TEMPORARY TABLE tempInitialEntries3 LIKE tempInitialEntries;",
 						"CREATE TEMPORARY TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
 						"CREATE TEMPORARY TABLE tempInitialTravelers (station_id INT, travelers INT);", 
 						"CREATE TEMPORARY TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	
 	foreach ($queries as $query) {
 		$db -> query($query, array());
 	}
@@ -335,7 +349,7 @@ function createInitialTables($game_id) {
 
 	$db -> query("INSERT INTO InitialNetworkValues SELECT station_id, networkValue, chainValue, " . $game_id . " FROM tempInitialNetworkValues;", array());
 	
-	createTravelersTable("tempInitialTravelers", "InitialNetworkValues", "tempInitialNetworkValues", $game_id, $train_table_id);
+	createTemporaryTravelersTable("tempInitialTravelers", "InitialNetworkValues", "tempInitialNetworkValues", $game_id, $train_table_id);
 	createTravelersPerStopTable("tempInitialTravelersPerStop", "tempInitialEntries", "tempInitialNetworkValues", "tempInitialTravelers");
 	
 	$db -> query("INSERT INTO InitialTravelersPerStop SELECT train_id, station_id, travelersPerStop, " . $game_id . " FROM tempInitialTravelersPerStop;", array());
@@ -450,164 +464,156 @@ function createNetworkValueTable($table_name, $entries_table, $train_table_id) {
 	$db -> query($query, $args);
 }
 
-/*function createInitialTravelersTable($table_name, $game_id, $train_table_id) {
+function createTemporaryTravelersTable($table_name, $nwval_table_initial, $nwval_table_current, $game_id, $train_table_id)
+{
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
-	SELECT id AS station_id, A.travelers 
-	FROM (
-		SELECT * 
-		FROM (
-			SELECT Station.code, ROUND
-			(
-				Station.area_cultivated_mixed * Constants.average_travelers_per_ha_leisure 
-				+
-				Station.count_home_total * Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
-				+
-				Station.count_work_total * Constants.average_workers_per_bvo * Constants.average_travelers_per_worker
-			) AS travelers
-			FROM Constants, Station		
-		) AS A 
-		UNION
-		SELECT code, travelers
-		FROM TrainTableStation 
-		WHERE train_table_id = :train_table_id
-	) AS A 
-	INNER JOIN TrainTableStation ON A.code = TrainTableStation.code
-	WHERE train_table_id = :train_table_id
-	GROUP BY A.code;";
+	SELECT id, travelers
+	FROM TrainTableStation 
+	WHERE train_table_id = :train_table_id";
 	$args = array('train_table_id' => $train_table_id);
-	$db -> query($query, $args);
-}*/
+	$db->query($query, $args);
+}
+
 
 function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_current, $game_id, $train_table_id) {
 	$db = Database::getDatabase();
 	$query = "
 	INSERT INTO " . $table_name . "
-	SELECT id AS station_id, A.travelers 
+	SELECT id AS station_id,
+		A.basetravelers
+		* 
+		IFNULL
+		(
+			(ROUND(current.networkValue + current.chainValue) - A.initial_POVN) 
+			/ 
+			A.initial_POVN 
+			/
+			IF((ROUND(current.networkValue + current.chainValue) - A.initial_POVN) / A.initial_POVN > 5, 20, IF((ROUND(current.networkValue + current.chainValue) - A.initial_POVN) / A.initial_POVN > 1, 15, 10))
+			+ 1
+			, 1
+		) AS travelers
 	FROM (
 		SELECT * 
 		FROM (
-			SELECT A.code, A.travelers * 
-				IFNULL(
-					(current.networkValue - initial.networkValue) 
-					/ 
-					initial.networkValue 
-					/
-					IF((current.networkValue - initial.networkValue) / initial.networkValue > 5, 20, IF((current.networkValue - initial.networkValue) / initial.networkValue > 1, 15, 10))
-					+ 1
-					, 1
-				) AS travelers 
-			FROM (
-				SELECT Station.code, ROUND
+			SELECT Station.code, RoundInfo2.id AS round_id, current_round_id, StationInstance.initial_POVN, 
+			ROUND
+			(
 				(
 					(
 						(
 							(
 								(
 									(
+										Station.area_cultivated_home - 
 										(
-											Station.area_cultivated_home - 
-											(
-												(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-												* 
-												(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-											)
+											SUM(Round.new_transform_area) 
+											* 
+											(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 										)
-										* 
-										IFNULL(count_home_total / area_cultivated_home, 0)
-									) 
-									+ 
-									SUM(Program.area_home * TypesHome.area_density)
+									)
+									* 
+									IFNULL(count_home_total / area_cultivated_home, 0)
 								) 
-								* 
-								Constants.average_citizens_per_home
-								+
-								IFNULL(SUM(Facility.citizens), 0)
+								+ 
+								SUM(Program.area_home * TypesHome.area_density)
 							) 
-							* Constants.average_travelers_per_citizen
+							* 
+							Constants.average_citizens_per_home
+							+
+							IFNULL(SUM(Facility.citizens), 0)
 						) 
-						+
+						* Constants.average_travelers_per_citizen
+					) 
+					+
+					(
 						(
 							(
 								(
+									Station.area_cultivated_work - 
 									(
-										Station.area_cultivated_work - 
-										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-											* 
-											(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-										)
+										SUM(Round.new_transform_area) 
+										* 
+										(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 									)
-									* 
-									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
-								) 
-								+ 
-								SUM(Program.area_work * TypesWork.people_density)
-								+
-								IFNULL(SUM(Facility.workers), 0)
-							)
-							*
-							Constants.average_travelers_per_worker
-						)
-						+
-						(
-							(
-								(
-									(
-										Station.area_cultivated_mixed - 
-										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
-											* 
-											(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-										)
-									)
-									* 
-									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
-								) 
-								+ 
-								SUM(Program.area_leisure * TypesLeisure.people_density)
+								)
+								* 
+								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 							) 
-							*
-							Constants.average_travelers_per_worker
+							+ 
+							SUM(Program.area_work * TypesWork.people_density)
+							+
+							IFNULL(SUM(Facility.workers), 0)
 						)
-						+
-						IFNULL(SUM(Facility.travelers), 0)
+						*
+						Constants.average_travelers_per_worker
 					)
-				) AS travelers
-				FROM Constants, Station
-				INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
-				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
-				INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
-				INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
-				INNER JOIN Types AS TypesHome ON Program.type_home = TypesHome.id
-				INNER JOIN Types AS TypesWork ON Program.type_work = TypesWork.id
-				INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
-				INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
-				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
-				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
-				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
-				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
-				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
-				LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
-				LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
-				WHERE Game.id = :game_id
-				GROUP BY Station.id, RoundInfo2.id
-				ORDER BY RoundInfo2.id
-			) AS A
-			INNER JOIN traintablestation ON A.code = traintablestation.code
-			INNER JOIN " . $nwval_table_initial . " AS initial ON initial.station_id = traintablestation.id
-			INNER JOIN " . $nwval_table_current . " AS current ON current.station_id = traintablestation.id
-			WHERE traintablestation.train_table_id = :train_table_id
-			AND game_id = :game_id
+					+
+					(
+						(
+							(
+								(
+									Station.area_cultivated_mixed - 
+									(
+										SUM(Round.new_transform_area) 
+										* 
+										(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+									)
+								)
+								* 
+								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
+							) 
+							+ 
+							SUM(Program.area_leisure * TypesLeisure.people_density)
+						) 
+						*
+						Constants.average_travelers_per_worker
+					)
+					+
+					IFNULL(SUM(Facility.travelers), 0)
+				)
+			) AS basetravelers
+			FROM Constants, Station
+			INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
+			INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+			INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id
+			INNER JOIN Program ON RoundInstance.exec_program_id = Program.id
+			INNER JOIN Types AS TypesHome ON Program.type_home = TypesHome.id
+			INNER JOIN Types AS TypesWork ON Program.type_work = TypesWork.id
+			INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
+			INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
+			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
+			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
+			INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
+			INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
+			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
+			INNER JOIN traintablestation ON Station.code = traintablestation.code
+			LEFT JOIN FacilityInstance ON RoundInstance.id = FacilityInstance.round_instance_id
+			LEFT JOIN Facility ON FacilityInstance.facility_id = Facility.id
+			WHERE Game.id = :game_id AND traintablestation.train_table_id = :train_table_id
+			GROUP BY Station.id, RoundInfo2.id
+			ORDER BY RoundInfo2.id
 		) AS A 
 		UNION
-		SELECT code, travelers
-		FROM TrainTableStation 
-		WHERE train_table_id = :train_table_id
+		SELECT 
+			Station.code, Game.current_round_id, Game.current_round_id, StationInstance.initial_POVN, 
+			ROUND
+			(
+				Station.count_home_total * Constants.average_citizens_per_home * Constants.average_travelers_per_citizen
+				+
+				Station.count_worker_total * Constants.average_travelers_per_worker
+			)
+		FROM Constants, Station
+		INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+		INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
+		INNER JOIN Game ON TeamInstance.game_id = Game.id
+		INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
+		WHERE Game.id = :game_id AND train_table_id = :train_table_id
 	) AS A 
 	INNER JOIN TrainTableStation ON A.code = TrainTableStation.code
-	WHERE train_table_id = :train_table_id
+	INNER JOIN " . $nwval_table_current . " AS current ON current.station_id = traintablestation.id
+	WHERE train_table_id = :train_table_id AND (A.round_id = A.current_round_id OR A.round_id = 6 AND A.current_round_id = 7)
 	GROUP BY A.code;";
 	$args = array('game_id' => $game_id, 'train_table_id' => $train_table_id);
 	$db -> query($query, $args);

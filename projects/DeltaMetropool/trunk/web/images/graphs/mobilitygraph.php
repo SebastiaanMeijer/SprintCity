@@ -161,7 +161,7 @@ function LoadTravelerDataMinMax($game_id)
 										(
 											Station.area_cultivated_home - 
 											(
-												(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+												SUM(Round.new_transform_area) 
 												* 
 												(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 											)
@@ -186,7 +186,7 @@ function LoadTravelerDataMinMax($game_id)
 									(
 										Station.area_cultivated_work - 
 										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+											SUM(Round.new_transform_area) 
 											* 
 											(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 										)
@@ -209,7 +209,7 @@ function LoadTravelerDataMinMax($game_id)
 									(
 										Station.area_cultivated_mixed - 
 										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+											SUM(Round.new_transform_area) 
 											* 
 											(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 										)
@@ -249,7 +249,7 @@ function LoadTravelerDataMinMax($game_id)
 				INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 				INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 				INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
-				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
+				INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
 				INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 				INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
 				INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id
@@ -311,7 +311,7 @@ function LoadTravelerData($game_id, $station_id)
 									(
 										Station.area_cultivated_home - 
 										(
-											(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+											SUM(Round.new_transform_area) 
 											* 
 											(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 										)
@@ -336,7 +336,7 @@ function LoadTravelerData($game_id, $station_id)
 								(
 									Station.area_cultivated_work - 
 									(
-										(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+										SUM(Round.new_transform_area) 
 										* 
 										(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 									)
@@ -359,7 +359,7 @@ function LoadTravelerData($game_id, $station_id)
 								(
 									Station.area_cultivated_mixed - 
 									(
-										(SUM(Program.area_home) + SUM(Program.area_work) + SUM(Program.area_leisure)) 
+										SUM(Round.new_transform_area) 
 										* 
 										(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 									)
@@ -377,16 +377,15 @@ function LoadTravelerData($game_id, $station_id)
 					IFNULL(SUM(Facility.travelers), 0)
 				)
 				*
+				IFNULL
 				(
-					IFNULL (
-						(RoundInstance2.POVN - StationInstance.initial_POVN) 
-						/ 
-						StationInstance.initial_POVN 
-						/
-						IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
-						+ 1
-						, 1
-					)
+					(RoundInstance2.POVN - StationInstance.initial_POVN) 
+					/ 
+					StationInstance.initial_POVN 
+					/
+					IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
+					+ 1
+					, 1
 				)
 			) AS TravelerCount
 			FROM Constants, Station
@@ -399,7 +398,7 @@ function LoadTravelerData($game_id, $station_id)
 			INNER JOIN Types AS TypesLeisure ON Program.type_leisure = TypesLeisure.id
 			INNER JOIN Round ON RoundInstance.round_id = Round.id AND Station.id = Round.station_id
 			INNER JOIN RoundInfo ON Round.round_info_id = RoundInfo.id
-			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id <= RoundInfo2.id
+			INNER JOIN RoundInfo AS RoundInfo2 ON RoundInfo.id < RoundInfo2.id
 			INNER JOIN Round AS Round2 ON RoundInfo2.id = Round2.round_info_id AND Station.id = Round2.station_id
 			INNER JOIN RoundInstance AS RoundInstance2 ON Round2.id = RoundInstance2.round_id AND StationInstance.id = RoundInstance2.station_instance_id
 			INNER JOIN Game ON TeamInstance.game_id = Game.id AND RoundInfo2.id <= current_round_id

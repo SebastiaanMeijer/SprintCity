@@ -141,14 +141,15 @@ function NewGame()
 	
 	// set initial network values for the participating stations
 	$result = $db->query("
-		SELECT Station.id AS station_id, InitialNetworkValues.networkValue 
+		SELECT Station.id AS station_id, ROUND(InitialNetworkValues.networkValue + InitialNetworkValues.chainValue) AS networkValue
 		FROM Game
 		INNER JOIN Scenario ON Scenario.id = Game.scenario_id
 		INNER JOIN ScenarioStation ON ScenarioStation.scenario_id = Scenario.id
 		INNER JOIN Station ON Station.id = ScenarioStation.station_id
 		INNER JOIN TrainTableStation ON TrainTableStation.code = Station.code
 			AND TrainTableStation.train_table_id = Scenario.train_table_id
-		INNER JOIN InitialNetworkValues ON InitialNetworkValues.station_id = TrainTableStation.id
+		INNER JOIN InitialNetworkValues ON InitialNetworkValues.station_id = TrainTableStation.id 
+			AND InitialNetworkValues.game_id = :game_id 
 		WHERE Game.id = :game_id;",
 		array('game_id' => $game_id));
 	
@@ -867,7 +868,7 @@ function SetNextRound($game_id)
 		writeTravelersHistory($game_id, $current_round_info_instance_id);
 		
 		// update the network values in the round instances
-		updateNetworkValues($game_id, $current_round_info_instance_id, $next_round_info_instance_id);
+		updateNetworkValues($game_id, $next_round_id, $next_round_info_instance_id);
 		
 		// copy train table changes of current round into the next round
 		$query = "

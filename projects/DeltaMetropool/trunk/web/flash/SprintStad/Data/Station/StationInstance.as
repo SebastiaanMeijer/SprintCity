@@ -33,6 +33,7 @@
 		public var count_worker_transform:Number = 0;
 		public var count_traveler_bonus:Number = 0;
 		public var count_citizen_bonus:Number = 0;
+		public var count_worker_bonus:Number = 0;
 		
 		public function StationInstance() 
 		{}
@@ -197,9 +198,9 @@
 			{
 				POVN = round.POVN;
 				PWN = round.PWN;
-				count_worker_total += round.worker_bonus;
 				count_traveler_bonus += round.traveler_bonus;
 				count_citizen_bonus += round.citizen_bonus;
+				count_worker_bonus += round.worker_bonus;
 			}
 			
 			var citizens:Number = count_home_total * constants.average_citizens_per_home + count_citizen_bonus;
@@ -281,6 +282,7 @@
 		
 		public function SetRound(round:Round):void
 		{
+			this.round = round;
 			this.POVN = round.POVN;
 			this.PWN = round.PWN;
 		}
