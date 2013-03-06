@@ -245,9 +245,8 @@
 			{
 				$db = Database::getDatabase();
 				$query = "
-					SELECT POVN
-					FROM Station
-					INNER JOIN StationInstance ON Station.id = StationInstance.station_id
+					SELECT initial_POVN
+					FROM StationInstance 
 					WHERE StationInstance.id = :station_instance_id;";
 				$args = array('station_instance_id' => $stationInstanceId);
 				$result = $db->query($query, $args);

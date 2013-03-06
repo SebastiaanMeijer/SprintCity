@@ -20,8 +20,7 @@
 			'transform_area_undeveloped_urban', 'transform_area_undeveloped_rural',
 			'count_home_total', 'count_home_transform',
 			'count_work_total', 'count_work_transform',
-			'count_worker_total', 'count_worker_transform', 
-			'count_travelers', 'team_id'
+			'count_worker_total', 'count_worker_transform', 'team_id'
 		);
 		
 		$mobility_fields = array(
@@ -60,10 +59,6 @@
 						break;
 					case 'name':
 						echo "\t\t" . '<name>' . str_replace("&shy;", "", $station_row['name']) . '</name>' . "\n";
-						break;
-					case 'count_travelers':
-						$mobility_data = getMobilityDataForStation($train_data, $station_row['code']);
-						echo "\t\t" . '<count_travelers>' . $mobility_data['totalTravelers'] . '</count_travelers>' . "\n";
 						break;
 					default:
 						echo "\t\t" . '<' . $station_field . '>' . $station_row[$station_field] . '</' . $station_field . '>' . "\n";

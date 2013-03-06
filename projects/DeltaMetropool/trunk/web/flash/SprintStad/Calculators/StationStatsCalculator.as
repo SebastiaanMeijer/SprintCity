@@ -26,8 +26,8 @@
 		{
 			var station:Station = stationInstance.station;
 			var povn_growth:Number = 0;
-			if (station.GetCurrentRound() != null)
-				povn_growth = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
+			if (stationInstance.round != null)
+				povn_growth = (stationInstance.round.POVN - station.POVN) / station.POVN;
 			else
 				povn_growth = (station.GetLatestRound().POVN - station.POVN) / station.POVN;
 			var traveler_growth:Number = 0;
@@ -38,21 +38,27 @@
 				traveler_growth = (povn_growth / 15);
 			else
 				traveler_growth = (povn_growth / 10);
-			return int(Math.round(travelers * (1 + traveler_growth)));
+			var final_travelers:int = int(Math.round(travelers * (1 + traveler_growth)));
+			return final_travelers;
 		}
 		
 		public static function GetCitizenStats(stationInstance:StationInstance):int
 		{
-			return int(stationInstance.count_home_total * Data.Get().GetConstants().average_citizens_per_home) + stationInstance.count_citizen_bonus;
+			var constants:Constants = Data.Get().GetConstants();
+			return int(stationInstance.count_home_total * constants.average_citizens_per_home + stationInstance.count_citizen_bonus);
+		}
+		
+		public static function GetWorkerStats(stationInstance:StationInstance):int
+		{
+			return int(stationInstance.count_worker_total + stationInstance.count_worker_bonus);
 		}
 		
 		public static function GetInitialTravelersStats(station:StationInstance):Number
 		{
 			var constants:Constants = Data.Get().GetConstants();
 			var result:Number = 
-				(station.count_home_total * constants.average_citizens_per_home + station.count_citizen_bonus) * constants.average_travelers_per_citizen + 
-				station.count_worker_total * constants.average_travelers_per_worker + 
-				station.area_cultivated_mixed * constants.average_travelers_per_ha_leisure +
+				GetCitizenStats(station) * constants.average_travelers_per_citizen + 
+				GetWorkerStats(station) * constants.average_travelers_per_worker + 
 				station.count_traveler_bonus;
 			return result;
 		}
