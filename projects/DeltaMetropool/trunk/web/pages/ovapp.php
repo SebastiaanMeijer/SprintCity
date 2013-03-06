@@ -40,7 +40,7 @@
 
     function handleTrainStopClick(trainStop) {
 
-        changeTrainStop(trainStop);
+        changeTrainStop(trainStop, true);
         var trainId = $(trainStop).attr('trainid');
         sendTrainToPHPService(trainId, refresh);
 
@@ -56,17 +56,18 @@
         // console.log('train[' + trainId +'].stationStops['+stopIndex+'] ='+ stopNum + ' | CHECK: ' + trains[trainId].stationStops[stopIndex]);
     }
 
-    function changeTrainStop(trainStop) {
+    function changeTrainStop(trainStop, allowZero) {
         var stopNum = $(trainStop).text();
-        if(stopNum == 0) {
-            $(trainStop).removeClass('invisible');
-        }
         if(stopNum < 8) {
             stopNum++;
             $(trainStop).text(stopNum);
         } else {
-            stopNum = 0;
-            $(trainStop).addClass('invisible');
+            stopNum = (allowZero == true ? 0 : 1);
+            $(trainStop).text(stopNum);
+        }
+        
+         if(stopNum == 0) {
+            $(trainStop).removeClass('invisible');
             $(trainStop).text("");
         }
 
@@ -96,7 +97,7 @@
                         color : '#f0098d'
                     }, 20, "swing");
                 });
-                changeTrainStop(this);
+                changeTrainStop(this, false);
             }
         });
         var trainId = $(trainTitle).attr('trainid');
