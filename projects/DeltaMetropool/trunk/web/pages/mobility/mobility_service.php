@@ -172,12 +172,12 @@ function getMobilityDataTrains() {
 		FROM (
 			SELECT * 
 			FROM (
-				SELECT train_id
+				SELECT TrainTableEntry.train_id
 				FROM Station 
 				INNER JOIN StationInstance ON Station.id = StationInstance.station_id
 				INNER JOIN TeamInstance ON StationInstance.team_instance_id = TeamInstance.id
 				INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
-				INNER JOIN traintableentry ON TrainTableStation.id = traintableentry.station_id
+				INNER JOIN TrainTableEntry ON TrainTableStation.id = traintableentry.station_id
 				WHERE TeamInstance.game_id = :game_id
 				AND train_table_id = :train_table_id
 				GROUP BY train_id
@@ -204,7 +204,7 @@ function getMobilityDataTrains() {
 			WHERE game_id = :game_id
 			GROUP BY train_id
 		) AS initialAvgTravelersPerStop ON initialAvgTravelersPerStop.train_id = A.train_id
-		INNER JOIN (
+		LEFT JOIN (
 			SELECT train_id, AVG(travelersPerStop) AS avgTravelers
 			FROM tempTravelersPerStop
 			GROUP BY train_id
@@ -325,12 +325,14 @@ function createInitialTables($game_id) {
 	
 	// debug
 	/*
-	$queries = array(	"CREATE TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
-						"CREATE TABLE tempInitialEntries2 LIKE tempInitialEntries;",
-						"CREATE TABLE tempInitialEntries3 LIKE tempInitialEntries;",
-						"CREATE TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
-						"CREATE TABLE tempInitialTravelers (station_id INT, travelers INT);", 
-						"CREATE TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);");
+	$queries = array(
+		"CREATE TABLE tempInitialEntries (train_id INT, station_id INT, frequency INT);", 
+		"CREATE TABLE tempInitialEntries2 LIKE tempInitialEntries;",
+		"CREATE TABLE tempInitialEntries3 LIKE tempInitialEntries;",
+		"CREATE TABLE tempInitialNetworkValues (station_id INT, networkValue DOUBLE, chainvalue INT);", 
+		"CREATE TABLE tempInitialTravelers (station_id INT, travelers INT);", 
+		"CREATE TABLE tempInitialTravelersPerStop (train_id INT, station_id INT, travelersPerStop INT);"
+	);
 	*/
 	// release
 	
