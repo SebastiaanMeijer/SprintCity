@@ -28,6 +28,8 @@
 			var povn_growth:Number = 0;
 			if (stationInstance.round != null)
 				povn_growth = (stationInstance.round.POVN - station.POVN) / station.POVN;
+			else if (station.GetCurrentRound() != null)
+				povn_growth = (station.GetCurrentRound().POVN - station.POVN) / station.POVN;
 			else
 				povn_growth = (station.GetLatestRound().POVN - station.POVN) / station.POVN;
 			var traveler_growth:Number = 0;

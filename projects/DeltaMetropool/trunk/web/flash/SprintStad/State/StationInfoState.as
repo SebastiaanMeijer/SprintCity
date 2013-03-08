@@ -29,6 +29,7 @@
 	public class StationInfoState implements IState
 	{
 		private var parent:SprintStad = null;
+		private var loadCount:int = 0;
 		private var barTotalArea:AreaBarDrawer;
 		private var barTransformArea:AreaBarDrawer;
 		
@@ -141,7 +142,6 @@
 				stationInstance.transform_area_undeveloped_urban +
 				stationInstance.transform_area_undeveloped_rural) + " ha resterend.)";
 			
-			//view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);	// cheat to make the traveler count exactly the same as the ov app
 			view.current_info.amount_citizens.text = StationStatsCalculator.GetCitizenStats(stationInstance);
 			view.current_info.amount_workers.text = StationStatsCalculator.GetWorkerStats(stationInstance);
@@ -183,16 +183,21 @@
 		
 		public function OnLoadingDone(data:int)
 		{
-			var view:MovieClip = parent.station_info_movie;
-			DrawUI(parent.GetCurrentStation());
-			
-			view.previous_station_button.buttonMode = true;
-			view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
-			view.next_station_button.buttonMode = true;
-			view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
-			
-			//remove loading screen
-			parent.removeChild(SprintStad.LOADER);
+			loadCount++;
+			if (loadCount >= 2)
+			{
+				loadCount = 0;
+				var view:MovieClip = parent.station_info_movie;
+				DrawUI(parent.GetCurrentStation());
+				
+				view.previous_station_button.buttonMode = true;
+				view.previous_station_button.addEventListener(MouseEvent.CLICK, PreviousStationEvent);
+				view.next_station_button.buttonMode = true;
+				view.next_station_button.addEventListener(MouseEvent.CLICK, NextStationEvent);
+				
+				//remove loading screen
+				parent.removeChild(SprintStad.LOADER);
+			}
 		}
 		
 		/* INTERFACE SprintStad.State.IState */
@@ -216,6 +221,7 @@
 			barTransformArea = new AreaBarDrawer(view.current_info.transform_area_bar);
 			
 			DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
+			DataLoader.Get().AddJob(DataLoader.DATA_CURRENT_ROUND, OnLoadingDone);
 		}
 		
 		public function Deactivate():void

@@ -101,7 +101,6 @@
 			return rounds[index];
 		}
 		
-		
 		public function GetRoundById(id:int):Round
 		{
 			for each (var round:Round in rounds)
@@ -109,7 +108,7 @@
 				if (round.round_info_id == id)
 					return round;
 			}
-			return round;
+			return null;
 		}
 		
 		public function GetCurrentRound():Round
