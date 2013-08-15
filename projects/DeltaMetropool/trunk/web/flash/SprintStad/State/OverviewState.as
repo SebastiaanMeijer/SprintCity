@@ -4,6 +4,7 @@
 	import fl.motion.MatrixTransformer;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -28,6 +29,7 @@
 	import SprintStad.Data.Types.Type;
 	import SprintStad.Data.Types.Types;
 	import SprintStad.Debug.Debug;
+	import SprintStad.Debug.ErrorDisplay;
 	import SprintStad.Drawer.AreaBarDrawer;
 	import SprintStad.Calculators.StationStatsCalculator;
 	import SprintStad.Drawer.LineGraphDrawer;
@@ -222,11 +224,15 @@
 				// set outline color and filling of station circles
 				var colorTransform:ColorTransform = new ColorTransform();
 				colorTransform.color = parseInt("0x" + station.owner.color, 16);
+				if (movie.outline == null)
+					ErrorDisplay.Get().DisplayError("Station circle " + station.code + " does not contain a reference for 'outline'");
 				movie.outline.transform.colorTransform = colorTransform;
 				if (currentMode == OverviewState.SPACE_MODE)
 					station.RefreshAreaBar();
 				else if (currentMode == OverviewState.MOBILITY_MODE)
 					station.RefreshMobilityBar();
+				if (movie.graph == null)
+					ErrorDisplay.Get().DisplayError("Station circle " + station.code + " does not contain a reference for 'graph'");
 				movie.graph.addChild(station.areaBar.GetClip());
 				movie.alpha = 1;
 			}
@@ -611,7 +617,10 @@
 		private function GetStationMovieClip(station:Station):MovieClip
 		{
 			var movie_name:String = station.code;
-			return MovieClip(parent.overview_movie.map.getChildByName(movie_name));
+			var result:DisplayObject = parent.overview_movie.map.getChildByName(movie_name);
+			if (result == null)
+				ErrorDisplay.Get().DisplayError("Could not find a station cirlce using code " + movie_name + " in the overview map.");
+			return MovieClip(result);
 		}
 		
 		private function GetStationByMovieClipObject(stationCircleClip:Object):Station
