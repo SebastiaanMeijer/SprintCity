@@ -22,10 +22,10 @@
 			{
 				var type:StationType = stationTypes.GetStationType(i);
 				Debug.out(station.station.name + " - POVN: " + station.POVN + " PWN: " + station.PWN + " IWD: " + station.IWD + " MNG: " + station.MNG);
-				var POVN:Number = CalculateSimilarity(station.POVN, type.POVN, Math.max(type.POVN, data.GetStations().MaxPOVN));
-				var PWN:Number = CalculateSimilarity(station.PWN, type.PWN, Math.max(type.PWN, data.GetStations().MaxPWN));
-				var IWD:Number = CalculateSimilarity(station.IWD, type.IWD, Math.max(type.IWD, data.GetStations().MaxIWD));
-				var MNG:Number = CalculateSimilarity(station.MNG, type.MNG, Math.max(type.MNG, data.GetStations().MaxMNG));
+				var POVN:Number = CalculateSimilarity(station.POVN, type.POVN);
+				var PWN:Number = CalculateSimilarity(station.PWN, type.PWN);
+				var IWD:Number = CalculateSimilarity(station.IWD, type.IWD);
+				var MNG:Number = CalculateSimilarity(station.MNG, type.MNG);
 				var average:int = (POVN + PWN + IWD + MNG) / 4;
 				top.push(new StationTypeEntry(average, type));
 			}
@@ -33,9 +33,9 @@
 			return top;
 		}
 		
-		private static function CalculateSimilarity(stationValue, typeValue, maxValue):Number
+		private static function CalculateSimilarity(stationValue, typeValue):Number
 		{
-			return 100 - 100 * (Math.abs(stationValue - typeValue) / maxValue);
+			return Math.min(stationValue, typeValue) / Math.max(stationValue, typeValue) * 100;
 		}
 		
 		private static function compare(value1:StationTypeEntry, value2:StationTypeEntry)

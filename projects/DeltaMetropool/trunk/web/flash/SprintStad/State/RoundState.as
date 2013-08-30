@@ -223,6 +223,7 @@
 				clip.type_name.text = cat_types[i].name;
 				clip.type_id = cat_types[i].id;
 				clip.type_area.text = cat_types[i].GetDemandUntilNow() + " ha"
+				clip.type_area.background = true;
 				if (station.HasRestrictionFor(cat_types[i].id))
 				{
 					clip.filters = [desaturateFilter];
