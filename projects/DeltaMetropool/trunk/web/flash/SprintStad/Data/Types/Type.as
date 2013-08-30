@@ -47,7 +47,7 @@
 			demands.push(demand);
 		}
 		
-		public function getTotalDemand():Number
+		public function GetTotalDemand():Number
 		{
 			var result:Number = 0;
 			for each (var demand:Demand in demands)

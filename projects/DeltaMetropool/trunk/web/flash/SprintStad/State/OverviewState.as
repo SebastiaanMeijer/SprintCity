@@ -5,6 +5,7 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -241,22 +242,41 @@
 		
 		private function FillDemandWindows():void
 		{
-			var view:MovieClip = parent.overview_movie;
-			var types:Types = Data.Get().GetTypes();
-			
-			for (var i:int = 0; i < types.GetTypeCount(); i++)
+			FillDemandWindow("home");
+			FillDemandWindow("work");
+			FillDemandWindow("leisure");
+		}
+		
+		private function FillDemandWindow(category:String):void
+		{
+			var view:DisplayObjectContainer = DisplayObjectContainer(parent.overview_movie.getChildByName("demand_" + category));
+			var types:Array = Data.Get().GetTypes().GetTypesOfCategory(category);
+			for (var i:int = 1; i <= 6; i++)
 			{
-				var type:Type = types.GetType(i);
-				if (type.id < 15)
+				var color:MovieClip = MovieClip(view.getChildByName("type_" + i + "_color"));
+				var name:TextField = TextField(view.getChildByName("type_" + i + "_name"));
+				var area:TextField = TextField(view.getChildByName("type_" + i + "_area"));
+				if (i <= types.length)
 				{
+					color.visible = true;
+					name.visible = true;
+					area.visible = true;
+					var type:Type = Type(types[i - 1]);
+					name.text = type.name;
 					if (Data.Get().current_round_id == 1)
-					{
-						TextField(view.getChildByName("type_" + type.id)).text = type.getTotalDemand() + " ha";
-					}
+						area.text = type.GetTotalDemand() + " ha";
 					else
-					{
-						TextField(view.getChildByName("type_" + type.id)).text = type.GetDemandUntilNow() + " ha";
-					}
+						area.text = type.GetDemandUntilNow() + " ha";
+					while (color.numChildren > 0) color.removeChildAt(0);
+					type.colorClip.width = 100;
+					type.colorClip.height = 100;			
+					color.addChild(type.colorClip);
+				}
+				else
+				{
+					color.visible = false;
+					name.visible = false;
+					area.visible = false;
 				}
 			}
 		}
@@ -264,15 +284,6 @@
 		private function SetDemandWindowsVisible(visible:Boolean):void
 		{
 			var parentMovie:MovieClip = parent.overview_movie;
-			var types:Types = Data.Get().GetTypes();
-			for (var i:int = 0; i < types.GetTypeCount(); i++)
-			{
-				var type:Type = types.GetType(i);
-				if (type.id < 15)
-				{
-					TextField(parentMovie.getChildByName("type_" + type.id)).visible = visible;
-				}
-			}
 			
 			parentMovie.demand_title.visible = visible;
 			parentMovie.demand_home.visible = visible;
