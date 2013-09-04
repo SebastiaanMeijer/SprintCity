@@ -204,8 +204,9 @@
 			}
 			
 			var citizens:Number = count_home_total * constants.average_citizens_per_home + count_citizen_bonus;
-			IWD = (citizens + count_worker_total) /  (area_cultivated_home + area_cultivated_work + area_cultivated_mixed);
-			MNG = Math.min(citizens * 5, count_worker_total) / Math.max(citizens * 5, count_worker_total) * 100;
+			var workers:Number = count_worker_total + count_worker_bonus;
+			IWD = (citizens + workers) / (area_cultivated_home + area_cultivated_work + area_cultivated_mixed + area_undeveloped_urban + area_undeveloped_rural);
+			MNG = Math.min(citizens, workers) / Math.max(citizens, workers) * 100;
 		}
 		
 		private function GetHomeDensity(program:Program):Number
