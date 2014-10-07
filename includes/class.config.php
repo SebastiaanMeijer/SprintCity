@@ -93,7 +93,7 @@
             define('WEB_ROOT', '');
 
             $this->dbHost       = 'localhost';
-            $this->dbName       = 'sprintstad';
+            $this->dbName       = 'sprintcity';
             $this->dbUsername   = 'root';
             $this->dbPassword   = '';
             $this->dbDieOnError = false;
@@ -123,7 +123,7 @@
             define('WEB_ROOT', '');
 
             $this->dbHost       = 'localhost';
-            $this->dbName       = 'sprintstad';
+            $this->dbName       = 'sprintcity';
             $this->dbUsername   = 'root';
             $this->dbPassword   = '';
             $this->dbDieOnError = true;
