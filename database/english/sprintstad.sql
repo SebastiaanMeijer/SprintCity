@@ -19,8 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `sprintstad`
 --
-CREATE DATABASE IF NOT EXISTS `sprintstad` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `sprintstad`;
+CREATE DATABASE IF NOT EXISTS `SprintCity` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `SprintCity`;
 
 -- --------------------------------------------------------
 
