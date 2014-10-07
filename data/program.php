@@ -15,14 +15,14 @@
 		// check if this user is allowed to change the program
 		if (!Program::isOwnedBySession($xml_array['program']['program_id'], $session_id))
 		{
-			echo 'Programma doorvoeren: toegang geweigerd.';
+			echo 'Process development: access denied.';
 			return;
 		}
 		
 		if (Program::areFutureProgramsFilled($xml_array['program']['program_id']))
 		{
-			echo 'Het programma is niet doorgevoerd omdat er al een programma in een volgende ronde doorgevoerd is. ' . 
-				'Zet alle bebouwing in het programma van deze latere ronde op nul en probeer het opnieuw.';
+			echo 'The developments will not be processed, beccause there already exists a processed development in the next round. ' . 
+				'Reset all developments of the later round and try again. ';
 			return;
 		}
 		

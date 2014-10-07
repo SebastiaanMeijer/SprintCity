@@ -96,7 +96,7 @@ function ShowAmbitionForm() {
     <div id="ambitionWindow">
         <form class="form" id="ambitions" action="mobilitysidebar.php" method="post">
             <table>
-                <caption>Ambities</caption>
+                <caption>Ambition</caption>
     <?php
     $game_id = Game::getGameIdOfSession(session_id());
     $motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
@@ -111,12 +111,12 @@ function ShowAmbitionForm() {
                 }
                 ?>
             </table>
-            <h2>Motivatie</h2>
+            <h2>Motivation</h2>
             <p>
                 <textarea class="textfield" type="text" name="ambitionMotivation"><?php echo $motivation; ?></textarea>
             </p>
             <p class="inputbutton">
-                <input type="submit" value="Ambities vastleggen" onClick="showConfirm()">
+                <input type="submit" value="Confirm Ambitions" onClick="showConfirm()">
             </p>
         </form>
     </div>
@@ -127,7 +127,7 @@ function ShowAmbitionText() {
     ?>
     <div id="ambitionWindow">
         <table>
-            <caption>Ambities</caption>
+            <caption>Ambition</caption>
     <?php
     $game_id = Game::getGameIdOfSession(session_id());
     $motivation = TeamInstance::getValueDescription($game_id, MOBILITY_TEAM_ID);
@@ -143,7 +143,7 @@ function ShowAmbitionText() {
             }
             ?>
         </table>
-        <h2>Motivatie</h2>
+        <h2>Motivation</h2>
         <p>
             <?php echo $motivation; ?>
         </p>
@@ -151,7 +151,7 @@ function ShowAmbitionText() {
     if (RoundInfo::getCurrentRoundIdBySessionId(session_id()) == MASTERPLAN_ROUND_ID) {
         ?>
             <p>
-                <a href="">Wijzigen</a>
+                <a href="">Change</a>
             </p>
         </div>
         <p>
@@ -176,7 +176,7 @@ function ShowAmbitionText() {
     <div id="stationWindow">
         <form class="form" action="mobilitysidebar.php" method="post">
             <table class="ambitions">
-                <caption>Netwerkwaarde</caption>
+                <caption>Network value</caption>
     <?php
     while ($row = mysql_fetch_array($result)) {
         ?>
@@ -188,7 +188,7 @@ function ShowAmbitionText() {
     }
     ?>
             </table>
-            <h2>Motivatie</h2>
+            <h2>Motivation</h2>
             <p>
                 <textarea class="textfield" type="text" name="povnMotivation"><?php echo $motivation; ?></textarea>
             </p>
@@ -210,7 +210,7 @@ function ShowStationText() {
     ?>
     <div id="stationWindow">
         <table class="ambitions">
-            <caption>Netwerkwaarde</caption>
+            <caption>Network value</caption>
     <?php
     while ($row = mysql_fetch_array($result)) {
         ?>
@@ -222,12 +222,12 @@ function ShowStationText() {
     }
     ?>
         </table>
-        <h2>Motivatie</h2>
+        <h2>Motivation</h2>
         <p>
     <?php echo $motivation; ?>
         </p>
         <p>
-            <a href="">Wijzigen</a>
+            <a href="">Change</a>
         </p>
     </div>
     <p>
@@ -247,7 +247,7 @@ function ShowStationText() {
         <script type="text/javascript" src="../script/mobility/ambition.js"></script>
     </head>
     <body>
-        <h1>Openbaar Vervoer</h1>
+        <h1>Public Transport</h1>
         <div id="ovlogo"></div>
         <h2>
 <?php echo RoundInfo::getCurrentRoundNameBySessionId(session_id()); ?>

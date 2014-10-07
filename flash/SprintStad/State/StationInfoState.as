@@ -80,7 +80,7 @@
 			view.sheet.addChild(station.imageData);
 			
 			//left info
-			view.current_info.title.text = "HUIDIG";
+			view.current_info.title.text = "CURRENT";
 			var top:Array = StationTypeCalculator.GetStationTypeTop(stationInstance);
 			var bitmap:Bitmap;
 			
@@ -140,7 +140,7 @@
 				stationInstance.transform_area_cultivated_work + 
 				stationInstance.transform_area_cultivated_mixed +  
 				stationInstance.transform_area_undeveloped_urban +
-				stationInstance.transform_area_undeveloped_rural) + " ha resterend.)";
+				stationInstance.transform_area_undeveloped_rural) + " ha remaining.)";
 			
 			view.current_info.amount_travelers.text = StationStatsCalculator.GetTravelersStats(stationInstance);	// cheat to make the traveler count exactly the same as the ov app
 			view.current_info.amount_citizens.text = StationStatsCalculator.GetCitizenStats(stationInstance);

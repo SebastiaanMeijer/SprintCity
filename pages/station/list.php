@@ -6,7 +6,7 @@
 	$stations = Station::getAllStations();
 ?>
 						<tr>
-							<td><a href="admin.php?view=station&action=edit" class="button">Nieuw Station</a></td>
+							<td><a href="admin.php?view=station&action=edit" class="button">New Station</a></td>
 						</tr>
 						<tr>
 							<td>
@@ -14,9 +14,9 @@
 									<tr>
 										<th></th>
 										<th>Station</th>
-										<th>Variant</th>
-										<th>Gemeente</th>
-										<th>Regio</th>
+										<th>Version</th>
+										<th>Municipality</th>
+										<th>Region</th>
 									</tr>
 <?php
 	foreach ($stations as $station_key => $station_value) 
@@ -26,7 +26,7 @@
 			$variant = '[' . $station_value->variant . ']';
 		echo "\t\t\t\t\t\t\t\t\t" . '<tr class="' . $class . '">' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t\t" . '<a href="admin.php?view=station&action=edit&station=' . $station_value->id . '" class="button">Wijzigen</a>' . "\n";
+		echo "\t\t\t\t\t\t\t\t\t\t\t" . '<a href="admin.php?view=station&action=edit&station=' . $station_value->id . '" class="button">Change</a>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '</td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $station_value->name . '</td>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td>' . $variant . '</td>' . "\n";

@@ -76,7 +76,7 @@
 					$round->station_id = $stationId;
 					$round->save();
 				}
-				DisplayMessage('success', 'Success', array('De wijzigingen zijn opgeslagen.'));
+				DisplayMessage('success', 'Success', array('The changes were saved.'));
 			}
 		}
 		else 
@@ -118,15 +118,15 @@
 		
 		// validate code
 		if (is_null($station->code) || $station->code == "")
-			$errors[] = "Er is geen station code ingevuld.";
+			$errors[] = "No station code was given.";
 		else if (!Station::isStationCodeUnique($station->code, $station->id))
-			$errors[] = "De opgegeven station code bestaat al.";
+			$errors[] = "This station code already exists.";
 		
 		// validate name
 		if (is_null($station->name) || $station->name == "")
-			$errors[] = "Er is geen station naam ingevuld.";
+			$errors[] = "No station name was given.";
 		else if (!Station::isStationNameUnique($station->name, $station->id))
-			$errors[] = "De opgegeven station naam bestaat al.";	
+			$errors[] = "This station name already exists.";	
 		
 		// validate transform areas
 		$totalTransformInRounds = 0;
@@ -139,17 +139,17 @@
 			$station->transform_area_undeveloped_urban + 
 			$station->transform_area_undeveloped_rural;
 		if ($totalTransformInRounds > $totalTransformInStation)
-			$errors[] = "In de rondes wordt meer transformatie gebied vrijgegeven dan er aanwezig is om het station (rondes totaal: " . $totalTransformInRounds . " ha, station totaal: " . $totalTransformInStation . " ha)";
+			$errors[] = "In the rounds more development area is given than exists in the station area (rounds total: " . $totalTransformInRounds . " ha, station area total: " . $totalTransformInStation . " ha)";
 		else if ($totalTransformInRounds < $totalTransformInStation)
-			$warnings[] = "In de rondes wordt minder transformatie gebied vrijgegeven dan er aanwezig is om het station (rondes totaal: " . $totalTransformInRounds . " ha, station totaal: " . $totalTransformInStation . " ha). Niet al het transformatie gebied kan hierdoor in het spel bebouwd worden.";
+			$warnings[] = "In de rounds less development area is given than exists in the station area (rounds total: " . $totalTransformInRounds . " ha, station total: " . $totalTransformInStation . " ha). Therefore not all development areas can be built up in the game.";
 		
 		// output errors
 		if (sizeof($errors) > 0)
-			DisplayMessage('error', 'Foutmelding', $errors);
+			DisplayMessage('error', 'Error', $errors);
 		
 		// output warnings
 		if (sizeof($warnings) > 0)
-			DisplayMessage('warning', 'Waarschuwing', $warnings);
+			DisplayMessage('warning', 'Warning', $warnings);
 		
 		return sizeof($errors) == 0;
 	}
@@ -204,7 +204,7 @@
 ?>
 								<table class="data">
 									<tr>
-										<th colspan="<?php echo sizeof($usedRoundInfos) + 1; ?>">Rondes</th>
+										<th colspan="<?php echo sizeof($usedRoundInfos) + 1; ?>">Rounds</th>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td></td>
@@ -214,7 +214,7 @@
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
-										<td>Beschikbaar transformatiegebied</td>
+										<td>Available development area</td>
 		<?php
 		foreach ($usedRoundInfos as $key => $value)
 			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->id . '" size="8" value="0" '.$disabled.'></td>' . "\n";
@@ -244,7 +244,7 @@
 ?>
 								<table class="data">
 									<tr>
-										<th colspan="<?php echo sizeof($rounds) + 1; ?>">Rondes</th>
+										<th colspan="<?php echo sizeof($rounds) + 1; ?>">Rounds</th>
 									</tr>
 									<tr class="<?php echo $class;?>">
 										<td></td>
@@ -254,7 +254,7 @@
 		?>
 									</tr>
 									<tr class="<?php echo $class;?>">
-										<td>Beschikbaar transformatiegebied</td>
+										<td>Available development area</td>
 		<?php
 		foreach ($rounds as $key => $value)
 			echo "\t\t\t\t\t\t\t\t\t\t" . '<td><input name="new_transform_area,' . $value->round_info_id . '" value="' . $value->new_transform_area . '" size="8" '.$disabled.'></td>' . "\n";
@@ -286,39 +286,39 @@
 									if (mysql_num_rows($games) > 0)
 									{
 										$messages = array();
-										$messages[0] = "Het wijzigen van dit station heeft effect op spel(len): ";
+										$messages[0] = "Changes in this station affect the following games: ";
 										while ($row = mysql_fetch_array($games))
 										{
 											$messages[0] .= $row["id"]." - ".$row["name"].", ";
 										}
-										DisplayMessage("warning", "Waarschuwing", $messages);
+										DisplayMessage("warning", "Warning", $messages);
 									}
 								?>
 									
 								<form action="<?php echo $submitAction ?>" method="POST">
 								<table class="data">
 									<tr>
-										<th colspan="3">Algemeen</th>
+										<th colspan="3">General</th>
 									</tr>
 <?php
 	GenerateForm($form_fields_stats, $station);
 	$image = "./images/stations/" . $station->code . ".png";
 ?>
 									<tr class="<?php echo $class; ?>">
-										<td>Achtergrond kaart</td>
+										<td>Background map</td>
 										<td><a href="<?php echo $image; ?>" target="_blank"><img width=350 src="<?php echo $image; ?>"></a></td>
 										<td><a href="<?php echo $image; ?>" target="_blank"><?php echo $image; ?></a></td>
 									</tr>
 									<tr>
-										<th colspan="3">Profiel</th>
+										<th colspan="3">Parameters</th>
 									</tr>
 <?php GenerateForm($form_fields_profile, $station)?>
 									<tr>
-										<th colspan="3">Stationsgebied</th>
+										<th colspan="3">Station area</th>
 									</tr>
 <?php GenerateForm($form_fields_area, $station)?>
 									<tr>
-										<th colspan="3">Transformatiegebied</th>
+										<th colspan="3">Development area</th>
 									</tr>
 <?php GenerateForm($form_fields_transform, $station)?>
 								</table>
@@ -329,7 +329,7 @@ if (is_null($rounds))
 else
 	GenerateRoundsForm($rounds);
 ?>
-									<button type="submit" name="FormAction" value="Save">Opslaan</button>
+									<button type="submit" name="FormAction" value="Save">Save</button>
 								</form>
 							</td>
 						</tr>

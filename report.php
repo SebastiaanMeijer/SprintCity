@@ -12,7 +12,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<meta name="keywords" content="">
 		<meta name="description" content="">
-		<title>Sprintstad Rapportage</title>
+		<title>SprintCity Report</title>
 		<link href="images/mobility/ns-logo.ico" rel="shortcut icon"/> 
 		<link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 		<link rel="stylesheet" type="text/css" href="style/mobility.css">
@@ -37,8 +37,8 @@
 			<table border="2">
 			<tr>
 				<th>TeamID</th>
-				<th>Teamnaam</th>
-				<th>Waarden</th>
+				<th>Team name</th>
+				<th>Ambitions</th>
 				<th>Stations</th>
 			</tr>
 			<?php
@@ -184,7 +184,7 @@
 					<?php
 					}
 					?>
-				<tr><th>Masterplan</th>
+				<tr><th>Master plan</th>
 					<?php
 					foreach($masterplan as $key => $element)
 					{
@@ -195,7 +195,7 @@
 					?>
 					
 					
-				<tr><th>Huidig Simpel</th>
+				<tr><th>Current simple</th>
 					<?php
 					foreach($simple_current as $key => $element)
 					{
@@ -204,7 +204,7 @@
 					<?php
 					}
 					?>
-				<tr><th>Huidig Compleet</th>
+				<tr><th>Current Complete</th>
 					<?php
 					foreach($current as $key => $element)
 					{

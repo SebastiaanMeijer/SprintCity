@@ -35,7 +35,7 @@
 		}
 		else
 		{
-			echo "Alleen bestanden van het XLS formaat kunnen worden geimporteerd";
+			echo "Only XLS format files can be imported";
 		}
 	}
 	else 

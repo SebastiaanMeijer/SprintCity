@@ -8,12 +8,12 @@
 ?>
 
 <div class="area">
-	<h2>Stationstypen</h2>
+	<h2>Station types</h2>
 	<form action="pages/submit_form.php" method="POST">
 		<table>
 			<tr class="warning">
 				<td>
-					<b>Waarschuwing:</b> Het wijzigen van deze waarden heeft effect op alle scenarios en games. Wanneer alreeds gespeelde games opnieuwe afgespeeld worden zullen er afwijkende resultaten optreden.
+					<b>warning:</b> Changing these values will affect all scenarios and games. When already performed sessions are run again, different results will occur.
 				</td>
 			</tr>
 		</table>
@@ -27,7 +27,7 @@
 				$('#saved_message').fadeOut().empty();
 			}
 		</script>
-		<span id="saved_message">Bezig met opslaan...</span>
+		<span id="saved_message">Saving...</span>
 <?php
 	}
 ?>
@@ -36,7 +36,7 @@
 				<td>
 					<table class="data">
 						<tr>
-							<th colspan="3">Typen</th>
+							<th colspan="3">Station types</th>
 						</tr>
 <?php
 	foreach ($stationTypes as $stationType_key => $stationType_value)
@@ -72,7 +72,7 @@
 			</tr>
 			<tr>
 				<td>
-					<button type="submit" name="Action" value="edit_station_types">Opslaan</button>
+					<button type="submit" name="Action" value="edit_station_types">Save</button>
 				</td>
 			</tr>
 		</table>

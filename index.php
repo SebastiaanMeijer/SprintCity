@@ -49,7 +49,7 @@ if (ClientSession::hasSession(session_id()))
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta name="keywords" content="">
 <meta name="description" content="">
-<title>Sprintstad Server</title>
+<title>SprintCity Server</title>
 <link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 <link rel="stylesheet" type="text/css" href="style/base.css">
 <link rel="stylesheet" type="text/css" href="style/style.css">
@@ -65,7 +65,7 @@ if (ClientSession::hasSession(session_id()))
 		<form action="index.php" method="POST">
 		<table>
 			<tr>
-				<td>Spel</td>
+				<td>Session</td>
 				<td>
 					<select name="game" onChange="this.form.submit()">
 <?php
@@ -98,7 +98,7 @@ if (ClientSession::hasSession(session_id()))
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><button type="submit" name="action" value="join">Start Spel</button></td>
+				<td colspan="2"><button type="submit" name="action" value="join">Start Session</button></td>
 			</tr>
 		</table>
 		</form>
@@ -106,11 +106,11 @@ if (ClientSession::hasSession(session_id()))
 	}
 	else
 	{
-		echo 'Er zijn geen games actief.';
+		echo 'There are no active sessions.';
 	}
 ?>
 		<a href="admin.php" style="float: right; display:block; margin:0 5px 5px 5px; width: 45%; text-align: right;">admin</a>
-		<a href="report.php?game=<?php echo $selected_game; ?>" style="float: left; display:block; margin:0 5px 5px 5px; width: 45%; text-align: left;">rapport</a>
+		<a href="report.php?game=<?php echo $selected_game; ?>" style="float: left; display:block; margin:0 5px 5px 5px; width: 45%; text-align: left;">report</a>
 	</div>
 </body>
 </html>

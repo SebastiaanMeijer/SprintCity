@@ -69,7 +69,7 @@
 				$scenario->save();
 				SaveDemand($scenario->id);
 				ScenarioStation::setStationsForScenario($scenario->id, $stations);
-				DisplayMessage('success', 'Success', array('De wijzigingen zijn opgeslagen.'));
+				DisplayMessage('success', 'Success', array('The changes were saved.'));
 			}
 			$otherStations = Station::getStationsNotOfScenario($scenarioId);
 		}
@@ -186,30 +186,30 @@
 		$warnings = array();
 		
 		if (is_null($scenario->name) || $scenario->name == "")
-			$errors[] = "Er is geen scenario naam ingevuld.";
+			$errors[] = "No name was given to the scenario.";
 		else if(!Scenario::isScenarioNameUnique($scenario->name, $scenario->id))
-			$errors[] = "De opgegeven scenario naam bestaat al.";
+			$errors[] = "This scenario name already exists.";
 		
 		if(is_null($scenario->description) || $scenario->description == "")
-			$warnings[] = "Er is geen omschrijving ingevuld.";
+			$warnings[] = "No description was given.";
 		
 		if(is_null($scenario->init_map_position_x) || is_null($scenario->init_map_position_y) ||  $scenario->init_map_position_x == "" || $scenario->init_map_position_y == "")
-			$errors[] = "De initiele kaartpositie is niet (volledig) ingevoerd.";
+			$errors[] = "Initial map position was not (well) defined.";
 		
 		if(is_null($scenario->init_map_scale) || $scenario->init_map_scale == "")
-			$errors[] = "Er is geen initiele kaart schaal ingevoerd.";
+			$errors[] = "Initial map scale unknown.";
 		
 		if(!$scenarioInUse && empty($stations))
-			$errors[] = "Er zijn geen stations toegevoegd aan het scenario";
+			$errors[] = "No stations were added to the scenario.";
 		
 	
 		// output errors
 		if (sizeof($errors) > 0)
-			DisplayMessage('error', 'Foutmelding', $errors);
+			DisplayMessage('error', 'Error', $errors);
 		
 		// output warnings
 		if (sizeof($warnings) > 0)
-			DisplayMessage('warning', 'Waarschuwing', $warnings);
+			DisplayMessage('warning', 'Warning', $warnings);
 		
 		return sizeof($errors) == 0;
 	}
@@ -239,7 +239,7 @@
 		
 		echo "\t\t\t\t\t\t\t\t" . '<table class="data">' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '<tr>' . "\n";
-		echo "\t\t\t\t\t\t\t\t\t\t" . '<th colspan="' . (sizeof($usedRoundInfos) + 1) . '">Marktvraag</th>' . "\n";
+		echo "\t\t\t\t\t\t\t\t\t\t" . '<th colspan="' . (sizeof($usedRoundInfos) + 1) . '">Demand</th>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '</tr>' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t" . '<tr class="' . $class . '">' . "\n";
 		echo "\t\t\t\t\t\t\t\t\t\t" . '<td></td>' . "\n";
@@ -265,14 +265,14 @@
 								<form id="scenarioform" name="scenarioform" onsubmit="formatStations()" method="POST">
 								<table class="data">
 									<tr>
-										<th colspan="2">Algemeen</th>
+										<th colspan="2">General</th>
 									</tr>
 									<tr class="<?php echo $class; ?>">
-										<td>Naam</td>
+										<td>Name</td>
 										<td><input type="text" name="name" maxLength="255" style="width: 350px;" value="<?php echo $scenario->name; ?>"></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
-										<td>Dienstregeling</td>
+										<td>Time table</td>
 										<td>
 											<select name="train_table_id">
 <?php
@@ -293,18 +293,18 @@
 										</td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
-										<td>Omschrijving</td>
+										<td>Description</td>
 										<td><textarea name="description" rows="12" style="width:350px;"><?php echo $scenario->description; ?></textarea></td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
-										<td>Kaart positie</td>
+										<td>Map position</td>
 										<td>
 											X <input type="text" name="init_map_position_x" maxLenght="5" value="<?php echo $scenario->init_map_position_x; ?>">
 											Y <input type="text" name="init_map_position_y" maxLenght="5" value="<?php echo $scenario->init_map_position_y; ?>">
 										</td>
 									</tr>
 									<tr class="<?php echo $class; ?>">
-										<td>Kaart schaal</td>
+										<td>Map scale</td>
 										<td><input type="text" name="init_map_scale" maxLenght="5" value="<?php echo $scenario->init_map_scale; ?>"></td>
 									</tr>
 								</table>
@@ -366,11 +366,11 @@
 											<?php
 												if($scenarioInUse)
 												{
-													echo "Dit scenario is al ingezet voor een spel.<br>U kunt de stations en marktvraag niet meer wijzigen.";
+													echo "This scenario has already been used in a game.<br>Stations and demand can no longer be changed.";
 												}
 												else
 												{
-													echo "Sleep de stations om de volgorde te wijzigen. <br> Dubbelklik op een station om te verwijderen.";
+													echo "Drag stations to change the order. <br> Double click station to delete.";
 												}
 											?>
 										</td>
@@ -420,7 +420,7 @@
 											<?php
 												if(!$scenarioInUse)
 												{
-													echo "<button  type=\"button\" onclick=\"addStation(newstation.selectedIndex)\">Voeg toe</button>";
+													echo "<button  type=\"button\" onclick=\"addStation(newstation.selectedIndex)\">Add</button>";
 												}
 											?>
 										</td>
@@ -429,7 +429,7 @@
 								<?php
 									GenerateDemandForm($demand);
 								?>
-								<button type="submit" name="FormAction" value="Save">Opslaan</button>
+								<button type="submit" name="FormAction" value="Save">Save</button>
 								</form>
 							</td>
 						</tr>

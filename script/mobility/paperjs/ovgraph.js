@@ -161,7 +161,7 @@ function drawStationNetworkValue(stations) {
         fontSize : 11,
         fillColor : 'black'
     };
-    labelText.content = 'Netwerkwaarde:';
+    labelText.content = 'Network value:';
     
     // values
     for (var i = 0; i < stations.length; i++) {
@@ -188,7 +188,7 @@ function drawTravelersPerDayValue(stations) {
         fontSize : 11,
         fillColor : 'black'
     };
-    labelText.content = 'Reizigers/dag:';
+    labelText.content = 'Passengers/day:';
     
     // values
     for (var i = 0; i < stations.length; i++) {

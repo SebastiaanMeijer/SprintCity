@@ -88,8 +88,8 @@ function getMobilityDataStations() {
 			SELECT Station.id AS station_id, 
 				   current_avg_travelers_per_stop AS currentTravelers, 
 				   initial_avg_travelers_per_stop AS cap100, 
-				   initial_avg_travelers_per_stop * 1.1 AS capOver, 
-				   initial_avg_travelers_per_stop * 0.9 AS capUnder
+				   initial_avg_travelers_per_stop * 1.25 AS capOver, 
+				   initial_avg_travelers_per_stop * 0.75 AS capUnder
 			FROM Station 
 			INNER JOIN TrainTableStation ON Station.code = TrainTableStation.code
 			INNER JOIN (SELECT station_id, AVG(travelersPerStop) AS current_avg_travelers_per_stop

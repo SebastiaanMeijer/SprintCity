@@ -10,20 +10,20 @@
 ?>
 
 <div class="area">
-	<h2>Nieuw team</h2>
+	<h2>New team</h2>
 	<form action="pages/submit_form.php" method="POST">
 		<input type="hidden" name="page" value="<?php getPage(); ?>">
 		<table>
 			<tr>
-				<td>Naam</td>
+				<td>Name</td>
 				<td><input type="text" name="name" maxlength="255"></td>
 			</tr>
 			<tr>
-				<td>Opmerkingen</td>
+				<td>Description</td>
 				<td><textarea name="description" rows="6"></textarea></td>
 			</tr>
 			<tr>
-				<td>Kleur</td>
+				<td>Color</td>
 				<td><input class="color" name="color"></input></td>
 			</tr>
 			<tr>
@@ -31,7 +31,7 @@
 				<td><input type="checkbox" name="cpu"></td>
 			</tr>
 			<tr>
-				<td colspan="2"><button type="submit" name="Action" value="new_team">Toevoegen</button></td>
+				<td colspan="2"><button type="submit" name="Action" value="new_team">Add</button></td>
 			<tr>
 		</table>
 	</form>
@@ -47,10 +47,10 @@
 	<table class="data">
 		<tr>
 			<th>ID</th>
-			<th>Naam</th>
-			<th>Kleur</th>
-			<th>Opmerkingen</th>
-			<th>Datum</th>
+			<th>Name</th>
+			<th>Color</th>
+			<th>Description</th>
+			<th>Date</th>
 			<th>Computer</th>
 		</tr>
 <?php	

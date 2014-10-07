@@ -11,7 +11,7 @@
 ?>
 
 <div class="area">
-	<h2>Nieuw Spel</h2>
+	<h2>New session</h2>
 	
 		<table>
 			<form action="admin.php?view=new_game" method="POST">
@@ -34,11 +34,11 @@
 			</form>
 			<form action="pages/submit_form.php" method="POST">
 			<tr>
-				<td>Naam</td>
+				<td>Name</td>
 				<td><input type="text" name="name" maxlength="255"></td>
 			</tr>
 			<tr>
-				<td>Opmerkingen</td>
+				<td>Description</td>
 				<td><textarea name="notes" rows="6"></textarea></td>
 			</tr>
 			<tr>
@@ -48,8 +48,8 @@
 						<tr>
 							<th>Code</th>
 							<th>Station</th>
-							<th>Gemeente</th>
-							<th>Regio</th>
+							<th>Municipality</th>
+							<th>Region</th>
 							<th>Team</th>
 						</tr>
 <?php
@@ -62,7 +62,7 @@
 		echo "\t\t\t\t\t\t" . '<td>' . $station_value->region . '</td>' . "\n";
 		echo "\t\t\t\t\t\t" . '<td>' . "\n";
 		echo "\t\t\t\t\t\t\t" . '<select name="team_' . $station_key . '">' . "\n";
-		echo "\t\t\t\t\t\t\t\t" . '<option value="null" selected>-geen-</option>'. "\n";
+		echo "\t\t\t\t\t\t\t\t" . '<option value="null" selected>-none-</option>'. "\n";
 		foreach ($teams as $team_key => $team_value)
 		{
 			echo "\t\t\t\t\t\t\t\t" . '<option value="' . $team_key . '">' . $team_value->name . '</option>' . "\n";
@@ -78,7 +78,7 @@
 			<tr>
 				<td colspan="2">
 					<input type="hidden" name="scenario" value="<?php echo $current_scenario; ?>"/>
-					<button type="submit" name="Action" value="new_game">Start Spel</button>
+					<button type="submit" name="Action" value="new_game">Start Session</button>
 				</td>
 			</tr>
 			</form>

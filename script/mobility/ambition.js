@@ -1,6 +1,6 @@
 /* vars go here */
 var max = 1;
-var message = "Er mag maximaal " + max + " ambitie ingevuld worden.";
+var message = "Only " + max + " ambition may be filled in.";
 
 function checkMax(checkgroup, limit, current)
 {

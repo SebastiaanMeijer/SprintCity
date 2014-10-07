@@ -69,7 +69,7 @@
 			// left info
 			var stationInstance:StationInstance = 
 				StationStatsCalculator.GetStationAfterProgram(station, Program.Default(), 0);
-			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
+			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "CURRENT");
 			// right info
 			OnEditorChange();
 			// update editor
@@ -131,7 +131,7 @@
 				station.transform_area_undeveloped_urban,
 				station.transform_area_undeveloped_rural,
 				0);
-			clip.transform_area.text = "(" + Math.round( station.GetTotalTransformArea()) + " ha resterend.)";
+			clip.transform_area.text = "(" + Math.round( station.GetTotalTransformArea()) + " ha remaining.)";
 			
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);
@@ -199,7 +199,7 @@
 			var new_transform_area:int = parent.GetCurrentStation().GetTotalTransformArea();
 			var stationInstance:StationInstance = 
 				StationStatsCalculator.GetStationAfterProgram(parent.GetCurrentStation(), parent.GetCurrentStation().program, new_transform_area);
-			DrawStationInfo(stationInstance, parent.program_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
+			DrawStationInfo(stationInstance, parent.program_movie.future_info, barFutureArea, barFutureTransformArea, "FUTURE");
 		}
 		
 		private function CreateProgram():Program

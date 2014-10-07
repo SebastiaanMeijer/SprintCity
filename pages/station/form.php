@@ -19,7 +19,7 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "code",
 			"label" => "Code",
-			"description" => "Telegrafische afkorting. Zie <a href=\"http://nl.wikipedia.org/wiki/Lijst_van_spoorwegstations_in_Nederland\" target=\"_blank\">wikipedia</a> voor een overzicht.",
+			"description" => "Station code (1 to 4 letters). For Dutch stations, see <a href=\"http://nl.wikipedia.org/wiki/Lijst_van_spoorwegstations_in_Nederland\" target=\"_blank\">wikipedia</a> for official list.",
 			"type" => "text",
 			"maxlength" => 5,
 			"disabled" => $disabled
@@ -28,8 +28,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "name",
-			"label" => "Naam",
-			"description" => "Gebruik wanneer nodig <i>&#38;shy;</i> op plaatsen waar het mogelijk is de naam op te breken (dit wordt gebruikt wanneer er weinig ruimte voor de station naam is in de OV applicatie grafiek).",
+			"label" => "Name",
+			"description" => "When station name is long, use <i>&#38;shy;</i> where break should be (this is used when there is little space for station names in the time table graph).",
 			"type" => "text",
 			"maxlength" => 255,
 			"disabled" => ""
@@ -38,8 +38,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "variant",
-			"label" => "Variant",
-			"description" => "Alleen zichtbaar hier in de back-end. Hiermee kan er onderscheid gemaakt worden tussen gelijke stations met afwijkende eigenschappen.",
+			"label" => "Version",
+			"description" => "Only visible in the back-end. This can be used to make versions of the same station, with different properties.",
 			"type" => "text",
 			"maxlength" => 255,
 			"disabled" => ""
@@ -48,7 +48,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "town",
-			"label" => "Gemeente",
+			"label" => "Municipality",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 255,
@@ -58,7 +58,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "region",
-			"label" => "Regio",
+			"label" => "Region",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 255,
@@ -68,8 +68,8 @@ function FormInit($inUse)
 		(
 			"tag" => "textarea",
 			"name" => "description_background",
-			"label" => "Achtergrond omschrijving",
-			"description" => "Gebruik [n] voor 'Enter'.",
+			"label" => "Spatial perspective",
+			"description" => "Use [n] for 'Enter'.",
 			"rows" => 12,
 			"disabled" => ""
 		),
@@ -77,8 +77,8 @@ function FormInit($inUse)
 		(
 			"tag" => "textarea",
 			"name" => "description_future",
-			"label" => "Toekomst omschrijving",
-			"description" => "Gebruik [n] voor 'Enter'.",
+			"label" => "Mobility perspective",
+			"description" => "Use [n] for 'Enter'.",
 			"rows" => 12,
 			"disabled" => ""
 		)
@@ -91,7 +91,7 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "POVN",
 			"label" => "POVN",
-			"description" => "Positie in het openbaar vervoersnetwerk in 2010",
+			"description" => "Initial public transport network value",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -101,7 +101,7 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "PWN",
 			"label" => "PWN",
-			"description" => "Positie in het wegennetwerk in 2010",
+			"description" => "Initial road transport network value",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -111,7 +111,7 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "IWD",
 			"label" => "IWD",
-			"description" => "Inwoners- en werknemersdichtheid in 2010",
+			"description" => "Initial residents and jobs density",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -121,7 +121,7 @@ function FormInit($inUse)
 			"tag" => "input",
 			"name" => "MNG",
 			"label" => "MNG",
-			"description" => "Mengingsintensiteit in 2010",
+			"description" => "Initial function mix",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -134,8 +134,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "area_cultivated_home",
-			"label" => "Bebouwd gebied wonen",
-			"description" => "In hectare",
+			"label" => "Built up area residential",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -144,8 +144,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "area_cultivated_work",
-			"label" => "Bebouwd gebied werken",
-			"description" => "In hectare",
+			"label" => "Built up area businesses",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -154,8 +154,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "area_cultivated_mixed",
-			"label" => "Bebouwd gebied mixed use",
-			"description" => "In hectare",
+			"label" => "Built up area amenities",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -164,8 +164,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "area_undeveloped_urban",
-			"label" => "Onbebouwd gebied binnenstedelijk",
-			"description" => "In hectare",
+			"label" => "Urban vacant space",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -174,8 +174,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "area_undeveloped_rural",
-			"label" => "Onbebouwd gebied uitleg",
-			"description" => "In hectare",
+			"label" => "Urban expansion area",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -184,7 +184,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_home_total",
-			"label" => "Totaal aantal huizen",
+			"label" => "Number of dwellings",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,
@@ -194,7 +194,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_work_total",
-			"label" => "Totaal bvo werk",
+			"label" => "Total business floor space",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,
@@ -204,7 +204,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_worker_total",
-			"label" => "Totaal aantal werknemers",
+			"label" => "Number of jobs",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,
@@ -218,8 +218,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "transform_area_cultivated_home",
-			"label" => "Bebouwd gebied wonen",
-			"description" => "In hectare",
+			"label" => "Built up area residential",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -228,8 +228,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "transform_area_cultivated_work",
-			"label" => "Bebouwd gebied werken",
-			"description" => "In hectare",
+			"label" => "Built up area businesses",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -238,8 +238,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "transform_area_cultivated_mixed",
-			"label" => "Bebouwd gebied mixed use",
-			"description" => "In hectare",
+			"label" => "Built up area amenities",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -248,8 +248,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "transform_area_undeveloped_urban",
-			"label" => "Onbebouwd gebied binnenstedelijk",
-			"description" => "In hectare",
+			"label" => "Urban vacant space",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -258,8 +258,8 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "transform_area_undeveloped_rural",
-			"label" => "Onbebouwd gebied uitleg",
-			"description" => "In hectare",
+			"label" => "Urban expansion area",
+			"description" => "In hectares",
 			"type" => "text",
 			"maxlength" => 4,
 			"disabled" => $disabled
@@ -268,7 +268,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_home_transform",
-			"label" => "Totaal aantal huizen",
+			"label" => "Number of dwellings",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,
@@ -278,7 +278,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_work_transform",
-			"label" => "Totaal bvo werk",
+			"label" => "Total business floor space",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,
@@ -288,7 +288,7 @@ function FormInit($inUse)
 		(
 			"tag" => "input",
 			"name" => "count_worker_transform",
-			"label" => "Totaal aantal werknemers",
+			"label" => "Number of jobs",
 			"description" => "",
 			"type" => "text",
 			"maxlength" => 7,

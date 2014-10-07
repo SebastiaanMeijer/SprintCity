@@ -1,0 +1,13 @@
+AlmerePoort = Almpo
+BleiZo = Blzt
+EindhovenAirport = Ehva
+Leiden Noord = Ldn
+LeidschendamNoord = Lsd
+Schiedam Kethel = Sdk
+Soestduinen = Stdu
+Veenendaal Zuid = Vndz
+Haarlem Westergracht = Wg
+Vogelenzang-Bennebroek = Vzbb
+Utrecht Vaartsche Rijn = Utvr
+Lisse = Lss
+Noordwijkerhout = Nwh

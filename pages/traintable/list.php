@@ -6,14 +6,14 @@
 	$traintables = TrainTable::GetAllTrainTables();
 ?>
 						<tr>
-							<td><a href="admin.php?view=traintable&action=edit" class="button">Dienstregeling toevoegen</a></td>
+							<td><a href="admin.php?view=traintable&action=edit" class="button">Add time table</a></td>
 						</tr>
 						<tr>
 							<td>
 								<table class="data">
 									<tr>
-										<th>Bestandsnaam</th>
-										<th>Toegevoegd op</th>
+										<th>File name</th>
+										<th>Added on</th>
 									</tr>
 <?php
 	foreach ($traintables as $key => $value) 

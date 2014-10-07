@@ -165,7 +165,7 @@
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_rural) + " ha resterend.)";
+				station.transform_area_undeveloped_rural) + " ha remaining.)";
 			
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);

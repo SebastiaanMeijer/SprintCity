@@ -2,7 +2,7 @@ $(document).ready(function() {
     $("#tabs").tabs();
 	
     $("#motivatie").click(function(){
-        if($("#motivatie").text() == "Vul hier je motivatie in... ")
+        if($("#motivatie").text() == "Fill in you motivation here... ")
         {
             $("#motivatie").text("");   
             

@@ -11,7 +11,7 @@ if(!empty($_POST['username']))
 	if($Auth->loggedIn())
 		redirect('admin.php');
 	else
-		$Error->add('username', "Ongeldige gebruikersnaam of wachtwoord.");
+		$Error->add('username', "Invalid user name or password.");
 }
 
 // Clean the submitted username before redisplaying it.
@@ -23,7 +23,7 @@ $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta name="keywords" content="">
 <meta name="description" content="">
-<title>Sprintstad Server</title>
+<title>SprintCity Server</title>
 <link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 <link rel="stylesheet" type="text/css" href="style/base.css">
 <link rel="stylesheet" type="text/css" href="style/style.css">
@@ -34,11 +34,11 @@ $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '
 		<form action="login.php" method="POST">
 		<table>
 			<tr>
-				<td>Gebruikersnaam</td>
+				<td>User name</td>
 				<td><input type="text" name="username" value="<?PHP echo $username;?>" id="username" /></td>
 			</tr>
 			<tr>
-				<td>Wachtwoord</td>
+				<td>Password</td>
 				<td>
 					<input type="password" name="password" value="" id="password" />
 				</td>
@@ -48,7 +48,7 @@ $username = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '
 			</tr>
 		</table>
 		</form>
-		<a href="index.php" style="display:block; margin:0 0 5px 5px; width: 95%; text-align: right;">terug</a>
+		<a href="index.php" style="display:block; margin:0 0 5px 5px; width: 95%; text-align: right;">back</a>
 	</div>
 </body>
 </html>

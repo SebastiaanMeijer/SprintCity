@@ -10,7 +10,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta name="keywords" content="">
 <meta name="description" content="">
-<title>Sprintstad Server</title>
+<title>SprintCity Server</title>
 <link rel="stylesheet" type="text/css" href="style/reset-fonts-grids.css">
 <link rel="stylesheet" type="text/css" href="style/base.css">
 <link rel="stylesheet" type="text/css" href="style/style.css">
@@ -22,7 +22,7 @@
 <body>
 <div id="doc4" class="yui-t2">
 	<div id="hd">
-		<h1>Sprintstad Server</h1>
+		<h1>SprintCity Server</h1>
 	</div>
 	<div id="bd">
 		<div id="yui-main">
@@ -37,11 +37,11 @@
 			</div>
 		</div>
 		<div class="yui-b">
-			<div class="menu-header">Spel</div>
+			<div class="menu-header">Session</div>
 			<div class="menu-body">
 				<ul>
-					<li><a href="admin.php?view=new_game">Nieuw Spel</a></li>
-					<li><a href="admin.php?view=games">Spellen</a></li>
+					<li><a href="admin.php?view=new_game">New Session</a></li>
+					<li><a href="admin.php?view=games">Sessions</a></li>
 					<li><a href="admin.php?view=teams">Teams</a></li>
 				</ul>
 			</div>
@@ -50,10 +50,10 @@
 			<div class="menu-body">
 				<ul>
 					<li><a href="admin.php?view=station">Stations</a></li>
-					<li><a href="admin.php?view=scenario">Scenario's</a></li>
-					<li><a href="admin.php?view=traintable">Dienstregelingen</a></li>
-					<li><a href="admin.php?view=constants">Constanten</a></li>
-					<li><a href="admin.php?view=station_types">Stationstypen</a></li>
+					<li><a href="admin.php?view=scenario">Scenarios</a></li>
+					<li><a href="admin.php?view=traintable">Time Tables</a></li>
+					<li><a href="admin.php?view=constants">Constants</a></li>
+					<li><a href="admin.php?view=station_types">Station Types</a></li>
 				</ul>
 			</div>
 			<div class = "menu-footer"></div>

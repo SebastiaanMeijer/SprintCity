@@ -18,12 +18,12 @@
 ?>
 
 <div class="area">
-	<h2>Constante waarden</h2>
+	<h2>Constant values</h2>
 	<form action="pages/submit_form.php" method="POST">
 		<table>
 			<tr class="warning">
 				<td>
-					<b>Waarschuwing:</b> Het wijzigen van deze waarden heeft effect op alle scenarios en games. Wanneer alreeds gespeelde games opnieuwe afgespeeld worden zullen er afwijkende resultaten optreden.
+					<b>Warning:</b> Changing these values will affect all scenarios and games. When already performed sessions are run again, different results will occur.
 				</td>
 			</tr>
 		</table>
@@ -32,29 +32,29 @@
 				<td>
 					<table class="data">
 						<tr>
-							<th colspan="2">Populatie</th>
+							<th colspan="2">Population</th>
 						</tr>
 						<tr class="odd">
-							<td>Gemiddeld aantal bewoners per woning</td>
+							<td>Average number of residents per dwelling</td>
 							<td><input type="text" name="average_citizens_per_home" maxlength="20" value="<?php echo $row['average_citizens_per_home'] ?>"></td>
 						</tr>
 						<tr class="even">
-							<td>Gemiddeld aantal werknemers per bvo</td>
+							<td>Average number of jobs per business floor space</td>
 							<td><input type="text" name="average_workers_per_bvo" maxlength="20" value="<?php echo $row['average_workers_per_bvo'] ?>"></td>
 						</tr>
 						<tr>
-							<th colspan="2">Reizigers</th>
+							<th colspan="2">Ridership</th>
 						</tr>
 						<tr class="odd">
-							<td>Gemiddeld aantal reizigers per inwoner</td>
+							<td>Average number of passengers per resident</td>
 							<td><input type="text" name="average_travelers_per_citizen" maxlength="20" value="<?php echo $row['average_travelers_per_citizen'] ?>"></td>
 						</tr>
 						<tr class="even">
-							<td>Gemiddeld aantal reizigers per werknemer</td>
+							<td>Average number of passengers per job</td>
 							<td><input type="text" name="average_travelers_per_worker" maxlength="20" value="<?php echo $row['average_travelers_per_worker'] ?>"></td>
 						</tr>
 						<tr class="odd">
-							<td>Gemiddeld aantal reizigers per ha leisure</td>
+							<td>Average number of passengers per hectare amenities</td>
 							<td><input type="text" name="average_travelers_per_ha_leisure" maxlength="20" value="<?php echo $row['average_travelers_per_ha_leisure'] ?>"></td>
 						</tr>
 					</table>
@@ -62,7 +62,7 @@
 			</tr>
 			<tr>
 				<td>
-					<button type="submit" name="Action" value="edit_constants">Oplaan</button>
+					<button type="submit" name="Action" value="edit_constants">Save</button>
 <?php
 				if (isset($_GET['intent']) && $_GET['intent'] == "done")
 				{
@@ -73,7 +73,7 @@
 							$('#saved_message').fadeOut().empty();
 						}
 					</script>
-					<span id="saved_message">Bezig met opslaan...</span>
+					<span id="saved_message">Saving...</span>
 <?php
 				}
 ?>

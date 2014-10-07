@@ -9,7 +9,7 @@
 	//echo "<br>";
 ?>
 				<div class="area">
-					<h2>Dienstregeling</h2>
+					<h2>Time table</h2>
 					<table>
 <?php 
 if (isset($_REQUEST['action']))
@@ -34,8 +34,8 @@ else
 ?>
 						<tr class="error">
 							<td>
-								Geen bestand gevonden. Het geselecteerde bestand overschrijdt waarschijnlijk het upload limiet van <?php echo getUploadLimit(); ?>MB.
-								Verander de volgende variablen in de php.ini: post_max_size=20M, upload_max_filesize=20M.
+								File not found. The selected file is probably larger than the limite of <?php echo getUploadLimit(); ?>MB.
+								Change the following variables in php.ini: post_max_size=20M, upload_max_filesize=20M.
 							</td>
 						</tr>
 <?php

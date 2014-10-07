@@ -8,7 +8,7 @@
 									<input type="hidden" name="action" value="import">
 								<table class="data">
 									<tr class="<?php echo $class; ?>">
-										<td>Excel bestand dienstregeling</td>
+										<td>Excel file time table</td>
 										<td><input name="trainTableFileName" type="file"></td>
 									</tr>
 								</table>

@@ -83,7 +83,7 @@
 			// left info
 			stationInstance = StationInstance.Create(station);
 			stationInstance.ApplyProgram(Program.Default(), 0);
-			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "HUIDIG");
+			DrawStationInfo(stationInstance, view.current_info, barCurrentArea, barCurrentTransformArea, "CURRENT");
 			
 			// init windows
 			InitWindows(station);
@@ -145,7 +145,7 @@
 				station.area_undeveloped_urban + 
 				station.area_undeveloped_rural) + " ha.)";
 			
-			if (title == "TOEKOMST")
+			if (title == "FUTURE")
 			{
 				transform_area_bar.drawStationCurrentBar(station.station, station.station.GetRoundById(Data.Get().current_round_id), CreateProgram());
 			}
@@ -159,7 +159,7 @@
 				station.transform_area_cultivated_work + 
 				station.transform_area_cultivated_mixed +  
 				station.transform_area_undeveloped_urban +
-				station.transform_area_undeveloped_rural) + " ha resterend.)";
+				station.transform_area_undeveloped_rural) + " ha remaining.)";
 			
 			clip.amount_travelers.text = StationStatsCalculator.GetTravelersStats(station);
 			clip.amount_citizens.text = StationStatsCalculator.GetCitizenStats(station);
@@ -344,7 +344,7 @@
 				new_transform_area = round.new_transform_area;
 			}
 			tempStationInstance.ApplyProgram(program, new_transform_area);
-			DrawStationInfo(tempStationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "TOEKOMST");
+			DrawStationInfo(tempStationInstance, parent.round_movie.future_info, barFutureArea, barFutureTransformArea, "FUTURE");
 		}
 		
 		private function CreateProgram():Program

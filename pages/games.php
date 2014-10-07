@@ -10,7 +10,7 @@
 ?>
 
 <div class="area">
-	<h2>Spellen</h2>
+	<h2>Sessions</h2>
 <?php
 	$class = new Loop('odd', 'even');
 	$pager = new Pager(getPage(), 10, Game::rowCount());
@@ -21,12 +21,12 @@
 		<table class="data">
 			<tr>
 				<th>ID</th>
-				<th>Naam</th>
+				<th>Name</th>
 				<th>Scenario</th>
 				<th>Start</th>
-				<th>Ronde</th>
-				<th>Actief</th>
-				<th width="75">Voortgang</th>
+				<th>Round</th>
+				<th>Active</th>
+				<th width="75">Progress</th>
 				<th></th>
 			</tr>
 <?php	
@@ -59,7 +59,7 @@
 ?>
 				</td>
 				<td>
-					<button type="submit" onclick="return confirm('Weet u zeker dat u dit spel wilt verwijderen?');" name="Action" value="delete_game,<?php echo $key; ?>">Verwijder</button>
+					<button type="submit" onclick="return confirm('Are you sure you want to delete this session?');" name="Action" value="delete_game,<?php echo $key; ?>">Delete</button>
 			</tr>
 <?php
 	}
