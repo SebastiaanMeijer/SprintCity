@@ -2,15 +2,15 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-CREATE SCHEMA IF NOT EXISTS `SprintStad` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
-USE `SprintStad` ;
+CREATE SCHEMA IF NOT EXISTS `SprintCity` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
+USE `SprintCity` ;
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Station`
+-- Table `Station`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Station` ;
+DROP TABLE IF EXISTS `Station` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Station` (
+CREATE  TABLE IF NOT EXISTS `Station` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `code` VARCHAR(5) NULL ,
   `name` TINYTEXT NULL ,
@@ -45,11 +45,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`RoundInfo`
+-- Table `RoundInfo`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`RoundInfo` ;
+DROP TABLE IF EXISTS `RoundInfo` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`RoundInfo` (
+CREATE  TABLE IF NOT EXISTS `RoundInfo` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `number` INT NOT NULL ,
   `name` TINYTEXT NULL ,
@@ -59,11 +59,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TrainTable`
+-- Table `TrainTable`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TrainTable` ;
+DROP TABLE IF EXISTS `TrainTable` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTable` (
+CREATE  TABLE IF NOT EXISTS `TrainTable` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `filename` TINYTEXT NULL ,
   `import_timestamp` DATETIME NULL ,
@@ -72,11 +72,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Scenario`
+-- Table `Scenario`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Scenario` ;
+DROP TABLE IF EXISTS `Scenario` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Scenario` (
+CREATE  TABLE IF NOT EXISTS `Scenario` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `train_table_id` INT NULL ,
   `name` TINYTEXT NULL ,
@@ -88,18 +88,18 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`Scenario` (
   INDEX `fk_Scenario_TrainTable1` (`train_table_id` ASC) ,
   CONSTRAINT `fk_Scenario_TrainTable1`
     FOREIGN KEY (`train_table_id` )
-    REFERENCES `SprintStad`.`TrainTable` (`id` )
+    REFERENCES `TrainTable` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Game`
+-- Table `Game`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Game` ;
+DROP TABLE IF EXISTS `Game` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Game` (
+CREATE  TABLE IF NOT EXISTS `Game` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `scenario_id` INT NOT NULL ,
   `name` TINYTEXT NULL ,
@@ -112,23 +112,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`Game` (
   INDEX `scenario_fk` (`scenario_id` ASC) ,
   CONSTRAINT `current_round_fk`
     FOREIGN KEY (`current_round_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `scenario_fk`
     FOREIGN KEY (`scenario_id` )
-    REFERENCES `SprintStad`.`Scenario` (`id` )
+    REFERENCES `Scenario` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Team`
+-- Table `Team`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Team` ;
+DROP TABLE IF EXISTS `Team` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Team` (
+CREATE  TABLE IF NOT EXISTS `Team` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` TINYTEXT NULL ,
   `description` TEXT NULL ,
@@ -140,11 +140,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TeamInstance`
+-- Table `TeamInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TeamInstance` ;
+DROP TABLE IF EXISTS `TeamInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TeamInstance` (
+CREATE  TABLE IF NOT EXISTS `TeamInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `game_id` INT NOT NULL ,
   `team_id` INT NOT NULL ,
@@ -154,23 +154,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TeamInstance` (
   INDEX `team_instance-game_fk` (`game_id` ASC) ,
   CONSTRAINT `team_instance-team_fk`
     FOREIGN KEY (`team_id` )
-    REFERENCES `SprintStad`.`Team` (`id` )
+    REFERENCES `Team` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `team_instance-game_fk`
     FOREIGN KEY (`game_id` )
-    REFERENCES `SprintStad`.`Game` (`id` )
+    REFERENCES `Game` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Types`
+-- Table `Types`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Types` ;
+DROP TABLE IF EXISTS `Types` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Types` (
+CREATE  TABLE IF NOT EXISTS `Types` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` TINYTEXT NULL ,
   `type` SET('home','work','leisure','average_home','average_work','average_leisure') NULL ,
@@ -185,11 +185,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Program`
+-- Table `Program`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Program` ;
+DROP TABLE IF EXISTS `Program` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Program` (
+CREATE  TABLE IF NOT EXISTS `Program` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `area_home` INT NULL DEFAULT 0 ,
   `area_work` INT NULL DEFAULT 0 ,
@@ -203,28 +203,28 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`Program` (
   INDEX `type_leisure_fk` (`type_leisure` ASC) ,
   CONSTRAINT `type_home_fk`
     FOREIGN KEY (`type_home` )
-    REFERENCES `SprintStad`.`Types` (`id` )
+    REFERENCES `Types` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `type_work_fk`
     FOREIGN KEY (`type_work` )
-    REFERENCES `SprintStad`.`Types` (`id` )
+    REFERENCES `Types` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `type_leisure_fk`
     FOREIGN KEY (`type_leisure` )
-    REFERENCES `SprintStad`.`Types` (`id` )
+    REFERENCES `Types` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`StationInstance`
+-- Table `StationInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`StationInstance` ;
+DROP TABLE IF EXISTS `StationInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`StationInstance` (
+CREATE  TABLE IF NOT EXISTS `StationInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `station_id` INT NOT NULL ,
   `team_instance_id` INT NOT NULL ,
@@ -236,28 +236,28 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`StationInstance` (
   INDEX `station_instance-program_fk` (`program_id` ASC) ,
   CONSTRAINT `station_instance-station_fk`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`Station` (`id` )
+    REFERENCES `Station` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `station_instance-team_instance_fk`
     FOREIGN KEY (`team_instance_id` )
-    REFERENCES `SprintStad`.`TeamInstance` (`id` )
+    REFERENCES `TeamInstance` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `station_instance-program_fk`
     FOREIGN KEY (`program_id` )
-    REFERENCES `SprintStad`.`Program` (`id` )
+    REFERENCES `Program` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Round`
+-- Table `Round`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Round` ;
+DROP TABLE IF EXISTS `Round` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Round` (
+CREATE  TABLE IF NOT EXISTS `Round` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `station_id` INT NOT NULL ,
   `round_info_id` INT NOT NULL ,
@@ -270,23 +270,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`Round` (
   INDEX `round-round_info_fk` (`round_info_id` ASC) ,
   CONSTRAINT `round-station_fk`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`Station` (`id` )
+    REFERENCES `Station` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `round-round_info_fk`
     FOREIGN KEY (`round_info_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`RoundInstance`
+-- Table `RoundInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`RoundInstance` ;
+DROP TABLE IF EXISTS `RoundInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`RoundInstance` (
+CREATE  TABLE IF NOT EXISTS `RoundInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `round_id` INT NOT NULL ,
   `station_instance_id` INT NOT NULL ,
@@ -301,33 +301,33 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`RoundInstance` (
   INDEX `round_instance_program_fk2` (`exec_program_id` ASC) ,
   CONSTRAINT `round_instance-round_fk`
     FOREIGN KEY (`round_id` )
-    REFERENCES `SprintStad`.`Round` (`id` )
+    REFERENCES `Round` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `round_instance-program_fk`
     FOREIGN KEY (`plan_program_id` )
-    REFERENCES `SprintStad`.`Program` (`id` )
+    REFERENCES `Program` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `round_instance-station_instance_fk`
     FOREIGN KEY (`station_instance_id` )
-    REFERENCES `SprintStad`.`StationInstance` (`id` )
+    REFERENCES `StationInstance` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `round_instance_program_fk2`
     FOREIGN KEY (`exec_program_id` )
-    REFERENCES `SprintStad`.`Program` (`id` )
+    REFERENCES `Program` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Constants`
+-- Table `Constants`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Constants` ;
+DROP TABLE IF EXISTS `Constants` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Constants` (
+CREATE  TABLE IF NOT EXISTS `Constants` (
   `average_citizens_per_home` FLOAT NOT NULL DEFAULT 2.3 COMMENT 'Gemiddeld aantal inwoners per woning(2.3inw/won)' ,
   `average_workers_per_bvo` FLOAT NOT NULL DEFAULT 0.04 ,
   `average_travelers_per_citizen` FLOAT NOT NULL DEFAULT 0.15 ,
@@ -337,11 +337,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`StationTypes`
+-- Table `StationTypes`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`StationTypes` ;
+DROP TABLE IF EXISTS `StationTypes` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`StationTypes` (
+CREATE  TABLE IF NOT EXISTS `StationTypes` (
   `id` INT NOT NULL ,
   `name` TINYTEXT NULL ,
   `description` TEXT NULL ,
@@ -355,11 +355,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`sessions`
+-- Table `sessions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`sessions` ;
+DROP TABLE IF EXISTS `sessions` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`sessions` (
+CREATE  TABLE IF NOT EXISTS `sessions` (
   `id` VARCHAR(255) CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
   `data` TEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
   `updated_on` INT(10) NOT NULL ,
@@ -370,11 +370,11 @@ COLLATE = utf8_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`users`
+-- Table `users`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`users` ;
+DROP TABLE IF EXISTS `users` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`users` (
+CREATE  TABLE IF NOT EXISTS `users` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
   `username` VARCHAR(65) CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
   `password` VARCHAR(65) CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ,
@@ -388,11 +388,11 @@ COLLATE = utf8_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Value`
+-- Table `Value`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Value` ;
+DROP TABLE IF EXISTS `Value` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Value` (
+CREATE  TABLE IF NOT EXISTS `Value` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `title` TINYTEXT NULL ,
   `description` TEXT NULL ,
@@ -402,11 +402,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`ValueInstance`
+-- Table `ValueInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`ValueInstance` ;
+DROP TABLE IF EXISTS `ValueInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`ValueInstance` (
+CREATE  TABLE IF NOT EXISTS `ValueInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `value_id` INT NOT NULL ,
   `team_instance_id` INT NOT NULL ,
@@ -416,23 +416,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`ValueInstance` (
   INDEX `value_instance-team_instance_fk` (`team_instance_id` ASC) ,
   CONSTRAINT `value_instance-value_fk`
     FOREIGN KEY (`value_id` )
-    REFERENCES `SprintStad`.`Value` (`id` )
+    REFERENCES `Value` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `value_instance-team_instance_fk`
     FOREIGN KEY (`team_instance_id` )
-    REFERENCES `SprintStad`.`TeamInstance` (`id` )
+    REFERENCES `TeamInstance` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`ClientSession`
+-- Table `ClientSession`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`ClientSession` ;
+DROP TABLE IF EXISTS `ClientSession` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`ClientSession` (
+CREATE  TABLE IF NOT EXISTS `ClientSession` (
   `id` VARCHAR(255) NOT NULL ,
   `team_instance_id` INT NOT NULL ,
   `created` INT NOT NULL ,
@@ -440,18 +440,18 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`ClientSession` (
   PRIMARY KEY (`id`) ,
   CONSTRAINT `client_session-team_instance-fk`
     FOREIGN KEY (`team_instance_id` )
-    REFERENCES `SprintStad`.`TeamInstance` (`id` )
+    REFERENCES `TeamInstance` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Demand`
+-- Table `Demand`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Demand` ;
+DROP TABLE IF EXISTS `Demand` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Demand` (
+CREATE  TABLE IF NOT EXISTS `Demand` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `scenario_id` INT NOT NULL ,
   `round_info_id` INT NOT NULL ,
@@ -463,28 +463,28 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`Demand` (
   INDEX `demand-scenario_fk` (`scenario_id` ASC) ,
   CONSTRAINT `demand-round_info_fk`
     FOREIGN KEY (`round_info_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `demand-types_fk`
     FOREIGN KEY (`type_id` )
-    REFERENCES `SprintStad`.`Types` (`id` )
+    REFERENCES `Types` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `demand-scenario_fk`
     FOREIGN KEY (`scenario_id` )
-    REFERENCES `SprintStad`.`Scenario` (`id` )
+    REFERENCES `Scenario` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`RoundInfoInstance`
+-- Table `RoundInfoInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`RoundInfoInstance` ;
+DROP TABLE IF EXISTS `RoundInfoInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`RoundInfoInstance` (
+CREATE  TABLE IF NOT EXISTS `RoundInfoInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `game_id` INT NOT NULL ,
   `round_info_id` INT NOT NULL ,
@@ -494,23 +494,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`RoundInfoInstance` (
   INDEX `round_info_instance-round_info_fk` (`round_info_id` ASC) ,
   CONSTRAINT `round_info_instance-game_fk`
     FOREIGN KEY (`game_id` )
-    REFERENCES `SprintStad`.`Game` (`id` )
+    REFERENCES `Game` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `round_info_instance-round_info_fk`
     FOREIGN KEY (`round_info_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`ScenarioStation`
+-- Table `ScenarioStation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`ScenarioStation` ;
+DROP TABLE IF EXISTS `ScenarioStation` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`ScenarioStation` (
+CREATE  TABLE IF NOT EXISTS `ScenarioStation` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `order` INT NOT NULL DEFAULT 1 ,
   `scenario_id` INT NOT NULL ,
@@ -520,23 +520,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`ScenarioStation` (
   INDEX `scenario_station-station_fk` (`station_id` ASC) ,
   CONSTRAINT `scenario_station-scenario_fk`
     FOREIGN KEY (`scenario_id` )
-    REFERENCES `SprintStad`.`Scenario` (`id` )
+    REFERENCES `Scenario` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `scenario_station-station_fk`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`Station` (`id` )
+    REFERENCES `Station` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TrainTableStation`
+-- Table `TrainTableStation`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TrainTableStation` ;
+DROP TABLE IF EXISTS `TrainTableStation` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableStation` (
+CREATE  TABLE IF NOT EXISTS `TrainTableStation` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `train_table_id` INT NOT NULL ,
   `code` VARCHAR(5) NULL ,
@@ -548,18 +548,18 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableStation` (
   INDEX `fk_Stationcodes` (`code` ASC) ,
   CONSTRAINT `fk_TrainTableStation_TrainTable1`
     FOREIGN KEY (`train_table_id` )
-    REFERENCES `SprintStad`.`TrainTable` (`id` )
+    REFERENCES `TrainTable` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TrainTableTrain`
+-- Table `TrainTableTrain`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TrainTableTrain` ;
+DROP TABLE IF EXISTS `TrainTableTrain` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableTrain` (
+CREATE  TABLE IF NOT EXISTS `TrainTableTrain` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `train_table_id` INT NOT NULL ,
   `name` TINYTEXT NULL ,
@@ -568,18 +568,18 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableTrain` (
   INDEX `fk_TrainTableTrain_TrainTable1` (`train_table_id` ASC) ,
   CONSTRAINT `fk_TrainTableTrain_TrainTable1`
     FOREIGN KEY (`train_table_id` )
-    REFERENCES `SprintStad`.`TrainTable` (`id` )
+    REFERENCES `TrainTable` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TrainTableEntry`
+-- Table `TrainTableEntry`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TrainTableEntry` ;
+DROP TABLE IF EXISTS `TrainTableEntry` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableEntry` (
+CREATE  TABLE IF NOT EXISTS `TrainTableEntry` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `train_id` INT NOT NULL ,
   `station_id` INT NOT NULL ,
@@ -589,23 +589,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableEntry` (
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fk_TrainTableEntry_TrainTableTrain1`
     FOREIGN KEY (`train_id` )
-    REFERENCES `SprintStad`.`TrainTableTrain` (`id` )
+    REFERENCES `TrainTableTrain` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `fk_TrainTableEntry_TrainTableStation1`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`TrainTableStation` (`id` )
+    REFERENCES `TrainTableStation` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TrainTableEntryInstance`
+-- Table `TrainTableEntryInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TrainTableEntryInstance` ;
+DROP TABLE IF EXISTS `TrainTableEntryInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableEntryInstance` (
+CREATE  TABLE IF NOT EXISTS `TrainTableEntryInstance` (
   `round_info_instance_id` INT NOT NULL ,
   `train_id` INT NOT NULL ,
   `station_id` INT NOT NULL ,
@@ -616,28 +616,28 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TrainTableEntryInstance` (
   INDEX `fk_TrainTableEntryInstance_RoundInfoInstance1` (`round_info_instance_id` ASC) ,
   CONSTRAINT `fk_TrainTableEntryInstance_TrainTableTrain1`
     FOREIGN KEY (`train_id` )
-    REFERENCES `SprintStad`.`TrainTableTrain` (`id` )
+    REFERENCES `TrainTableTrain` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `fk_TrainTableEntryInstance_TrainTableStation1`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`TrainTableStation` (`id` )
+    REFERENCES `TrainTableStation` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `fk_TrainTableEntryInstance_RoundInfoInstance1`
     FOREIGN KEY (`round_info_instance_id` )
-    REFERENCES `SprintStad`.`RoundInfoInstance` (`id` )
+    REFERENCES `RoundInfoInstance` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TravelerHistory`
+-- Table `TravelerHistory`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TravelerHistory` ;
+DROP TABLE IF EXISTS `TravelerHistory` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TravelerHistory` (
+CREATE  TABLE IF NOT EXISTS `TravelerHistory` (
   `round_info_instance_id` INT NOT NULL ,
   `station_id` INT NOT NULL ,
   `travelers_per_stop` INT NULL ,
@@ -646,23 +646,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TravelerHistory` (
   INDEX `fk_StationTravelerHistory_RoundInfoInstance1` (`round_info_instance_id` ASC) ,
   CONSTRAINT `fk_StationTravelerHistory_TrainTableStation1`
     FOREIGN KEY (`station_id` )
-    REFERENCES `SprintStad`.`TrainTableStation` (`id` )
+    REFERENCES `TrainTableStation` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `fk_StationTravelerHistory_RoundInfoInstance1`
     FOREIGN KEY (`round_info_instance_id` )
-    REFERENCES `SprintStad`.`RoundInfoInstance` (`id` )
+    REFERENCES `RoundInfoInstance` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`Facility`
+-- Table `Facility`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`Facility` ;
+DROP TABLE IF EXISTS `Facility` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`Facility` (
+CREATE  TABLE IF NOT EXISTS `Facility` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `name` TINYTEXT NULL ,
   `description` TEXT NULL ,
@@ -675,11 +675,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`FacilityInstance`
+-- Table `FacilityInstance`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`FacilityInstance` ;
+DROP TABLE IF EXISTS `FacilityInstance` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`FacilityInstance` (
+CREATE  TABLE IF NOT EXISTS `FacilityInstance` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `round_instance_id` INT NULL ,
   `facility_id` INT NULL ,
@@ -688,23 +688,23 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`FacilityInstance` (
   INDEX `facility-instance_facility_fk_idx` (`facility_id` ASC) ,
   CONSTRAINT `facility-instance_round-instance_fk`
     FOREIGN KEY (`round_instance_id` )
-    REFERENCES `SprintStad`.`RoundInstance` (`id` )
+    REFERENCES `RoundInstance` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `facility-instance_facility_fk`
     FOREIGN KEY (`facility_id` )
-    REFERENCES `SprintStad`.`Facility` (`id` )
+    REFERENCES `Facility` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`TypeRestriction`
+-- Table `TypeRestriction`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`TypeRestriction` ;
+DROP TABLE IF EXISTS `TypeRestriction` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`TypeRestriction` (
+CREATE  TABLE IF NOT EXISTS `TypeRestriction` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `station_instance_id` INT NULL ,
   `from_round_info_id` INT NULL ,
@@ -717,33 +717,33 @@ CREATE  TABLE IF NOT EXISTS `SprintStad`.`TypeRestriction` (
   INDEX `type-restriction_type_fk_idx` (`type_id` ASC) ,
   CONSTRAINT `type-restriction_station-instance_fk`
     FOREIGN KEY (`station_instance_id` )
-    REFERENCES `SprintStad`.`StationInstance` (`id` )
+    REFERENCES `StationInstance` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `from_type-restriction_round-info_fk`
     FOREIGN KEY (`from_round_info_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `to_type-restriction_round-info_fk`
     FOREIGN KEY (`to_round_info_id` )
-    REFERENCES `SprintStad`.`RoundInfo` (`id` )
+    REFERENCES `RoundInfo` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   CONSTRAINT `type-restriction_type_fk`
     FOREIGN KEY (`type_id` )
-    REFERENCES `SprintStad`.`Types` (`id` )
+    REFERENCES `Types` (`id` )
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`InitialNetworkValues`
+-- Table `InitialNetworkValues`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`InitialNetworkValues` ;
+DROP TABLE IF EXISTS `InitialNetworkValues` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`InitialNetworkValues` (
+CREATE  TABLE IF NOT EXISTS `InitialNetworkValues` (
   `station_id` INT NULL ,
   `networkValue` DOUBLE NULL ,
   `chainValue` INT NULL ,
@@ -752,11 +752,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `SprintStad`.`InitialTravelersPerStop`
+-- Table `InitialTravelersPerStop`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SprintStad`.`InitialTravelersPerStop` ;
+DROP TABLE IF EXISTS `InitialTravelersPerStop` ;
 
-CREATE  TABLE IF NOT EXISTS `SprintStad`.`InitialTravelersPerStop` (
+CREATE  TABLE IF NOT EXISTS `InitialTravelersPerStop` (
   `train_id` INT NULL ,
   `station_id` INT NULL ,
   `travelersPerStop` INT NULL ,
