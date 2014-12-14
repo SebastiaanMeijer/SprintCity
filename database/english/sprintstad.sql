@@ -934,9 +934,12 @@ CREATE TABLE IF NOT EXISTS `facility` (
   `name` tinytext,
   `description` text,
   `image` tinytext,
-  `citizens` int(11) DEFAULT NULL,
-  `workers` int(11) DEFAULT NULL,
-  `travelers` int(11) DEFAULT NULL,
+  `citizens` int(11) DEFAULT 0,
+  `workers` int(11) DEFAULT 0,
+  `travelers` int(11) DEFAULT 0,
+  `citizens_percent` FLOAT DEFAULT 0,
+  `workers_percent` FLOAT DEFAULT 0,
+  `travelers_percent` FLOAT DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
 
@@ -944,26 +947,26 @@ CREATE TABLE IF NOT EXISTS `facility` (
 -- Dumping data for table `facility`
 --
 
-INSERT INTO `facility` (`id`, `name`, `description`, `image`, `citizens`, `workers`, `travelers`) VALUES
-(1, 'Regional Hospital', NULL, '/SprintStad/images/facilities/hospital.png', 0, 2000, 1000),
-(2, 'Regional Education Center', NULL, '/SprintStad/images/facilities/school.png', 0, 1140, 2000),
-(3, 'Outdoor Recreation Facility', NULL, '/SprintStad/images/facilities/recreation.png', 0, 40, 200),
-(4, 'Furniture Retail Center', NULL, '/SprintStad/images/facilities/ikea.png', 0, 500, 500),
-(5, 'Hotel and Conference Center', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 400, 800),
-(6, 'Dune Visitor Center', NULL, '/SprintStad/images/facilities/restaurant.png', 0, 15, 100),
-(7, 'Botanical Gardens', NULL, '/SprintStad/images/facilities/tuin.png', 0, 5, 10),
-(8, 'Beach Club', NULL, '/SprintStad/images/facilities/restaurant.png', 0, 10, 25),
-(9, 'Hotel and Wellness Resort', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 20, 40),
-(10, 'Conference Center', NULL, '/SprintStad/images/facilities/conferentie.png', 0, 20, 40),
-(11, 'Elderly Care Center', NULL, ' /SprintStad/images/facilities/hospital.png', 210, 930, 50),
-(12, 'Park + Ride Facility', NULL, '/SprintStad/images/facilities/PenR.png', 0, 10, 750),
-(13, 'Coastal Tram Service Zandvoort + Overveen', NULL, '/SprintStad/images/facilities/tram.png', 0, 5, 400),
-(14, 'Verknopen HOV met station Driehuis', NULL, '/SprintStad/images/facilities/verknopen_bus_trein.png', 0, 5, 680),
-(15, 'Concurrentie HOV Driehuis', NULL, '/SprintStad/images/facilities/bus.png', 4922, 1440, 0),
-(16, 'Concurrentie HOV Santpoort Noord', NULL, '/SprintStad/images/facilities/bus.png', 4540, 1694, 0),
-(17, 'Concurrentie HOV Santpoort Zuid', NULL, '/SprintStad/images/facilities/bus.png', 725, 99, 0),
-(18, 'Concurrentie HOV Bloemendaal', NULL, '/SprintStad/images/facilities/bus.png', 7825, 1043, 0),
-(19, 'Factory Outlet Center', NULL, '/SprintStad/images/facilities/shopping.png', 0, 250, 625);
+INSERT INTO `facility` (`id`, `name`, `description`, `image`, `citizens`, `workers`, `travelers`, `citizens_percent`, `workers_percent`, `travelers_percent`) VALUES
+(1, 'Regional Hospital', NULL, '/SprintStad/images/facilities/hospital.png', 0, 2000, 1000, 0, 0, 0),
+(2, 'Regional Education Center', NULL, '/SprintStad/images/facilities/school.png', 0, 1140, 2000, 0, 0, 0),
+(3, 'Outdoor Recreation Facility', NULL, '/SprintStad/images/facilities/recreation.png', 0, 40, 200, 0, 0, 0),
+(4, 'Furniture Retail Center', NULL, '/SprintStad/images/facilities/ikea.png', 0, 500, 500, 0, 0, 0),
+(5, 'Hotel and Conference Center', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 400, 800, 0, 0, 0),
+(6, 'Dune Visitor Center', NULL, '/SprintStad/images/facilities/restaurant.png', 0, 15, 100, 0, 0, 0),
+(7, 'Botanical Gardens', NULL, '/SprintStad/images/facilities/tuin.png', 0, 5, 10, 0, 0, 0),
+(8, 'Beach Club', NULL, '/SprintStad/images/facilities/restaurant.png', 0, 10, 25, 0, 0, 0),
+(9, 'Hotel and Wellness Resort', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 20, 40, 0, 0, 0),
+(10, 'Conference Center', NULL, '/SprintStad/images/facilities/conferentie.png', 0, 20, 40, 0, 0, 0),
+(11, 'Elderly Care Center', NULL, ' /SprintStad/images/facilities/hospital.png', 210, 930, 50, 0, 0, 0),
+(12, 'Park + Ride Facility', NULL, '/SprintStad/images/facilities/PenR.png', 0, 10, 750, 0, 0, 0),
+(13, 'Coastal Tram Service Zandvoort + Overveen', NULL, '/SprintStad/images/facilities/tram.png', 0, 5, 400, 0, 0, 0),
+(14, 'Verknopen HOV met station Driehuis', NULL, '/SprintStad/images/facilities/verknopen_bus_trein.png', 0, 5, 680, 0, 0, 0),
+(15, 'Concurrentie HOV Driehuis', NULL, '/SprintStad/images/facilities/bus.png', 4922, 1440, 0, 0, 0, 0),
+(16, 'Concurrentie HOV Santpoort Noord', NULL, '/SprintStad/images/facilities/bus.png', 4540, 1694, 0, 0, 0, 0),
+(17, 'Concurrentie HOV Santpoort Zuid', NULL, '/SprintStad/images/facilities/bus.png', 725, 99, 0, 0, 0, 0),
+(18, 'Concurrentie HOV Bloemendaal', NULL, '/SprintStad/images/facilities/bus.png', 7825, 1043, 0, 0, 0, 0),
+(19, 'Factory Outlet Center', NULL, '/SprintStad/images/facilities/shopping.png', 0, 250, 625, 0, 0, 0);
 
 -- --------------------------------------------------------
 
