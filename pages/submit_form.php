@@ -778,9 +778,11 @@ function CalculateTotals($data)
 		// only do this when the station can actually accept more area
 		if ($row['def_area'] < $row['area'])
 		{
-			$fraction = 
-				(1 - $row['density_delta'] / $data['totals']['max_density_delta'] + 1 / $data['totals']['candidates']) + 
-				(1 - $row['povn_delta'] / $data['totals']['max_povn_delta'] + 1 / $data['totals']['candidates']);
+			$density_fraction = 0;
+			if ($data['totals']['max_density_delta'] > 0)
+				$density_fraction = (1 - $row['density_delta'] / $data['totals']['max_density_delta'] + 1 / $data['totals']['candidates']);
+			$povn_fraction = (1 - $row['povn_delta'] / $data['totals']['max_povn_delta'] + 1 / $data['totals']['candidates']);
+			$fraction = $density_fraction + $povn_fraction;
 			$data['entries'][$index]['fraction'] = $fraction;
 			$data['totals']['total_fraction'] += $fraction;
 		}

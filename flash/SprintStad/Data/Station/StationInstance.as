@@ -34,6 +34,9 @@
 		public var count_traveler_bonus:Number = 0;
 		public var count_citizen_bonus:Number = 0;
 		public var count_worker_bonus:Number = 0;
+		public var count_traveler_percent_bonus:Number = 0;
+		public var count_citizen_percent_bonus:Number = 0;
+		public var count_worker_percent_bonus:Number = 0;
 		
 		public function StationInstance() 
 		{}
@@ -201,10 +204,13 @@
 				count_traveler_bonus += round.traveler_bonus;
 				count_citizen_bonus += round.citizen_bonus;
 				count_worker_bonus += round.worker_bonus;
+				count_traveler_percent_bonus += round.traveler_percent_bonus;
+				count_citizen_percent_bonus += round.citizen_percent_bonus;
+				count_worker_percent_bonus += round.worker_percent_bonus;
 			}
 			
-			var citizens:Number = count_home_total * constants.average_citizens_per_home + count_citizen_bonus;
-			var workers:Number = count_worker_total + count_worker_bonus;
+			var citizens:Number = (count_home_total * constants.average_citizens_per_home + count_citizen_bonus) * (1 + count_citizen_percent_bonus / 100);
+			var workers:Number = (count_worker_total + count_worker_bonus) * (1 + count_worker_percent_bonus / 100);
 			IWD = (citizens + workers) / (area_cultivated_home + area_cultivated_work + area_cultivated_mixed + area_undeveloped_urban + area_undeveloped_rural);
 			MNG = Math.min(citizens, workers) / Math.max(citizens, workers) * 100;
 		}

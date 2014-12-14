@@ -1,0 +1,41 @@
+body
+{
+	background-color: #eef4f7;
+}
+
+h2
+{
+	font-weight: bold;
+	font-size: 18pt;
+}
+
+table
+{
+	margin: 20 auto 20 auto;
+	
+}
+
+th
+{
+	font-weight: bold;
+	text-align: center;
+	padding: 5;
+	border-bottom-width: 2px;
+}
+
+th.first-column
+{
+	border-right-width: 2px;
+}
+
+td
+{
+	padding: 5;
+	text-align: right;
+}
+
+td.first-column
+{
+	font-weight: bold;
+	border-right-width: 2px;
+}

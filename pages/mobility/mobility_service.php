@@ -508,23 +508,27 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 							(
 								(
 									(
-										Station.area_cultivated_home - 
 										(
-											SUM(Round.new_transform_area) 
-											* 
-											(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+											Station.area_cultivated_home - 
+											(
+												SUM(Round.new_transform_area) 
+												* 
+												(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+											)
 										)
-									)
-									* 
-									IFNULL(count_home_total / area_cultivated_home, 0)
+										* 
+										IFNULL(count_home_total / area_cultivated_home, 0)
+									) 
+									+ 
+									SUM(Program.area_home * TypesHome.area_density)
 								) 
-								+ 
-								SUM(Program.area_home * TypesHome.area_density)
-							) 
-							* 
-							Constants.average_citizens_per_home
-							+
-							IFNULL(SUM(Facility.citizens), 0)
+								* 
+								Constants.average_citizens_per_home
+								+
+								IFNULL(SUM(Facility.citizens), 0)
+							)
+							*
+							IFNULL(1 + SUM(Facility.citizens_percent) / 100, 1)
 						) 
 						* Constants.average_travelers_per_citizen
 					) 
@@ -533,20 +537,24 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 						(
 							(
 								(
-									Station.area_cultivated_work - 
 									(
-										SUM(Round.new_transform_area) 
-										* 
-										(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										Station.area_cultivated_work - 
+										(
+											SUM(Round.new_transform_area) 
+											* 
+											(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										)
 									)
-								)
-								* 
-								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
-							) 
-							+ 
-							SUM(Program.area_work * TypesWork.people_density)
-							+
-							IFNULL(SUM(Facility.workers), 0)
+									* 
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
+								) 
+								+ 
+								SUM(Program.area_work * TypesWork.people_density)
+								+
+								IFNULL(SUM(Facility.workers), 0)
+							)
+							*
+							IFNULL(1 + SUM(Facility.workers_percent) / 100, 1)
 						)
 						*
 						Constants.average_travelers_per_worker
@@ -575,6 +583,8 @@ function createTravelersTable($table_name, $nwval_table_initial, $nwval_table_cu
 					+
 					IFNULL(SUM(Facility.travelers), 0)
 				)
+				*
+				IFNULL(1 + SUM(Facility.travelers_percent) / 100, 1)
 			) AS basetravelers
 			FROM Constants, Station
 			INNER JOIN StationInstance ON Station.id = StationInstance.station_id 

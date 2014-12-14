@@ -214,7 +214,7 @@
 			return null;
 		}
 		
-		public static function GetInitialTravelerCount($station_id)
+		public static function getInitialTravelerCount($station_id)
 		{
 
 			if (isset($station_id))
@@ -237,6 +237,19 @@
 				return $db->getValue($result);
 			}
 			return null;
+		}
+		
+		public static function getInitialPOVN($station_id)
+		{
+			$db = Database::getDatabase();
+			$query = "
+				SELECT POVN
+				FROM Station
+				WHERE id = :station_id;";
+			$args = array('station_id' => $station_id);
+			$result = $db->query($query, $args);
+			return $db->getValue($result);
+			
 		}
 		
 		public static function getInitialPOVNByStationInstanceId($stationInstanceId)
@@ -1085,7 +1098,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Facility', array('id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers'), $id);
+			parent::__construct('Facility', array('id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers', 'citizens_percent', 'workers_percent', 'travelers_percent'), $id);
 		}
 		
 		public static function getAllFacilities()
