@@ -162,7 +162,8 @@
 				RoundInfo.number, RoundInfo.name, RoundInfo.description, 
 				RoundInfo.id AS round_info_id, 
 				RoundInstance.plan_program_id, RoundInstance.exec_program_id, RoundInstance.exec_program_id,
-				SUM(Facility.citizens) AS citizen_bonus, SUM(Facility.workers) AS worker_bonus, SUM(Facility.travelers) AS traveler_bonus, 
+				SUM(Facility.citizens) AS citizen_bonus, SUM(Facility.workers) AS worker_bonus, SUM(Facility.travelers) AS traveler_bonus,
+				SUM(Facility.travelers_percent) AS traveler_percent_bonus,
 				GROUP_CONCAT(Facility.id SEPARATOR ',') AS bonuses
 			FROM StationInstance 
 			INNER JOIN RoundInstance ON StationInstance.id = RoundInstance.station_instance_id 

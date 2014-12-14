@@ -1,9 +1,7 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
-CREATE SCHEMA IF NOT EXISTS `SprintCity` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
-USE `SprintCity` ;
 
 -- -----------------------------------------------------
 -- Table `Station`
@@ -177,8 +175,8 @@ CREATE  TABLE IF NOT EXISTS `Types` (
   `description` TEXT NULL ,
   `color` VARCHAR(6) NULL DEFAULT '000000' ,
   `image` TINYTEXT NULL ,
-  `area_density` FLOAT NOT NULL COMMENT 'Beeld wonen (wo/ha)\\nBeeld werken (bvo/ha)\\nBeeld leisure (bvo/ha)' ,
-  `people_density` FLOAT NOT NULL COMMENT 'Beeld wonen (wo/ha)\\nBeeld werken (werknemers/ha)\\nBeeld leisure (werknemers/ha)' ,
+  `area_density` FLOAT NOT NULL COMMENT 'Beeld wonen (wo/ha)\nBeeld werken (bvo/ha)\nBeeld leisure (bvo/ha)' ,
+  `people_density` FLOAT NOT NULL COMMENT 'Beeld wonen (wo/ha)\nBeeld werken (werknemers/ha)\nBeeld leisure (werknemers/ha)' ,
   `POVN` INT NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
@@ -667,9 +665,12 @@ CREATE  TABLE IF NOT EXISTS `Facility` (
   `name` TINYTEXT NULL ,
   `description` TEXT NULL ,
   `image` TINYTEXT NULL ,
-  `citizens` INT NULL ,
-  `workers` INT NULL ,
-  `travelers` INT NULL ,
+  `citizens` INT NULL DEFAULT 0 ,
+  `workers` INT NULL DEFAULT 0 ,
+  `travelers` INT NULL DEFAULT 0 ,
+  `citizens_percent` FLOAT NULL DEFAULT 0 ,
+  `workers_percent` FLOAT NULL DEFAULT 0 ,
+  `travelers_percent` FLOAT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 

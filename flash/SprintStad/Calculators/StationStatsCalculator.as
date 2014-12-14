@@ -47,21 +47,21 @@
 		public static function GetCitizenStats(stationInstance:StationInstance):int
 		{
 			var constants:Constants = Data.Get().GetConstants();
-			return int(stationInstance.count_home_total * constants.average_citizens_per_home + stationInstance.count_citizen_bonus);
+			return int((stationInstance.count_home_total * constants.average_citizens_per_home + stationInstance.count_citizen_bonus) * (1 + stationInstance.count_citizen_percent_bonus / 100));
 		}
 		
 		public static function GetWorkerStats(stationInstance:StationInstance):int
 		{
-			return int(stationInstance.count_worker_total + stationInstance.count_worker_bonus);
+			return int((stationInstance.count_worker_total + stationInstance.count_worker_bonus) * (1 + stationInstance.count_worker_percent_bonus / 100));
 		}
 		
 		public static function GetInitialTravelersStats(station:StationInstance):Number
 		{
 			var constants:Constants = Data.Get().GetConstants();
 			var result:Number = 
-				GetCitizenStats(station) * constants.average_travelers_per_citizen + 
+				(GetCitizenStats(station) * constants.average_travelers_per_citizen + 
 				GetWorkerStats(station) * constants.average_travelers_per_worker + 
-				station.count_traveler_bonus;
+				station.count_traveler_bonus) * (1 + station.count_traveler_percent_bonus / 100);
 			return result;
 		}
 		

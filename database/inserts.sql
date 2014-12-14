@@ -986,9 +986,9 @@ INSERT INTO `scenariostation` (`id`, `order`, `scenario_id`, `station_id`) VALUE
 -- -----------------------------------------------------
 -- Data for table `SprintStad`.`Facility`
 -- -----------------------------------------------------
-INSERT INTO `facility` (`id`, `name`, `description`, `image`, `citizens`, `workers`, `travelers`) VALUES 
-(1, 'Regionaal Ziekenhuis', NULL, '/SprintStad/images/facilities/hospital.png', 0, 2000, 1000),
-(2, 'Regionaal Opleidingcentrum', NULL, '/SprintStad/images/facilities/school.png', 0, 1140, 2000),
-(3, 'Randstedelijk Recreatievoorziening', NULL, '/SprintStad/images/facilities/recreation.png', 0, 40, 200),
-(4, 'IKEA vestiging', NULL, '/SprintStad/images/facilities/ikea.png', 0, 500, 500),
-(5, 'Hotel en conference centre', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 400, 800);
+INSERT INTO `facility` (`id`, `name`, `description`, `image`, `citizens`, `workers`, `travelers`, `citizens_percent`, `workers_percent`, `travelers_percent`) VALUES 
+(1, 'Regionaal Ziekenhuis', NULL, '/SprintStad/images/facilities/hospital.png', 0, 2000, 1000, 0, 0, 0),
+(2, 'Regionaal Opleidingcentrum', NULL, '/SprintStad/images/facilities/school.png', 0, 1140, 2000, 0, 0, 0),
+(3, 'Randstedelijk Recreatievoorziening', NULL, '/SprintStad/images/facilities/recreation.png', 0, 40, 200, 0, 0, 0),
+(4, 'IKEA vestiging', NULL, '/SprintStad/images/facilities/ikea.png', 0, 500, 500, 0, 0, 0),
+(5, 'Hotel en conference centre', NULL, '/SprintStad/images/facilities/hotelconference.png', 0, 400, 800, 0, 0, 0);

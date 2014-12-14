@@ -19,6 +19,9 @@ package SprintStad.Data.Facility
 		public var citizens:int = 0;
 		public var workers:int = 0;
 		public var travelers:int = 0;
+		public var citizens_percent:Number = 0;
+		public var workers_percent:Number = 0;
+		public var travelers_percent:Number = 0;
 		
 		private var loader:Loader = null;
 		

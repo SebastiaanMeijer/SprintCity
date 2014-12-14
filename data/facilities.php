@@ -9,7 +9,7 @@
 	function printFacilities()
 	{
 		$facility_fields = array(
-			'id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers'
+			'id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers', 'citizens_percent', 'workers_percent', 'travelers_percent'
 		);
 		
 		$facilities_result = getFacilities();

@@ -1098,7 +1098,7 @@
 	{
 		public function __construct($id = null)
 		{
-			parent::__construct('Facility', array('id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers'), $id);
+			parent::__construct('Facility', array('id', 'name', 'description', 'image', 'citizens', 'workers', 'travelers', 'citizens_percent', 'workers_percent', 'travelers_percent'), $id);
 		}
 		
 		public static function getAllFacilities()

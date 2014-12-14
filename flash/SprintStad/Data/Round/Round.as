@@ -17,6 +17,9 @@
 		public var citizen_bonus:int = 0;
 		public var worker_bonus:int = 0;
 		public var traveler_bonus:int = 0;
+		public var citizen_percent_bonus:Number = 0;
+		public var worker_percent_bonus:Number = 0;
+		public var traveler_percent_bonus:Number = 0;
 		public var bonuses:String = "";
 		
 		// game data

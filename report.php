@@ -62,60 +62,68 @@
 			(
 				(
 					(
-						Station.area_cultivated_home - 
 						(
-							SUM(Round.new_transform_area) 
-							* 
-							(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							Station.area_cultivated_home - 
+							(
+								SUM(Round.new_transform_area) 
+								* 
+								(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							)
 						)
-					)
-					* 
-					(count_home_total / area_cultivated_home)
+						* 
+						(count_home_total / area_cultivated_home)
+					) 
+					+ 
+					SUM(Program.area_home * TypesHome.area_density)
 				) 
+				* 
+				Constants.average_citizens_per_home
 				+ 
-				SUM(Program.area_home * TypesHome.area_density)
+				IFNULL(SUM(Facility.citizens), 0)
 			)
 			*
-			Constants.average_citizens_per_home
-			+
-			IFNULL(SUM(Facility.citizens), 0)
+			IFNULL(1 + SUM(Facility.citizens_percent) / 100, 1)
 		) AS CitizenCount,
 		(
 			(
 				(
 					(
-						Station.area_cultivated_work - 
 						(
-							SUM(Round.new_transform_area) 
-							* 
-							(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							Station.area_cultivated_work - 
+							(
+								SUM(Round.new_transform_area) 
+								* 
+								(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							)
 						)
-					)
-					* 
-					(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
-				) 
-				+ 
-				SUM(Program.area_work * TypesWork.people_density)
-			) 
-			+
-			(
+						* 
+						(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+					) 
+					+ 
+					SUM(Program.area_work * TypesWork.people_density)
+				)
+				+
 				(
 					(
-						Station.area_cultivated_mixed - 
 						(
-							SUM(Round.new_transform_area) 
-							* 
-							(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							Station.area_cultivated_mixed - 
+							(
+								SUM(Round.new_transform_area)
+								* 
+								(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+							)
 						)
-					)
-					* 
-					(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
-				) 
-				+ 
-				SUM(Program.area_leisure * TypesLeisure.people_density)
-			) 
-			+
-			IFNULL(SUM(Facility.workers), 0)
+						* 
+						(count_worker_total / (area_cultivated_work + area_cultivated_mixed))
+					) 
+					+ 
+					SUM(Program.area_leisure * TypesLeisure.people_density)
+				)
+				+
+				IFNULL(SUM(Facility.workers), 0)
+			)
+			*
+			IFNULL(1 + SUM(Facility.workers_percent) / 100, 1)
 		) AS WorkerCount,
 		RoundInstance.POVN AS Povn,
 		ROUND
@@ -126,84 +134,95 @@
 						(
 							(
 								(
-									Station.area_cultivated_home - 
+									(
+										(
+											Station.area_cultivated_home - 
+											(
+												SUM(Round.new_transform_area) 
+												* 
+												(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+											)
+										)
+										* 
+										IFNULL(count_home_total / area_cultivated_home, 0)
+									) 
+									+ 
+									SUM(Program.area_home * TypesHome.area_density)
+								) 
+								* 
+								Constants.average_citizens_per_home
+								+
+								IFNULL(SUM(Facility.citizens), 0)
+							)
+							*
+							IFNULL(1 + SUM(Facility.citizens_percent) / 100, 1)
+						) 
+						*
+						Constants.average_travelers_per_citizen
+					) 
+					+
+					(
+						(
+							(
+								(
+									(
+										Station.area_cultivated_work - 
+										(
+											SUM(Round.new_transform_area) 
+											* 
+											(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										)
+									)
+									* 
+									IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
+								) 
+								+ 
+								SUM(Program.area_work * TypesWork.people_density)
+								+
+								IFNULL(SUM(Facility.workers), 0)
+							)
+							*
+							IFNULL(1 + SUM(Facility.workers_percent) / 100, 1)
+						) 
+						*
+						Constants.average_travelers_per_worker
+					)
+					+
+					(
+						(
+							(
+								(
+									Station.area_cultivated_mixed - 
 									(
 										SUM(Round.new_transform_area) 
 										* 
-										(transform_area_cultivated_home / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
+										(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
 									)
 								)
 								* 
-								IFNULL(count_home_total / area_cultivated_home, 0)
+								IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
 							) 
 							+ 
-							SUM(Program.area_home * TypesHome.area_density)
+							SUM(Program.area_leisure * TypesLeisure.people_density)
 						) 
-						* 
-						Constants.average_citizens_per_home
-						+
-						IFNULL(SUM(Facility.citizens), 0)
-					) 
-					* Constants.average_travelers_per_citizen
-				) 
-				+
-				(
-					(
-						(
-							(
-								Station.area_cultivated_work - 
-								(
-									SUM(Round.new_transform_area) 
-									* 
-									(transform_area_cultivated_work / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-								)
-							)
-							* 
-							IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
-						) 
-						+ 
-						SUM(Program.area_work * TypesWork.people_density)
-						+
-						IFNULL(SUM(Facility.workers), 0)
+						*
+						Constants.average_travelers_per_worker
 					)
-					*
-					Constants.average_travelers_per_worker
+					+
+					IFNULL(SUM(Facility.travelers), 0)
 				)
-				+
+				*
+				IFNULL
 				(
-					(
-						(
-							(
-								Station.area_cultivated_mixed - 
-								(
-									SUM(Round.new_transform_area) 
-									* 
-									(transform_area_cultivated_mixed / (transform_area_cultivated_home + transform_area_cultivated_work + transform_area_cultivated_mixed + transform_area_undeveloped_urban + transform_area_undeveloped_rural))
-								)
-							)
-							* 
-							IFNULL(count_worker_total / (area_cultivated_work + area_cultivated_mixed), 0)
-						) 
-						+ 
-						SUM(Program.area_leisure * TypesLeisure.people_density)
-					) 
-					*
-					Constants.average_travelers_per_worker
+					(RoundInstance2.POVN - StationInstance.initial_POVN) 
+					/ 
+					StationInstance.initial_POVN 
+					/
+					IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
+					+ 1
+					, 1
 				)
-				+
-				IFNULL(SUM(Facility.travelers), 0)
-			)
-			*
-			IFNULL
-			(
-				(RoundInstance2.POVN - StationInstance.initial_POVN) 
-				/ 
-				StationInstance.initial_POVN 
-				/
-				IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 5, 20, IF((RoundInstance2.POVN - StationInstance.initial_POVN) / StationInstance.initial_POVN > 1, 15, 10))
-				+ 1
-				, 1
-			)
+			) * IFNULL(1 + SUM(Facility.travelers_percent) / 100, 1)
 		) AS TravelerCount
 	FROM Constants, Station
 	INNER JOIN StationInstance ON Station.id = StationInstance.station_id 
