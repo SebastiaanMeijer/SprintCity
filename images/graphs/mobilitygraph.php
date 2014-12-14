@@ -17,9 +17,15 @@ require_once('linegraph.php');
 	
 	$povnData = LoadPOVNData($gameId, $stationId);
 	$travelerData = LoadTravelerData($gameId, $stationId);
+	$initTravelerCount = Station::getInitialTravelerCount($_REQUEST['station']);
 	
-	if (count($povnData) == 0)
+	if (!isset($povnData))
 		$povnData = array(0);
+	
+	if (isset($travelerData))
+		array_unshift($travelerData, $initTravelerCount);
+	else
+		$travelerData = array($initTravelerCount);
 	
 	// Get min/max values
 	$povnMinMax = array_merge(LoadInitPOVNMinMax(), LoadPOVNDataMinMax($gameId));
