@@ -13,14 +13,11 @@ package SprintStad.Drawer
 	// for now just a container that may contain graphs
 	public class LineGraphDrawer 
 	{
-		private var parent:Sprite;
 		private var spaceGraphs:Array = new Array();
 		private var mobilityGraphs:Array = new Array();
 		
-		public function LineGraphDrawer(parent:Sprite) 
+		public function LineGraphDrawer() 
 		{
-			this.parent = parent;
-			
 			var stations:Stations = Data.Get().GetStations();
 			
 			LoadGraphs(stations);
@@ -38,21 +35,21 @@ package SprintStad.Drawer
 			}
 		}
 		
-		private function RemoveAllChildren():void
+		private function RemoveAllChildren(parent:MovieClip):void
 		{
 			while (parent.numChildren > 0)
 				parent.removeChildAt(0);
 		}
 		
-		public function DrawSpaceGraph(stationID:int):void
+		public function DrawSpaceGraph(parent:MovieClip, stationID:int):void
 		{
-			RemoveAllChildren();
+			RemoveAllChildren(parent);
 			parent.addChild(spaceGraphs[stationID]);
 		}
 		
-		public function DrawMobilityGraph(stationID:int):void
+		public function DrawMobilityGraph(parent:MovieClip, stationID:int):void
 		{
-			RemoveAllChildren();
+			RemoveAllChildren(parent);
 			parent.addChild(mobilityGraphs[stationID]);
 		}
 	}

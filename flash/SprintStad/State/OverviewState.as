@@ -131,7 +131,7 @@
 				
 				// only initially load lineGraphDrawer, otherwise this is done in OnLoadingCurrentRoundDone()
 				if (lineGraphDrawer == null)
-					lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+					lineGraphDrawer = new LineGraphDrawer();
 				
 				// station buttons
 				for (var i:int = 0; i < stations.GetStationCount(); i++)
@@ -425,9 +425,9 @@
 			Debug.out("Refreshing Line Graphs, stationID:" + station.id);
 			try {
 				if (currentMode == OverviewState.SPACE_MODE)
-					lineGraphDrawer.DrawSpaceGraph(station.id);
+					lineGraphDrawer.DrawSpaceGraph(parent.overview_movie.lineGraphContainer, station.id);
 				else if (currentMode == OverviewState.MOBILITY_MODE)
-					lineGraphDrawer.DrawMobilityGraph(station.id);
+					lineGraphDrawer.DrawMobilityGraph(parent.overview_movie.lineGraphContainer, station.id);
 			}
 			catch (e:Error)
 			{
@@ -759,7 +759,7 @@
 			{
 				DataLoader.Get().AddJob(DataLoader.DATA_STATIONS, OnLoadingDone);
 				DataLoader.Get().AddJob(DataLoader.DATA_MOBILITY_REPORT, OnLoadingDone);
-				lineGraphDrawer = new LineGraphDrawer(Sprite(parent.overview_movie.lineGraphContainer));
+				lineGraphDrawer = new LineGraphDrawer();
 				targetLoadCount += 2;
 			}
 			// only load values if -in- or -just out of- masterplan phase
