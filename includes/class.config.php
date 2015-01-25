@@ -15,7 +15,7 @@
         // Add your server hostnames to the appropriate arrays. ($_SERVER['HTTP_HOST'])
         private $productionServers = array();
         private $stagingServers    = array();
-        private $localServers      = array('localhost');
+        private $localServers      = array('localhost', '/^127\.0\.0\.1$/',);
 
         // Standard Config Options...
 
